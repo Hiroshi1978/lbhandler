@@ -3,7 +3,7 @@ lbhandler
 
 We aim to offer libraries that makes it easier to handle resources of some web services including AWS Elastic Load Balancing (ELB), Cloudn Load Balancing Advanced (LBA), and construct your application.
 
-The sample code below uses an implementation that communicates with ELB API or the corresponding one of LBA.
+The sample code below uses an implementation that communicates with ELB by its API's or with LBA by its corresponding ones.
 
 ### How to create new load balancer ?
 
