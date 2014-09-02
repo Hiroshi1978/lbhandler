@@ -21,6 +21,8 @@ import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerListe
 import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DeregisterInstancesFromLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DeregisterInstancesFromLoadBalancerResult;
+import com.amazonaws.services.elasticloadbalancing.model.DescribeInstanceHealthRequest;
+import com.amazonaws.services.elasticloadbalancing.model.DescribeInstanceHealthResult;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersResult;
 import com.amazonaws.services.elasticloadbalancing.model.DetachLoadBalancerFromSubnetsRequest;
@@ -60,7 +62,25 @@ public class AWSElasticLoadBalancing implements VendorWebService{
         String awsKey = conf.getProperty("aws.key");
         String secretKey = conf.getProperty("aws.secret");
         AWSCredentials credentials = new BasicAWSCredentials(awsKey,secretKey);
+        
         awsHttpClient = new AmazonElasticLoadBalancingClient(credentials);
+    }
+    
+    private void setUpHttpClient(AmazonElasticLoadBalancingClient awsELBClient){
+
+        Properties conf = new Properties();
+        try {
+            conf.load(this.getClass().getResourceAsStream("./httpclient_config.txt"));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        String endpoint = conf.getProperty("endpoint");
+        String serviceName = conf.getProperty("servicename");
+        String regionName = conf.getProperty("region");
+        
+        awsELBClient.setEndpoint(endpoint, serviceName, regionName);
+        awsELBClient.setServiceNameIntern(serviceName);
     }
     
     public static AWSElasticLoadBalancing create(){
@@ -447,6 +467,52 @@ public class AWSElasticLoadBalancing implements VendorWebService{
         
         return result.getLoadBalancerDescriptions();
     }
+    
+    public DescribeInstanceHealthResult describeInstanceHealth(DescribeInstanceHealthRequest request){
 
+        if(request == null)
+            throw new IllegalArgumentException("Invalid request."); 
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load Balancer Name not specified."); 
+
+        return awsHttpClient.describeInstanceHealth(request);
+    }
+
+    public DescribeInstanceHealthResult describeInstanceHealth(String loadBalancerName){
+        
+        if(loadBalancerName == null || loadBalancerName.isEmpty())
+            throw new IllegalArgumentException("Load Balancer Name not specified."); 
+
+        DescribeInstanceHealthRequest request = new DescribeInstanceHealthRequest(loadBalancerName);
+        return awsHttpClient.describeInstanceHealth(request);
+    }
+
+    public DescribeInstanceHealthResult describeInstanceHealth(String loadBalancerName, List<Instance> instances){
+        
+        if(loadBalancerName == null || loadBalancerName.isEmpty())
+            throw new IllegalArgumentException("Load Balancer Name not specified."); 
+        if(instances == null || instances.isEmpty())
+            throw new IllegalArgumentException("Load Balancer Name not specified."); 
+
+        DescribeInstanceHealthRequest request = new DescribeInstanceHealthRequest(loadBalancerName);
+        request.setInstances(instances);
+        
+        return awsHttpClient.describeInstanceHealth(request);
+    }
+
+    public DescribeInstanceHealthResult describeInstanceHealth(String loadBalancerName, Instance instance){
+        
+        if(loadBalancerName == null || loadBalancerName.isEmpty())
+            throw new IllegalArgumentException("Load Balancer Name not specified."); 
+        
+        DescribeInstanceHealthRequest request = new DescribeInstanceHealthRequest(loadBalancerName);
+        if(instance != null){
+            List<Instance> instances = new ArrayList<>();
+            instances.add(instance);
+            request.setInstances(instances);
+        }
+        
+        return awsHttpClient.describeInstanceHealth(request);
+    }
 
 }
