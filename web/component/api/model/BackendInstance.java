@@ -12,4 +12,13 @@ package web.component.api.model;
  */
 public interface BackendInstance {
     
+    /**
+     * Returns instance of load balancer with which this backend instance is registered.
+     * If this backend instances is not registered with any load balancer, this method returns null.
+     * @return instance of LoadBalancer or null.
+     */
+    public LoadBalancer getLoadBalancer();
+    public String getId();
+    public void registerToLoadBalancer(LoadBalancer lb);
+    public void deregisterFromLoadBalancer(LoadBalancer lb);
 }
