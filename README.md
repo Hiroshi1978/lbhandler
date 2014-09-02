@@ -34,7 +34,7 @@ If you need secure system with port 443, then this will go.
 ```java
 
     LoadBalancer lb = new YourImplClass.Builder("MyFirstLoadBalancer")
-                    .defaultHttpsListener("you-registered-certificate-id")
+                    .defaultHttpsListener("your-registered-certificate-id")
                     .build();
 
 ```
