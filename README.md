@@ -75,3 +75,8 @@ And the result may be like this.
     Self Introduction : 'I'm very dilligent !'
      ------------------------ 
 
+
+### Dependency
+
+Our library has some implementation that works with AWS. Please check the classes in web.component.impl.awselb packages for such codes. Those classes needs AWS SDK for Java. It is neseccary for path to JAR files that contain the SDK to be included in your class path.
+You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforjava/).
