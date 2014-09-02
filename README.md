@@ -81,3 +81,8 @@ And the result may be like this.
 
 Our library has some implementation that works with AWS. Please check the classes in [web.component.impl.awselb packages](https://github.com/Hiroshi1978/lbhandler/tree/master/web/component/impl/awselb) for such codes. Those classes needs AWS SDK for Java. It is neseccary for paths to JAR files that contain the SDK to be included in your class path.
 You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforjava/).
+
+### Want to learn ELB or LBA ?
+
+[Elastic Load Balancing](http://aws.amazon.com/jp/elasticloadbalancing/)
+[Cloudn Load Balancing Advanced (LBA)](http://www.ntt.com/cloudn/data/lba.html)
