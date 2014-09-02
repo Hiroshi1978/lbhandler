@@ -62,7 +62,7 @@ public class AWSElasticLoadBalancing implements VendorWebService{
         String awsKey = conf.getProperty("aws.key");
         String secretKey = conf.getProperty("aws.secret");
         AWSCredentials credentials = new BasicAWSCredentials(awsKey,secretKey);
-        
+    	
         awsHttpClient = new AmazonElasticLoadBalancingClient(credentials);
     }
     
@@ -491,11 +491,10 @@ public class AWSElasticLoadBalancing implements VendorWebService{
         
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
-        if(instances == null || instances.isEmpty())
-            throw new IllegalArgumentException("Load Balancer Name not specified."); 
-
+        
         DescribeInstanceHealthRequest request = new DescribeInstanceHealthRequest(loadBalancerName);
-        request.setInstances(instances);
+        if(instances != null)
+            request.setInstances(instances);
         
         return awsHttpClient.describeInstanceHealth(request);
     }
