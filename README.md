@@ -86,5 +86,4 @@ You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforja
 ### Want to learn ELB or LBA ?
 
  * [Elastic Load Balancing](http://aws.amazon.com/jp/elasticloadbalancing/)
-
  * [Cloudn Load Balancing Advanced (LBA)](http://www.ntt.com/cloudn/data/lba.html)
