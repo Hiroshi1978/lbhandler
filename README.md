@@ -24,7 +24,7 @@ Or, if you use VPC,
 
     LoadBalancer lb = new YourImplClass.Builder("MyFirstLoadBalancer")
                     .defaultHttpListener()
-                    .subnets("your-subnet-id")
+                    .subnet("your-subnet-id")
                     .build();
 
 ```
