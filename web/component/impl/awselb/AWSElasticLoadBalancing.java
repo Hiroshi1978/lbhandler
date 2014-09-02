@@ -426,19 +426,27 @@ public class AWSElasticLoadBalancing implements VendorWebService{
 
     public LoadBalancerDescription getLoadBalancerDescription(String loadBalancerName){
 
+        List<String> loadBalancerNames = new ArrayList<>();
+        loadBalancerNames.add(loadBalancerName);
+        return this.getLoadBalancerDescriptions(loadBalancerNames).get(0);
+        
+    }
+
+    public List<LoadBalancerDescription> getLoadBalancerDescriptions(List<String> loadBalancerNames){
+
         DescribeLoadBalancersResult result = null;
         
         try{
-             result =  this.describeLoadBalancers(loadBalancerName);
+             result =  this.describeLoadBalancers(loadBalancerNames);
         }catch(AmazonServiceException ase){
             System.out.println(ase.getMessage());
         }
         
         if(result == null)
-            return new LoadBalancerDescription();
+            return new ArrayList<>();
         
-        List<LoadBalancerDescription> descriptions = result.getLoadBalancerDescriptions();
-        return descriptions.isEmpty() ? new LoadBalancerDescription() : descriptions.get(0);
+        return result.getLoadBalancerDescriptions();
     }
+
 
 }
