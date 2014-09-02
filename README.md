@@ -29,6 +29,16 @@ Or, if you use VPC,
 
 ```
 
+If you need secure system with port 443, then this will go.
+
+```java
+
+    LoadBalancer lb = new YourImplClass.Builder("MyFirstLoadBalancer")
+                    .defaultHttpsListener("you-registered-certificate-id")
+                    .build();
+
+```
+
 ### How to get information about the created load balancer ?
 
 For example, you may extract some information about your load balancer in this way.
