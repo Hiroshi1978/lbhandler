@@ -13,6 +13,18 @@ Maybe you can write like this.
 
     LoadBalancer lb = new YourImplClass.Builder("MyFirstLoadBalancer")
                     .defaultHttpListener()
+                    .zones("availability-zone-name")
+                    .build();
+
+```
+
+Or, if you use VPC,
+
+```java
+
+    LoadBalancer lb = new YourImplClass.Builder("MyFirstLoadBalancer")
+                    .defaultHttpListener()
+                    .subnets("your-subnet-id")
                     .build();
 
 ```
