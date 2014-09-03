@@ -66,5 +66,6 @@ public interface LoadBalancer {
     public String getName();
     public List<LoadBalancerListener> getListeners();
     public List<Zone> getZones();
-    public List<Subnet> getSubnets();        
+    public List<Subnet> getSubnets(); 
+    public List<BackendInstance> getBackendInstances();
 }
