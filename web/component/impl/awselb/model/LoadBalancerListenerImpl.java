@@ -8,6 +8,7 @@ package web.component.impl.awselb.model;
 
 import com.amazonaws.services.elasticloadbalancing.model.Listener;
 import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
+import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
 
 /**
@@ -16,6 +17,8 @@ import web.component.api.model.LoadBalancerListener;
  */
 public class LoadBalancerListenerImpl extends Listener implements LoadBalancerListener{
 
+    private LoadBalancer lb;
+    
     LoadBalancerListenerImpl(){
         
     }
@@ -70,6 +73,16 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     @Override
     public void setServerCertificate(String serverCertificateId){
         super.setSSLCertificateId(serverCertificateId);
+    }
+
+    @Override
+    public LoadBalancer getLoadBalancer() {
+        return this.lb;
+    }
+
+    @Override
+    public void deleteFromLoadBalancer() {
+        this.lb.deleteListener(this);
     }
     
 }

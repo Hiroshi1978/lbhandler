@@ -20,4 +20,7 @@ public interface LoadBalancerListener {
     public String getInstanceProtocol();
     public String getServiceProtocol();
     public void setServerCertificate(String serverCertificateId);
+    
+    public LoadBalancer getLoadBalancer();
+    public void deleteFromLoadBalancer();
 }
