@@ -21,4 +21,5 @@ public interface BackendInstance {
     public String getId();
     public void register(LoadBalancer lb);
     public void deregister();
+    public BackendInstanceState getBackendInstanceState();
 }

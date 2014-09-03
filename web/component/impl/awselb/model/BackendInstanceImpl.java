@@ -47,4 +47,8 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
             lb.deregisterInstance(this);
     }
 
+    @Override
+    public BackendInstanceState getBackendInstanceState(){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
