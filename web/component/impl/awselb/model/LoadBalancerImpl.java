@@ -31,10 +31,10 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     private static final AWSElasticLoadBalancing elb = AWSElasticLoadBalancing.create();
     private final String name;
-    private final List<LoadBalancerListener> listeners;
-    private List<Zone> zones;
-    private List<Subnet> subnets;
-    private List<BackendInstance> backendInstances;
+    private final List<LoadBalancerListener> listeners = new ArrayList<>();
+    private final List<Zone> zones = new ArrayList<>();
+    private final List<Subnet> subnets = new ArrayList<>();
+    private final List<BackendInstance> backendInstances = new ArrayList<>();
     
     private volatile boolean started;
     private volatile boolean destroyed;
@@ -43,15 +43,15 @@ public class LoadBalancerImpl implements LoadBalancer{
         
         this.name = builder.name;
 
-        List<Listener> lbaListeners = new ArrayList<>();
+        List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener listener : builder.listeners){
             if(listener instanceof LoadBalancerListenerImpl){
-                lbaListeners.add((Listener) listener);
+                elbListeners.add((Listener) listener);
             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
         }
-        this.listeners = builder.listeners;
+        this.listeners.addAll(builder.listeners);
         
         List<AvailabilityZone> availabilityZones = new ArrayList<>();
         if(builder.zones != null){
@@ -63,24 +63,24 @@ public class LoadBalancerImpl implements LoadBalancer{
                 }
             }
         }
-        this.zones = builder.zones;
+        this.zones.addAll(builder.zones);
         
         List<String> subnetIds = new ArrayList<>();
         if(builder.subnets != null){
             for(Subnet subnet : builder.subnets){
                 if(subnet instanceof SubnetImpl){
-                    subnetIds.add(subnet.getSubnetId());
+                    subnetIds.add(subnet.getId());
                 }else{
                     throw new IllegalArgumentException("Invalid subnets specified.");
                 }
             }
         }
-        this.subnets = builder.subnets;
+        this.subnets.addAll(builder.subnets);
         
         if(this.zones != null && !this.zones.isEmpty()){
-            elb.createLoadBalancerWithAvailabilityZones(name, lbaListeners, availabilityZones);
+            elb.createLoadBalancerWithAvailabilityZones(name, elbListeners, availabilityZones);
         }else if(this.subnets != null && !this.subnets.isEmpty()){
-            elb.createLoadBalancerWithSubnets(name, lbaListeners, subnetIds);
+            elb.createLoadBalancerWithSubnets(name, elbListeners, subnetIds);
         }else{
             throw new IllegalArgumentException("Either zones or subnets must be specified.");
         }
@@ -94,7 +94,7 @@ public class LoadBalancerImpl implements LoadBalancer{
             throw new IllegalArgumentException("Load balancer listeners not specified.");
         
         this.name = name;
-        this.listeners = listeners;
+        this.listeners.addAll(listeners);
     }
     
     /**
@@ -123,28 +123,28 @@ public class LoadBalancerImpl implements LoadBalancer{
      */
     @Override
     public void createListeners(List<LoadBalancerListener> listeners) {
-        List<Listener> lbaListeners = new ArrayList<>();
+        List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener listener : listeners){
             if(listener instanceof LoadBalancerListenerImpl){
-                lbaListeners.add((Listener)listener);
+                elbListeners.add((Listener)listener);
             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
         }
-        elb.createLoadBalancerListeners(name,lbaListeners);
+        elb.createLoadBalancerListeners(name,elbListeners);
     }
 
     @Override
     public void deleteListeners(List<LoadBalancerListener> listeners) {
-        List<Listener> lbaListeners = new ArrayList<>();
+        List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener listener : listeners){
             if(listener instanceof LoadBalancerListenerImpl){
-                lbaListeners.add((Listener)listener);
+                elbListeners.add((Listener)listener);
             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
         }
-        elb.deleteLoadBalancerListeners(name,lbaListeners);
+        elb.deleteLoadBalancerListeners(name,elbListeners);
     }
 
     @Override
@@ -162,43 +162,46 @@ public class LoadBalancerImpl implements LoadBalancer{
     }
 
     @Override
-    public void registerInstances(List<BackendInstance> instances) {
-        List<Instance> lbaInstances = new ArrayList<>();
-        for(BackendInstance instance : instances){
-            if(instance instanceof BackendInstanceImpl){
-                lbaInstances.add((Instance)instance);
+    public void registerInstances(List<BackendInstance> newBackendInstances) {
+        List<Instance> elbInstances = new ArrayList<>();
+        for(BackendInstance newBackendInstance : newBackendInstances){
+            if(newBackendInstance instanceof BackendInstanceImpl){
+                elbInstances.add((Instance)newBackendInstance);
             }else{
                 throw new IllegalArgumentException("Invalid instances specified.");
             }
         }
-        elb.registerInstancesWithLoadBalancer(name, lbaInstances);
+        elb.registerInstancesWithLoadBalancer(name, elbInstances);
+        //this operation has to be modified because it can add duplicate element to the list.
+        backendInstances.addAll(newBackendInstances);
     }
 
     @Override
-    public void deregisterInstances(List<BackendInstance> instances) {
-        List<Instance> lbaInstances = new ArrayList<>();
-        for(BackendInstance instance : instances){
-            if(instance instanceof BackendInstanceImpl){
-                lbaInstances.add((Instance)instance);
+    public void deregisterInstances(List<BackendInstance> instancesToDelete) {
+        List<Instance> elbInstances = new ArrayList<>();
+        for(BackendInstance instanceToDelete : instancesToDelete){
+            if(instanceToDelete instanceof BackendInstanceImpl){
+                elbInstances.add((Instance)instanceToDelete);
             }else{
                 throw new IllegalArgumentException("Invalid instances specified.");
             }
         }
-        elb.deregisterInstancesFromLoadBalancer(name, lbaInstances);
+        elb.deregisterInstancesFromLoadBalancer(name, elbInstances);
+        backendInstances.removeAll(instancesToDelete);
     }
 
     @Override
-    public void registerInstance(BackendInstance instance) {
-        List<BackendInstance> instances = new ArrayList<>();
-        instances.add(instance);
-        this.registerInstances(instances);
+    public void registerInstance(BackendInstance newBackendInstance) {
+        List<BackendInstance> newBackendInstances = new ArrayList<>();
+        newBackendInstances.add(newBackendInstance);
+        this.registerInstances(newBackendInstances);
     }
 
     @Override
-    public void deregisterInstance(BackendInstance instance) {
-        List<BackendInstance> instances = new ArrayList<>();
-        instances.add(instance);
-        this.deregisterInstances(instances);
+    public void deregisterInstance(BackendInstance instanceToDelete) {
+        List<BackendInstance> instancesToDelete = new ArrayList<>();
+        instancesToDelete.add(instanceToDelete);
+        this.deregisterInstances(instancesToDelete);
     }
 
     @Override

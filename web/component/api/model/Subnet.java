@@ -11,5 +11,5 @@ package web.component.api.model;
  * @author Hiroshi
  */
 public interface Subnet {
-    public String getSubnetId();
+    public String getId();
 }

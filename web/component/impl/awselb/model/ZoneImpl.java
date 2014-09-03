@@ -15,18 +15,18 @@ import web.component.api.model.Zone;
  */
 public class ZoneImpl extends AvailabilityZone implements Zone{
     
-    private final String zoneName;
+    private final String name;
     
-    private ZoneImpl(String zoneName){
-        this.zoneName = zoneName;
+    private ZoneImpl(String name){
+        this.name = name;
     }
     
-    public static Zone create(String zoneName){
-        return new ZoneImpl(zoneName);
+    public static Zone create(String name){
+        return new ZoneImpl(name);
     }
     
     @Override
-    public String getZoneName(){
-        return this.zoneName;
+    public String getName(){
+        return name;
     }
 }

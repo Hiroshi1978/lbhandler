@@ -81,9 +81,9 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     }
 
     @Override
-    public void deleteFromLoadBalancer() {
+    public void delete() {
         if(lb != null )
-            this.lb.deleteListener(this);
+            lb.deleteListener(this);
     }
     
 }

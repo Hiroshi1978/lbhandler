@@ -22,5 +22,5 @@ public interface LoadBalancerListener {
     public void setServerCertificate(String serverCertificateId);
     
     public LoadBalancer getLoadBalancer();
-    public void deleteFromLoadBalancer();
+    public void delete();
 }

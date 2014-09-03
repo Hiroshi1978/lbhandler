@@ -14,15 +14,15 @@ import web.component.api.model.Subnet;
  */
 public class SubnetImpl implements Subnet{
 
-    private final String subnetId;
+    private final String id;
     
-    private SubnetImpl(String subnetId){
-        this.subnetId = subnetId;
+    private SubnetImpl(String id){
+        this.id = id;
     }
     
     @Override
-    public String getSubnetId() {
-        return this.subnetId;
+    public String getId() {
+        return id;
     }
     
     public static Subnet create(String id){

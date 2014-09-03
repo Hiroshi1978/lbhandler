@@ -14,7 +14,7 @@ public interface BackendInstance {
     
     /**
      * Returns instance of load balancer with which this backend instance is registered.
-     * If this backend instances is not registered with any load balancer, this method returns null.
+     * If this backend instance is not registered with any load balancer, this method returns null.
      * @return instance of LoadBalancer or null.
      */
     public LoadBalancer getLoadBalancer();

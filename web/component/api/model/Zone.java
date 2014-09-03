@@ -11,5 +11,5 @@ package web.component.api.model;
  * @author Hiroshi
  */
 public interface Zone {
-    public String getZoneName();
+    public String getName();
 }
