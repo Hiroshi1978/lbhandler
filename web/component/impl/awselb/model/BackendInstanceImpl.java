@@ -34,7 +34,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     }
 
     @Override
-    public void registerToLoadBalancer(LoadBalancer newLb) {
+    public void register(LoadBalancer newLb) {
         if(lb == null || !lb.equals(newLb)){
             newLb.registerInstance(this);
             lb = newLb;
@@ -42,11 +42,9 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     }
 
     @Override
-    public void deregisterFromLoadBalancer(LoadBalancer lb) {
-        if(this.lb != null && this.lb.equals(lb)){
-            this.lb.deregisterInstance(this);
-        }
-        
+    public void deregister() {
+        if(lb != null)
+            lb.deregisterInstance(this);
     }
 
 }
