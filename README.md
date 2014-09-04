@@ -100,7 +100,7 @@ Or, you can do the same thing in this way also.
 
 ```
 
-For checking the states of the server,
+For checking the state of the server,
 
 ```java
 
