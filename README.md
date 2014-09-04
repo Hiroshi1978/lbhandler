@@ -135,5 +135,5 @@ To inspect the source codes, visit [Github AWS SDK for Java](https://github.com/
 
 ### Want to learn ELB or LBA ?
 
- * [Elastic Load Balancing](http://aws.amazon.com/jp/elasticloadbalancing/)
+ * [Amazon Elastic Load Balancing](http://aws.amazon.com/jp/elasticloadbalancing/)
  * [Cloudn Load Balancing Advanced (LBA)](http://www.ntt.com/cloudn/data/lba.html)
