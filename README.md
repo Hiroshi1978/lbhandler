@@ -100,6 +100,16 @@ Or, you can do the same thing in this way also.
 
 ```
 
+For checking the states of the server,
+
+```java
+
+    BackendInstanceState state = myWebServerNo1.getBackendInstanceState();
+    System.out.println("Service state : " + state.getState() + " Reason code : " + state.getReasonCode());
+    
+```
+
+
 Then, if you want to deregister them,
 
 ```java
