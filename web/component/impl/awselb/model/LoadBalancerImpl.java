@@ -169,14 +169,15 @@ public class LoadBalancerImpl implements LoadBalancer{
         List<Instance> elbInstances = new ArrayList<>();
         for(BackendInstance newBackendInstance : newBackendInstances){
             if(newBackendInstance instanceof BackendInstanceImpl){
-                elbInstances.add((Instance)newBackendInstance);
+                if(!backendInstances.contains(newBackendInstance)){
+                    backendInstances.add(newBackendInstance);
+                    elbInstances.add((Instance)newBackendInstance);
+                }
             }else{
                 throw new IllegalArgumentException("Invalid instances specified.");
             }
         }
         elb.registerInstancesWithLoadBalancer(name, elbInstances);
-        //this operation has to be modified because it can add duplicate element to the list.
-        backendInstances.addAll(newBackendInstances);
     }
 
     @Override
