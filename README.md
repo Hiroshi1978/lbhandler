@@ -75,7 +75,7 @@ And the result may be like this.
      ------------------------ 
 
 
-### Register Your web servers with the load balancer.
+### Let's register your web servers with the load balancer.
 
 It's very simple.
 
@@ -98,6 +98,23 @@ Or, you can do the same thing in this way also.
     myWebServerNo1.register(lb);
     myWebServerNo2.register(lb);
 
+```
+
+Then, if you want to deregister them,
+
+```java
+
+    lb.deregisterInstances(myWebServers);
+    
+```
+
+And again, this is as good.
+
+```java
+
+    myWebServerNo1.deregister();
+    myWebServerNo2.deregister();
+    
 ```
 
 ### Dependency
