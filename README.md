@@ -75,6 +75,31 @@ And the result may be like this.
      ------------------------ 
 
 
+### Register Your web servers with the load balancer.
+
+It's very simple.
+
+```java
+
+    BackendInstance myWebServerNo1 = BackendInstanceImpl.create("id-of-you-web-server-no-1");
+    BackendInstance myWebServerNo2 = BackendInstanceImpl.create("id-of-you-web-server-no-2");
+    
+    List<BackendInstance> myWebServers = new ArrayList<>();
+    myWebServers.add(myWebServerNo1);
+    myWebServers.add(myWebServerNo2);
+    lb.registerInstances(myWebServers);
+
+```
+
+Or, you can do the same thing in this way also.
+
+```java
+
+    myWebServerNo1.register(lb);
+    myWebServerNo2.register(lb);
+
+```
+
 ### Dependency
 
 Our library has some implementation that works with AWS. Please check the classes in [web.component.impl.awselb packages](https://github.com/Hiroshi1978/lbhandler/tree/master/web/component/impl/awselb) for such codes. Those classes needs AWS SDK for Java. It is necessary for paths to the JAR files that contain SDK to be included in your class path.
