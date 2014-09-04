@@ -79,7 +79,7 @@ And the result may be like this.
 
 Our library has some implementation that works with AWS. Please check the classes in [web.component.impl.awselb packages](https://github.com/Hiroshi1978/lbhandler/tree/master/web/component/impl/awselb) for such codes. Those classes needs AWS SDK for Java. It is necessary for paths to the JAR files that contain SDK to be included in your class path.
 You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforjava/).
-
+To inspect the source code, visit [Github AWS SDK for Java](https://github.com/aws/aws-sdk-java).
 
 ### Want to learn ELB or LBA ?
 
