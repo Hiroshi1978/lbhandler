@@ -57,9 +57,15 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     }
 
     @Override
-    public void deregister() {
-        if(lb != null)
-            lb.deregisterInstance(this);
+    public LoadBalancer deregister() {
+        
+        if(lb == null)
+            return null;
+        
+        lb.deregisterInstance(this);
+        LoadBalancer deregisteredFrom = lb;
+        lb = null;
+        return deregisteredFrom;
     }
 
     @Override

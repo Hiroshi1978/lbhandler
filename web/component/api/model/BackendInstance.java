@@ -20,6 +20,12 @@ public interface BackendInstance {
     public LoadBalancer getLoadBalancer();
     public String getId();
     public void register(LoadBalancer lb);
-    public void deregister();
+    
+    /*
+    * If this backend instance is registered with any load balancer, deregistered from it
+    * and return the instance of the load balancer.
+    * If failed to deregister, return null.
+    */
+    public LoadBalancer deregister();
     public BackendInstanceState getBackendInstanceState();
 }
