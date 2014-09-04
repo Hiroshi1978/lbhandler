@@ -8,6 +8,8 @@ package web.component.impl.awselb.model;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
+import com.amazonaws.services.elasticloadbalancing.model.BackendServerDescription;
+import com.amazonaws.services.elasticloadbalancing.model.DescribeInstanceHealthResult;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersResult;
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.InstanceState;
@@ -17,6 +19,7 @@ import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription
 import java.util.ArrayList;
 import java.util.List;
 import web.component.api.model.BackendInstance;
+import web.component.api.model.BackendInstanceState;
 import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
 import web.component.api.model.Subnet;
@@ -298,9 +301,21 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public List<BackendInstance> getBackendInstances() {
-        return this.backendInstances;
+        return backendInstances.isEmpty() ? this.getBackendInstances(true) : backendInstances;
     }
-    
+
+    public List<BackendInstance> getBackendInstances(boolean reload) {
+        if(reload){
+            List<Instance> elbInstances = elb.getLoadBalancerDescription(name).getInstances();
+            List<BackendInstance> latestInstances = new ArrayList<>();
+            for(Instance elbInstance : elbInstances)
+                latestInstances.add(BackendInstanceImpl.create(this, elbInstance.getInstanceId()));
+            backendInstances.clear();
+            backendInstances.addAll(latestInstances);
+        }
+        return backendInstances;
+    }
+
     public static class Builder{
         
         private final String name;
@@ -324,7 +339,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
         
         public Builder defaultHttpListener(){
-            LoadBalancerListener listener = new LoadBalancerListenerImpl();
+            LoadBalancerListenerImpl listener = new LoadBalancerListenerImpl();
             listener.setInstancePort(80);
             listener.setInstanceProtocol("HTTP");
             listener.setServicePort(80);
@@ -333,7 +348,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
         
         public Builder defaultHttpsListener(String serverCertificateId){
-            LoadBalancerListener listener = new LoadBalancerListenerImpl();
+            LoadBalancerListenerImpl listener = new LoadBalancerListenerImpl();
             listener.setInstancePort(443);
             listener.setInstanceProtocol("HTTPS");
             listener.setServicePort(443);
@@ -383,15 +398,20 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
     }
     
-    public List<InstanceState> getInstanceStates(){
-        return elb.describeInstanceHealth(name).getInstanceStates();
+    public List<BackendInstanceState> getInstanceStates(){
+        List<InstanceState> elbInstanceStates = elb.describeInstanceHealth(name).getInstanceStates();
+        List<BackendInstanceState> states  = new ArrayList<>();
+        for(InstanceState elbInstanceState : elbInstanceStates)
+            states.add( BackendInstanceImpl.State.create(elbInstanceState));
+        return states;
     }
     
-    public List<InstanceState> getInstanceStates(List<BackendInstance> backendInstances){
+    public List<BackendInstanceState> getInstanceStates(List<BackendInstance> backendInstances){
+
         List<Instance> elbInstances = new ArrayList<>();
         for(BackendInstance backendInstance : backendInstances){
             if(backendInstance instanceof BackendInstanceImpl){
-                elbInstances.add((BackendInstanceImpl)backendInstance);
+                elbInstances.add((Instance)backendInstance);
             }else{
                 Instance elbInstance = new Instance();
                 elbInstance.setInstanceId(backendInstance.getId());
@@ -399,23 +419,35 @@ public class LoadBalancerImpl implements LoadBalancer{
             }
         }
         
-        return elb.describeInstanceHealth(name, elbInstances).getInstanceStates();
+        List<InstanceState> elbInstanceStates = elb.describeInstanceHealth(name, elbInstances).getInstanceStates();
+        List<BackendInstanceState> states  = new ArrayList<>();
+        for(InstanceState elbInstanceState : elbInstanceStates)
+            states.add( BackendInstanceImpl.State.create(elbInstanceState));
+        
+        return states;
     }
     
-    public List<InstanceState> getInstanceStatesByInstanceId(List<String> backendInstanceIds){
-        List<Instance> instances = new ArrayList<>();
+    public List<BackendInstanceState> getInstanceStatesByInstanceId(List<String> backendInstanceIds){
+
+        List<Instance> elbInstances = new ArrayList<>();
         for(String id : backendInstanceIds)
-            instances.add(new Instance(id));
-        return elb.describeInstanceHealth(name, instances).getInstanceStates();
+            elbInstances.add(new Instance(id));
+        
+        List<InstanceState> elbInstanceStates = elb.describeInstanceHealth(name, elbInstances).getInstanceStates();
+        List<BackendInstanceState> states  = new ArrayList<>();
+        for(InstanceState elbInstanceState : elbInstanceStates)
+            states.add( BackendInstanceImpl.State.create(elbInstanceState));
+        
+        return states;
     }
 
-    public InstanceState getInstanceState(String backendInstanceId){
+    public BackendInstanceState getInstanceState(String backendInstanceId){
         List<String> backendInstanceIds = new ArrayList<>();
         backendInstanceIds.add(backendInstanceId);
         return this.getInstanceStatesByInstanceId(backendInstanceIds).get(0);
     }
     
-    public InstanceState getInstanceState(BackendInstance backendInstance){
+    public BackendInstanceState getInstanceState(BackendInstance backendInstance){
         List<BackendInstance> backendInstances = new ArrayList<>();
         backendInstances.add(backendInstance);
         return this.getInstanceStates(backendInstances).get(0);
@@ -425,4 +457,5 @@ public class LoadBalancerImpl implements LoadBalancer{
         DescribeLoadBalancersResult result = elb.describeLoadBalancers();
         return result;
     }
+    
 }

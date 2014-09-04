@@ -56,6 +56,10 @@ public interface LoadBalancer {
     public void disableZone(Zone zone);
     public void delete();
     
+    public List<BackendInstanceState> getInstanceStates();
+    public List<BackendInstanceState> getInstanceStates(List<BackendInstance> backendInstances);
+    public BackendInstanceState getInstanceState(BackendInstance backendInstance);
+    
     /**
      * Check if this load balancer is destroyed.
      * Once destroyed, the load balancer should not be available again. 
