@@ -105,8 +105,12 @@ For checking the state of the server,
 ```java
 
     BackendInstanceState state = myWebServerNo1.getBackendInstanceState();
-    System.out.println("Service state : " + state.getState() + " Reason code : " + state.getReasonCode());
     
+    System.out.println("ID            : " + state.getId());
+    System.out.println("Service state : " + state.getState());
+    System.out.println("Reason        : " + state.getReasonCode());
+    System.out.println("Description   : " + state.getDescription());
+
 ```
 
 
