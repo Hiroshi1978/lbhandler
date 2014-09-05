@@ -469,7 +469,7 @@ public class LoadBalancerImpl implements LoadBalancer{
     @Override
     public int hashCode() {
         //this is wrong, but don't know how to implement this method properly.
-        return this.getName().hashCode();
+        return 31 * this.getName().hashCode();
     }
     
 }
