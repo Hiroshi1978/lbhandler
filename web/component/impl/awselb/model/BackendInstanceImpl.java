@@ -59,7 +59,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     @Override
     public void registerWith(LoadBalancer newLb) {
         
-        if(!(newLb instanceof LoadBalancerImpl))
+        if(newLb == null || !(newLb instanceof LoadBalancerImpl))
             throw new IllegalArgumentException("Invalid load balancer specified.");
             
         if(!lbs.contains(newLb)){
