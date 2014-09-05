@@ -132,9 +132,9 @@ And again, this is as good.
 
 ```java
 
-    myWebServerNo1.deregisterFrom(lb);
-    myWebServerNo2.deregisterFrom(lb);
-    
+    for(BackendInstance myWebServer : myWebServers)
+        myWebServer.deregisterFrom(lb);
+
 ```
 
 ### Dependency
