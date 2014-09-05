@@ -18,7 +18,7 @@ import web.component.api.model.LoadBalancer;
  */
 public class BackendInstanceImpl extends Instance implements BackendInstance{
 
-    private LoadBalancer lb;
+    private final List<LoadBalancer> lbs = new ArrayList<>();
     private final String id;
     
     private BackendInstanceImpl(String id){
@@ -26,7 +26,10 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     }
     
     private BackendInstanceImpl(LoadBalancer lb, String id){
-        this.lb = lb;
+        
+        if(!(lb instanceof LoadBalancerImpl))
+            throw new IllegalArgumentException("Invalid load balancer specified.");
+        this.lbs.add(lb);
         this.id = id;
     }
     
@@ -40,9 +43,14 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
 
     @Override
     public LoadBalancer getLoadBalancer() {
-        return lb;
+        return lbs.get(0);
     }
 
+    @Override
+    public List<LoadBalancer> getLoadBalancers(){
+        return lbs;
+    }
+    
     @Override
     public String getId() {
         return id;
@@ -50,22 +58,26 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
 
     @Override
     public void register(LoadBalancer newLb) {
-        if(lb == null || !lb.equals(newLb)){
+        
+        if(!(newLb instanceof LoadBalancerImpl))
+            throw new IllegalArgumentException("Invalid load balancer specified.");
+            
+        if(!lbs.contains(newLb)){
             newLb.registerInstance(this);
-            lb = newLb;
+            lbs.add(newLb);
         }
     }
 
     @Override
-    public LoadBalancer deregister() {
+    public void deregisterFrom(LoadBalancer lb) {
         
-        if(lb == null)
-            return null;
+        if(lb == null || !(lb instanceof LoadBalancerImpl))
+            throw new IllegalArgumentException("Invalid load balancer specified.");
         
-        lb.deregisterInstance(this);
-        LoadBalancer deregisteredFrom = lb;
-        lb = null;
-        return deregisteredFrom;
+        if(lbs.contains(lb)){
+            lb.deregisterInstance(this);
+            lbs.remove(lb);
+        }
     }
 
     @Override
