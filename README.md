@@ -84,8 +84,6 @@ It's very simple.
     BackendInstance myWebServerNo1  = BackendInstanceImpl.create("id-of-you-web-server-no-1");
     BackendInstance myWebServerNo2  = BackendInstanceImpl.create("id-of-you-web-server-no-2");
     . . . . . .
-    . . . . . .
-    BackendInstance myWebServerNo9  = BackendInstanceImpl.create("id-of-you-web-server-no-9");
     BackendInstance myWebServerNo10 = BackendInstanceImpl.create("id-of-you-web-server-no-10");
     
     List<BackendInstance> myWebServers = new ArrayList<>();
@@ -93,8 +91,6 @@ It's very simple.
     myWebServers.add(myWebServerNo1);
     myWebServers.add(myWebServerNo2);
     . . . . . .
-    . . . . . .
-    myWebServers.add(myWebServerNo9);
     myWebServers.add(myWebServerNo10);
 
     lb.registerInstances(myWebServers);
@@ -105,9 +101,9 @@ Or, you can do the same thing in this way also.
 
 ```java
 
-    myWebServerNo1.registerWith(lb);
-    myWebServerNo2.registerWith(lb);
-
+    for(BackendInstance myWebServer : myWebServers)
+        myWebServer.registerWith(lb);
+    
 ```
 
 For checking the state of the server,
