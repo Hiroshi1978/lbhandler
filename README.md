@@ -95,8 +95,8 @@ Or, you can do the same thing in this way also.
 
 ```java
 
-    myWebServerNo1.register(lb);
-    myWebServerNo2.register(lb);
+    myWebServerNo1.registerWith(lb);
+    myWebServerNo2.registerWith(lb);
 
 ```
 
@@ -126,8 +126,8 @@ And again, this is as good.
 
 ```java
 
-    myWebServerNo1.deregister();
-    myWebServerNo2.deregister();
+    myWebServerNo1.deregisterFrom(lb);
+    myWebServerNo2.deregisterFrom(lb);
     
 ```
 
