@@ -69,6 +69,19 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     }
 
     @Override
+    public boolean equals(Object toCompare){
+        if(toCompare instanceof BackendInstanceImpl)
+            return this.getId().equals(((BackendInstanceImpl)toCompare).getId());
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        //this is wrong, but I don't know how to implement this method.
+        return 31 * id.hashCode();
+    }
+
+    @Override
     public BackendInstanceState getBackendInstanceState(){
         return lb == null ? BackendInstanceImpl.State.create(new InstanceState()) : lb.getInstanceState(this);
     }
@@ -104,5 +117,6 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
         public String getState() {
             return elbInstanceState.getState();
         }
+        
     }
 }
