@@ -66,7 +66,8 @@ public class LoadBalancerImpl implements LoadBalancer{
                 }
             }
         }
-        this.zones.addAll(builder.zones);
+        if(builder.zones != null)
+            this.zones.addAll(builder.zones);
         
         List<String> subnetIds = new ArrayList<>();
         if(builder.subnets != null){
@@ -78,7 +79,8 @@ public class LoadBalancerImpl implements LoadBalancer{
                 }
             }
         }
-        this.subnets.addAll(builder.subnets);
+        if(builder.subnets != null)
+            this.subnets.addAll(builder.subnets);
         
         if(this.zones != null && !this.zones.isEmpty()){
             elb.createLoadBalancerWithAvailabilityZones(name, elbListeners, availabilityZones);
