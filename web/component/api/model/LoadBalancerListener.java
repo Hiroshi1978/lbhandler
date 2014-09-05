@@ -22,5 +22,15 @@ public interface LoadBalancerListener {
     public void setServerCertificate(String serverCertificateId);
     
     public LoadBalancer getLoadBalancer();
-    public void delete();
+    
+   /*
+    * Add this load balancer listener to load balancer.
+    */
+    public void addTo(LoadBalancer lb);
+    
+   /*
+    * Delete this load balancer listener from load balancer, and return the load balancer instance.
+    * If this listener is not attached to any load balancer, return null.
+    */
+    public LoadBalancer delete();
 }
