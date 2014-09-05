@@ -28,4 +28,17 @@ public class SubnetImpl implements Subnet{
     public static Subnet create(String id){
         return new SubnetImpl(id);
     }
+    
+    @Override
+    public boolean equals(Object toBeCompared){
+        if(toBeCompared instanceof SubnetImpl)
+            return this.getId().equals(((SubnetImpl)toBeCompared).getId());
+        return false;
+    }
+    
+    @Override
+    public int hashCode(){
+        //this is wrong, but don't know how to implement this method properly.
+        return 31 * this.getId().hashCode();
+    }
 }

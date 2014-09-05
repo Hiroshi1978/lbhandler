@@ -29,4 +29,17 @@ public class ZoneImpl extends AvailabilityZone implements Zone{
     public String getName(){
         return name;
     }
+    
+    @Override
+    public boolean equals(Object toBeCompared){
+        if(toBeCompared instanceof ZoneImpl)
+            return this.getName().equals(((ZoneImpl)toBeCompared).getName());
+        return false;
+    }
+    
+    @Override
+    public int hashCode(){
+        //this is wrong, but don't know how to implement this method properly.
+        return 31 * this.getName().hashCode();
+    }
 }
