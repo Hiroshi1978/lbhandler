@@ -81,6 +81,18 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     }
 
     @Override
+    public void addTo(LoadBalancer addedTo){
+        if(lb == null){
+            if(!(addedTo instanceof LoadBalancerImpl))
+                throw new IllegalArgumentException("Invalid load balancer specified.");
+            addedTo.createListener(this);
+            lb = addedTo;
+        }else if(!lb.equals(addedTo)){
+            throw new IllegalArgumentException("Already attached to another load balancer.");
+        }
+    }
+    
+    @Override
     public LoadBalancer delete() {
         LoadBalancer deleteFrom = lb;
         if(deleteFrom != null ){
