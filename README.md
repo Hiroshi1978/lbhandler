@@ -81,12 +81,22 @@ It's very simple.
 
 ```java
 
-    BackendInstance myWebServerNo1 = BackendInstanceImpl.create("id-of-you-web-server-no-1");
-    BackendInstance myWebServerNo2 = BackendInstanceImpl.create("id-of-you-web-server-no-2");
+    BackendInstance myWebServerNo1  = BackendInstanceImpl.create("id-of-you-web-server-no-1");
+    BackendInstance myWebServerNo2  = BackendInstanceImpl.create("id-of-you-web-server-no-2");
+    . . . . . .
+    . . . . . .
+    BackendInstance myWebServerNo9  = BackendInstanceImpl.create("id-of-you-web-server-no-9");
+    BackendInstance myWebServerNo10 = BackendInstanceImpl.create("id-of-you-web-server-no-10");
     
     List<BackendInstance> myWebServers = new ArrayList<>();
+
     myWebServers.add(myWebServerNo1);
     myWebServers.add(myWebServerNo2);
+    . . . . . .
+    . . . . . .
+    myWebServers.add(myWebServerNo9);
+    myWebServers.add(myWebServerNo10);
+
     lb.registerInstances(myWebServers);
 
 ```
