@@ -8,8 +8,6 @@ package web.component.impl.awselb.model;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
-import com.amazonaws.services.elasticloadbalancing.model.BackendServerDescription;
-import com.amazonaws.services.elasticloadbalancing.model.DescribeInstanceHealthResult;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersResult;
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.InstanceState;
@@ -459,6 +457,19 @@ public class LoadBalancerImpl implements LoadBalancer{
     public static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
         DescribeLoadBalancersResult result = elb.describeLoadBalancers();
         return result;
+    }
+    
+    @Override
+    public boolean equals(Object toBeCompared){
+        if(toBeCompared instanceof LoadBalancerImpl)
+            return this.getName().equals(((LoadBalancerImpl)toBeCompared).getName());
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        //this is wrong, but don't know how to implement this method properly.
+        return this.getName().hashCode();
     }
     
 }
