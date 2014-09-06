@@ -45,7 +45,16 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
 
     @Override
     public LoadBalancer getLoadBalancer() {
-        return lbs.get(0);
+        return lbs.isEmpty() ? null : lbs.get(0);
+    }
+
+   /*
+    * This method should be called only from the classes in this package, for example, by LoadBalancerImplClass
+    * when its instance is constructed and its backendInstances member is initialized.
+    * Should not be called by outer codes, so this is defined as package private, not as public.
+    */
+    void setLoadBalancer(LoadBalancer lb) {
+        lbs.add(lb);
     }
 
     @Override

@@ -89,6 +89,10 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
     }
 
+    private LoadBalancerImpl(String name){
+        this.name = name;
+    }
+    
    /*
     * This constructor should be called only inside the getExistLoadBalancerByName method.
     */
@@ -110,8 +114,15 @@ public class LoadBalancerImpl implements LoadBalancer{
         this.name = name;
         this.listeners.addAll(listeners);
         this.zones.addAll(zones);
-        this.subnets.addAll(subnets);
-        this.backendInstances.addAll(backendInstances);
+        
+        if(subnets != null && !subnets.isEmpty())
+            this.subnets.addAll(subnets);
+
+        if(backendInstances != null && !backendInstances.isEmpty()){
+            for(BackendInstance backendInstance : backendInstances)
+                ((BackendInstanceImpl)backendInstance).setLoadBalancer(this);
+            this.backendInstances.addAll(backendInstances);
+        }
     }
     
     /**
