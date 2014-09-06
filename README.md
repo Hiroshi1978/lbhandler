@@ -81,19 +81,19 @@ It's very simple.
 
 ```java
 
-    BackendInstance myWebServerNo1  = BackendInstanceImpl.create("id-of-you-web-server-no-1");
-    BackendInstance myWebServerNo2  = BackendInstanceImpl.create("id-of-you-web-server-no-2");
+    BackendInstance webServerNo1  = BackendInstanceImpl.create("id-of-you-web-server-no-1");
+    BackendInstance webServerNo2  = BackendInstanceImpl.create("id-of-you-web-server-no-2");
     . . . . . .
-    BackendInstance myWebServerNo10 = BackendInstanceImpl.create("id-of-you-web-server-no-10");
+    BackendInstance webServerNo10 = BackendInstanceImpl.create("id-of-you-web-server-no-10");
     
-    List<BackendInstance> myWebServers = new ArrayList<>();
+    List<BackendInstance> webServers = new ArrayList<>();
 
-    myWebServers.add(myWebServerNo1);
-    myWebServers.add(myWebServerNo2);
+    myWebServers.add(webServerNo1);
+    myWebServers.add(webServerNo2);
     . . . . . .
-    myWebServers.add(myWebServerNo10);
+    myWebServers.add(webServerNo10);
 
-    lb.registerInstances(myWebServers);
+    lb.registerInstances(webServers);
 
 ```
 
@@ -101,8 +101,8 @@ Or, you can do the same thing in this way also.
 
 ```java
 
-    for(BackendInstance myWebServer : myWebServers)
-        myWebServer.registerWith(lb);
+    for(BackendInstance webServer : webServers)
+        webServer.registerWith(lb);
     
 ```
 
@@ -110,7 +110,7 @@ For checking the state of the server,
 
 ```java
 
-    BackendInstanceState state = myWebServerNo1.getBackendInstanceState();
+    BackendInstanceState state = webServerNo1.getBackendInstanceState();
     
     System.out.println("ID            : " + state.getId());
     System.out.println("Service state : " + state.getState());
@@ -124,7 +124,7 @@ Then, if you want to deregister them,
 
 ```java
 
-    lb.deregisterInstances(myWebServers);
+    lb.deregisterInstances(webServers);
     
 ```
 
@@ -132,8 +132,8 @@ And again, this is as good.
 
 ```java
 
-    for(BackendInstance myWebServer : myWebServers)
-        myWebServer.deregisterFrom(lb);
+    for(BackendInstance webServer : webServers)
+        webServer.deregisterFrom(lb);
 
 ```
 
