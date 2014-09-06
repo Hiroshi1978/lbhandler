@@ -45,7 +45,6 @@ For example, you may extract some information about your load balancer in this w
             System.exit(1);
         }
         System.out.println("");
-        System.out.println(" Describe my load balancer. ");
         System.out.println(" ------------------------ ");
         System.out.println(lb.getName());
         System.out.println(lb.getListeners());
@@ -59,9 +58,8 @@ And the result may be like this.
     Wait for the lb to be started...
     Wait for the lb to be started...
     
-     Describe my load balancer. 
      ------------------------ 
-    MyFirstLoadBalancer
+    MyLB
     [{Protocol: HTTP,LoadBalancerPort: 80,InstanceProtocol: HTTP,InstancePort: 80,}]
     Self Introduction : 'I'm very dilligent !'
      ------------------------ 
