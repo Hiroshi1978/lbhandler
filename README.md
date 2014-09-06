@@ -81,10 +81,10 @@ It's very simple.
 
 ```java
 
-    BackendInstance webServerNo1  = BackendInstanceImpl.create("id-of-you-web-server-no-1");
-    BackendInstance webServerNo2  = BackendInstanceImpl.create("id-of-you-web-server-no-2");
+    BackendInstance webServerNo1  = BackendInstanceImpl.create("web-server-1");
+    BackendInstance webServerNo2  = BackendInstanceImpl.create("web-server-2");
     . . . . . .
-    BackendInstance webServerNo10 = BackendInstanceImpl.create("id-of-you-web-server-no-10");
+    BackendInstance webServerNo10 = BackendInstanceImpl.create("web-server-10");
     
     List<BackendInstance> webServers = new ArrayList<>();
 
