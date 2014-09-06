@@ -6,6 +6,8 @@
 
 package web.component.api.model;
 
+import java.util.List;
+
 /**
  *
  * @author Hiroshi
@@ -35,6 +37,8 @@ public interface BackendInstance {
     /*
     * Deregister this backend instance from the specified load balancer.
     */
-    public LoadBalancer deregisterFrom(LoadBalancer lb);
+    public void deregisterFrom(LoadBalancer lb);
     public BackendInstanceState getBackendInstanceState();
+    public BackendInstanceState getBackendInstanceStateFromLB(LoadBalancer lb);
+    
 }

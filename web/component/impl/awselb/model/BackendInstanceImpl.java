@@ -8,6 +8,8 @@ package web.component.impl.awselb.model;
 
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.InstanceState;
+import java.util.ArrayList;
+import java.util.List;
 import web.component.api.model.BackendInstance;
 import web.component.api.model.BackendInstanceState;
 import web.component.api.model.LoadBalancer;
@@ -95,7 +97,12 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
 
     @Override
     public BackendInstanceState getBackendInstanceState(){
-        return lb == null ? BackendInstanceImpl.State.create(new InstanceState()) : lb.getInstanceState(this);
+        return lbs.isEmpty() ? BackendInstanceImpl.State.create(new InstanceState()) : lbs.get(0).getInstanceState(this);
+    }
+
+    @Override
+    public BackendInstanceState getBackendInstanceStateFromLB(LoadBalancer lb){
+        return lbs.contains(lb) ? lb.getInstanceState(this) : BackendInstanceImpl.State.create(new InstanceState());
     }
     
     public static class State implements BackendInstanceState{
