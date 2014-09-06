@@ -1,4 +1,0 @@
-endpoint=
-servicename=
-region=
-signer.type=AWS4SignerType
