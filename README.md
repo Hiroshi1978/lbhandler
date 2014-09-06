@@ -9,19 +9,22 @@ We aim to offer libraries that makes it possible to handle resources of some web
 Maybe you can write like this.
 
 ```java
-    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB").defaultHttpListener().zones("zone-name").build();
+    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB")
+                        .defaultHttpListener().zones("zone-name").build();
 ```
 
 Or, if you use VPC,
 
 ```java
-    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB").defaultHttpListener().subnet("subnet-id").build();
+    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB")
+                        .defaultHttpListener().subnet("subnet-id").build();
 ```
 
 If you need secure system with port 443, then this will go.
 
 ```java
-    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB").defaultHttpsListener("ssl-certificate-id").build();
+    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB")
+                        .defaultHttpsListener("ssl-certificate-id").build();
 ```
 
 ### How to get information about the created load balancer ?
