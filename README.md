@@ -35,7 +35,6 @@ If you need secure system with port 443, then this will go.
 For example, you may extract some information about your load balancer in this way.
 
 ```java
-
         try{
             while(!lb.isStarted()){
                 System.out.println("Wait for the lb to be started...");
@@ -50,7 +49,6 @@ For example, you may extract some information about your load balancer in this w
         System.out.println(lb.getListeners());
         System.out.println(lb.getOtherUsefulInformation());
         System.out.println(" ------------------------ ");
-
 ```
 
 And the result may be like this.
@@ -70,7 +68,6 @@ And the result may be like this.
 It's very simple.
 
 ```java
-
     BackendInstance webServerNo1  = BackendInstanceImpl.create("web-server-1");
     BackendInstance webServerNo2  = BackendInstanceImpl.create("web-server-2");
     . . . . . .
@@ -84,47 +81,38 @@ It's very simple.
     myWebServers.add(webServerNo10);
 
     lb.registerInstances(webServers);
-
 ```
 
 Or, you can do the same thing in this way also.
 
 ```java
-
     for(BackendInstance webServer : webServers)
         webServer.registerWith(lb);
-    
 ```
 
 For checking the state of the server,
 
 ```java
-
     BackendInstanceState state = webServerNo1.getBackendInstanceState();
     
     System.out.println("ID            : " + state.getId());
     System.out.println("Service state : " + state.getState());
     System.out.println("Reason        : " + state.getReasonCode());
     System.out.println("Description   : " + state.getDescription());
-
 ```
 
 
 Then, if you want to deregister them,
 
 ```java
-
     lb.deregisterInstances(webServers);
-    
 ```
 
 And again, this is as good.
 
 ```java
-
     for(BackendInstance webServer : webServers)
         webServer.deregisterFrom(lb);
-
 ```
 
 ### Dependency
