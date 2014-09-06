@@ -21,10 +21,9 @@ import web.component.api.model.LoadBalancer;
 public class BackendInstanceImpl extends Instance implements BackendInstance{
 
     private final List<LoadBalancer> lbs = new ArrayList<>();
-    private final String id;
     
     private BackendInstanceImpl(String id){
-        this.id = id;
+        super.setInstanceId(id);
     }
     
     private BackendInstanceImpl(LoadBalancer lb, String id){
@@ -32,7 +31,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
         if(!(lb instanceof LoadBalancerImpl))
             throw new IllegalArgumentException("Invalid load balancer specified.");
         this.lbs.add(lb);
-        this.id = id;
+        super.setInstanceId(id);
     }
     
     public static BackendInstance create(String id){
@@ -64,7 +63,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     
     @Override
     public String getId() {
-        return id;
+        return super.getInstanceId();
     }
 
     @Override
@@ -101,7 +100,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     @Override
     public int hashCode() {
         //this is wrong, but I don't know how to implement this method.
-        return 31 * id.hashCode();
+        return 31 * getId().hashCode();
     }
 
     @Override
@@ -116,7 +115,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
 
     @Override
     public String toString(){
-        return "{BackendInstanceID: " + id + "}";
+        return "{BackendInstanceID: " + getId() + "}";
     }
 
     public static class State implements BackendInstanceState{
