@@ -26,7 +26,7 @@ If you need secure system with port 443, then this will go.
 
 ```java
 
-    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB").defaultHttpsListener("registered-certificate-id").build();
+    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB").defaultHttpsListener("ssl-certificate-id").build();
 
 ```
 
