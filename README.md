@@ -10,8 +10,7 @@ Maybe you can write like this.
 
 ```java
 
-    LoadBalancer lb = new LoadBalancerImpl.Builder("FirstLoadBalancer")
-                    .defaultHttpListener().zones("zone-name").build();
+    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB").defaultHttpListener().zones("zone-name").build();
 
 ```
 
@@ -19,8 +18,7 @@ Or, if you use VPC,
 
 ```java
 
-    LoadBalancer lb = new LoadBalancerImpl.Builder("FirstLoadBalancer")
-                    .defaultHttpListener().subnet("subnet-id").build();
+    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB").defaultHttpListener().subnet("subnet-id").build();
 
 ```
 
@@ -28,8 +26,7 @@ If you need secure system with port 443, then this will go.
 
 ```java
 
-    LoadBalancer lb = new LoadBalancerImpl.Builder("FirstLoadBalancer")
-                    .defaultHttpsListener("registered-certificate-id").build();
+    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB").defaultHttpsListener("registered-certificate-id").build();
 
 ```
 
