@@ -89,15 +89,29 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
     }
 
-    private LoadBalancerImpl(String name, List<LoadBalancerListener> listeners) {
+   /*
+    * This constructor should be called only inside the getExistLoadBalancerByName method.
+    */
+    private LoadBalancerImpl(
+            String name, 
+            List<LoadBalancerListener> listeners,
+            List<Zone> zones,
+            List<Subnet> subnets,
+            List<BackendInstance> backendInstances
+    ) {
         
         if(name == null || name.isEmpty())
             throw new IllegalArgumentException("Load balancer name not specified.");
         if(listeners == null || listeners.isEmpty())
             throw new IllegalArgumentException("Load balancer listeners not specified.");
+        if(zones == null || zones.isEmpty())
+            throw new IllegalArgumentException("Zones not specified.");
         
         this.name = name;
         this.listeners.addAll(listeners);
+        this.zones.addAll(zones);
+        this.subnets.addAll(subnets);
+        this.backendInstances.addAll(backendInstances);
     }
     
     /**
@@ -267,10 +281,25 @@ public class LoadBalancerImpl implements LoadBalancer{
             
                 List<LoadBalancerListener> listeners = new ArrayList<>();
                 List<ListenerDescription> listenerDescriptions = description.getListenerDescriptions();
-                for(ListenerDescription listenerDescription : listenerDescriptions){
+                for(ListenerDescription listenerDescription : listenerDescriptions)
                     listeners.add(new LoadBalancerListenerImpl(listenerDescription));
-                }
-                loadBalancer = new LoadBalancerImpl(name,listeners);
+                
+                List<Zone> zones = new ArrayList<>();
+                List<String> zoneNames = description.getAvailabilityZones();
+                for(String zoneName : zoneNames)
+                    zones.add(ZoneImpl.create(zoneName));
+                
+                List<Subnet> subnets = new ArrayList<>();
+                List<String> subnetIds = description.getSubnets();
+                for(String subnetId : subnetIds)
+                    subnets.add(SubnetImpl.create(subnetId));
+                
+                List<BackendInstance> backendInstances = new ArrayList<>();
+                List<Instance> instances = description.getInstances();
+                for(Instance instance : instances)
+                    backendInstances.add(BackendInstanceImpl.create(instance.getInstanceId()));
+
+                loadBalancer = new LoadBalancerImpl(name,listeners,zones,subnets,backendInstances);
             }
         }catch(AmazonServiceException ase){
             System.out.println(ase.getMessage());

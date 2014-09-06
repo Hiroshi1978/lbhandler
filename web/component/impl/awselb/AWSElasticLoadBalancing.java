@@ -63,7 +63,9 @@ public class AWSElasticLoadBalancing implements VendorWebService{
         String secretKey = conf.getProperty("aws.secret");
         AWSCredentials credentials = new BasicAWSCredentials(awsKey,secretKey);
     	
-        awsHttpClient = new AmazonElasticLoadBalancingClient(credentials);
+        AmazonElasticLoadBalancingClient initialClient = new AmazonElasticLoadBalancingClient(credentials);
+        setUpHttpClient(initialClient);
+        awsHttpClient = initialClient;
     }
     
     private void setUpHttpClient(AmazonElasticLoadBalancingClient awsELBClient){
@@ -448,7 +450,8 @@ public class AWSElasticLoadBalancing implements VendorWebService{
 
         List<String> loadBalancerNames = new ArrayList<>();
         loadBalancerNames.add(loadBalancerName);
-        return this.getLoadBalancerDescriptions(loadBalancerNames).get(0);
+        List<LoadBalancerDescription> descriptions = this.getLoadBalancerDescriptions(loadBalancerNames);
+        return descriptions.isEmpty() ? new LoadBalancerDescription() : descriptions.get(0);
         
     }
 

@@ -41,4 +41,9 @@ public class SubnetImpl implements Subnet{
         //this is wrong, but don't know how to implement this method properly.
         return 31 * this.getId().hashCode();
     }
+    
+    @Override
+    public String toString(){
+        return "{SubnetID: " + id + "}";
+    }
 }

@@ -104,7 +104,12 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     public BackendInstanceState getBackendInstanceStateFromLB(LoadBalancer lb){
         return lbs.contains(lb) ? lb.getInstanceState(this) : BackendInstanceImpl.State.create(new InstanceState());
     }
-    
+
+    @Override
+    public String toString(){
+        return "{BackendInstanceID: " + id + "}";
+    }
+
     public static class State implements BackendInstanceState{
 
         private final InstanceState elbInstanceState;

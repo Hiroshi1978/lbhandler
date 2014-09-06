@@ -42,4 +42,9 @@ public class ZoneImpl extends AvailabilityZone implements Zone{
         //this is wrong, but don't know how to implement this method properly.
         return 31 * this.getName().hashCode();
     }
+
+    @Override
+    public String toString(){
+        return "{ZoneName: " + name + "}";
+    }
 }
