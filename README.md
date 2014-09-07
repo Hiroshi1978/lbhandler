@@ -122,20 +122,25 @@ To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/
 
 To use AWS ELB implementation, you have to create two files and prepare some configuration parameters for http client which communicates with AWS ELB following these steps.
 
- Step1. Create text file with name 'credentials.txt' int the directory where AWSElasticLoadBalancing.class exists.
+###### Step 1. 
+Create text file with name 'credentials.txt' int the directory where AWSElasticLoadBalancing.class exists.
 
- Step2. Edit the text file following the sample below.
+###### Step 2. 
+Edit the text file following the sample below.
 
 ```
     aws.key=YOURAWSACCESSKEY
     aws.secret=YOURAWSSECRETKEYCORRESPONDINGTOTHEACCESSKEY
 ```
 
- Step3. Save the file.
+###### Step 3. 
+Save the file.
 
- Step4. Create text file with name'httpclient_config.txt' in the same directory.
+###### Step 4. 
+Create text file with name'httpclient_config.txt' in the same directory.
 
- Step5. Edit the text file following the sample. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.
+###### Step 5. 
+Edit the text file following the sample below. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.
 
 ```
     endpoint=protocol://endpoint.of.service/path
@@ -144,7 +149,8 @@ To use AWS ELB implementation, you have to create two files and prepare some con
     signer.type=AWS4SignerType
 ```
 
-  Step6. Save the file.
+###### Step 6. 
+Save the file.
 
 ### Want to learn ELB or LBA ?
 
