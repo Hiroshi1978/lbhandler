@@ -4,6 +4,10 @@ lbhandler
 We aim to offer libraries that makes it possible to handle resources of some web services including AWS Elastic Load Balancing (ELB), Cloudn Load Balancing Advanced (LBA), as the ordinary instances of Java classes on running JVM. And so help build your application that utilizes ELB or LBA.
 
 
+## Usage
+
+ * [create new load balancer](#how-to-create-new-load-balancer-)
+
 ### How to create new load balancer ?
 
 Maybe you can write like this.
