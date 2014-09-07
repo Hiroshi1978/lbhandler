@@ -111,13 +111,22 @@ public class LoadBalancerImpl implements LoadBalancer{
         if(zones == null || zones.isEmpty())
             throw new IllegalArgumentException("Zones not specified.");
         
+        //set load balancer name.
         this.name = name;
+
+        //set listeners.
+        for(LoadBalancerListener listener : listeners)
+           ((LoadBalancerListenerImpl)listener).setLoadBalancer(this);
         this.listeners.addAll(listeners);
+
+        //set zones.
         this.zones.addAll(zones);
-        
+
+        //set subnets.
         if(subnets != null && !subnets.isEmpty())
             this.subnets.addAll(subnets);
 
+        //set backendinstances.
         if(backendInstances != null && !backendInstances.isEmpty()){
             for(BackendInstance backendInstance : backendInstances)
                 ((BackendInstanceImpl)backendInstance).setLoadBalancer(this);
@@ -294,7 +303,6 @@ public class LoadBalancerImpl implements LoadBalancer{
                 List<ListenerDescription> listenerDescriptions = description.getListenerDescriptions();
                 for(ListenerDescription listenerDescription : listenerDescriptions)
                     listeners.add(new LoadBalancerListenerImpl(listenerDescription));
-                
                 List<Zone> zones = new ArrayList<>();
                 List<String> zoneNames = description.getAvailabilityZones();
                 for(String zoneName : zoneNames)

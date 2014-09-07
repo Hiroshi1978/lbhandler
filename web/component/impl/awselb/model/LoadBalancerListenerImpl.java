@@ -37,12 +37,20 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
 
     @Override
     public void setInstancePort(int instancePort) {
-        super.setInstancePort(instancePort);
+        //can set only before this listener is added to any load balancer.
+        if(lb == null)
+            super.setInstancePort(instancePort);
+        else
+            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
     }
 
     @Override
     public void setServicePort(int servciePort) {
-        super.setLoadBalancerPort(servciePort);
+        //can set only before this listener is added to any load balancer.
+        if(lb == null)
+            super.setLoadBalancerPort(servciePort);
+        else
+            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
     }
 
     @Override
@@ -56,8 +64,21 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     }
 
     @Override
+    public void setInstanceProtocol(String instanceProtocol) {
+        //can set only before this listener is added to any load balancer.
+        if(lb == null)
+            super.setInstanceProtocol(instanceProtocol);
+        else
+            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
+    }
+
+    @Override
     public void setServiceProtocol(String serviceProtocol) {
-        super.setProtocol(serviceProtocol);
+        //can set only before this listener is added to any load balancer.
+        if(lb == null)
+            super.setProtocol(serviceProtocol);
+        else
+            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
     }
 
     @Override
@@ -72,12 +93,26 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     
     @Override
     public void setServerCertificate(String serverCertificateId){
-        super.setSSLCertificateId(serverCertificateId);
+        //can set only before this listener is added to any load balancer.
+        if(lb == null)
+            super.setSSLCertificateId(serverCertificateId);
+        else
+            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
     }
 
     @Override
     public LoadBalancer getLoadBalancer() {
         return lb;
+    }
+
+   /*
+    * This method should be called only from the classes in this package, for example, by LoadBalancerImplClass
+    * when its instance is constructed and its listeners member is initialized.
+    * Should not be called by outer codes, so this is defined as package private, not as public.
+    */
+    void setLoadBalancer(LoadBalancer newLb) {
+        if(lb == null)
+            lb = newLb;
     }
 
     @Override
