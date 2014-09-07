@@ -4,9 +4,13 @@ lbhandler
 We aim to offer libraries that makes it possible to handle resources of some web services including AWS Elastic Load Balancing (ELB), Cloudn Load Balancing Advanced (LBA), as the ordinary instances of Java classes on running JVM. And so help build your application that utilizes ELB or LBA.
 
 
-## Usage
+## Usage and some details
 
  * [create new load balancer](#how-to-create-new-load-balancer-)
+ * [Get information about load balancer](#how-to-get-information-about-the-created-load-balancer-)
+ * [Register web servers with load balancer](#lets-register-your-web-servers-with-the-load-balancer)
+ * [Dependency](#dependency)
+ * [Set up HTTP Client](#setting-up-http-client)
 
 ### How to create new load balancer ?
 
@@ -122,7 +126,7 @@ Our library has some implementation that works with AWS. Please check the classe
 You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforjava/).
 To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/aws/aws-sdk-java).
 
-### Setting up HTTP client
+### Setting up HTTP Client
 
 To use AWS ELB implementation, you have to create two files and prepare some configuration parameters for http client which communicates with AWS ELB following these steps.
 
