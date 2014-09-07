@@ -4,13 +4,17 @@ lbhandler
 We aim to offer libraries that makes it possible to handle resources of some web services including AWS Elastic Load Balancing (ELB), Cloudn Load Balancing Advanced (LBA), as the ordinary instances of Java classes on running JVM. And so help build your application that utilizes ELB or LBA.
 
 
-## Usage and some details
+## Usage
 
  * [Create new load balancer](#how-to-create-new-load-balancer-)
  * [Get information about load balancer](#how-to-get-information-about-the-created-load-balancer-)
  * [Register web servers with load balancer](#lets-register-your-web-servers-with-the-load-balancer)
+
+## Some details
+
  * [Dependency](#dependency)
  * [Set up HTTP Client](#setting-up-http-client)
+ * [Further learning](#want-to-learn-elb-or-lba-)
 
 ### How to create new load balancer ?
 
