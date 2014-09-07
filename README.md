@@ -120,7 +120,7 @@ To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/
 
 ### Setting up http client
 
-To use AWS ELB implementation, you have to set up some configuration parameters for http client which communicates with AWS ELB.
+To use AWS ELB implementation, you have to set up some configuration parameters for http client which communicates with AWS ELB following these steps.
 
   1. Create text file with name 'credentials.txt' int the directory where AWSElasticLoadBalancing.class exists.
 
