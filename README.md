@@ -126,7 +126,7 @@ To use AWS ELB implementation, you have to create two files and prepare some con
 Create text file with name 'credentials.txt' int the directory where AWSElasticLoadBalancing.class exists.
 
 ###### Step 2. 
-Edit the text file following the sample below.
+Edit it following the sample below, and save it.
 
 ```
     aws.key=YOURAWSACCESSKEY
@@ -134,13 +134,10 @@ Edit the text file following the sample below.
 ```
 
 ###### Step 3. 
-Save the file.
-
-###### Step 4. 
 Create text file with name'httpclient_config.txt' in the same directory.
 
-###### Step 5. 
-Edit the text file following the sample below. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.
+###### Step 4. 
+Edit it following the sample below, and save it. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.
 
 ```
     endpoint=protocol://endpoint.of.service/path
@@ -149,8 +146,6 @@ Edit the text file following the sample below. In most cases the value to the ke
     signer.type=AWS4SignerType
 ```
 
-###### Step 6. 
-Save the file.
 
 ### Want to learn ELB or LBA ?
 
