@@ -118,7 +118,7 @@ Our library has some implementation that works with AWS. Please check the classe
 You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforjava/).
 To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/aws/aws-sdk-java).
 
-### Setting up http client
+### Setting up HTTP client
 
 To use AWS ELB implementation, you have to create two files and prepare some configuration parameters for http client which communicates with AWS ELB following these steps.
 
