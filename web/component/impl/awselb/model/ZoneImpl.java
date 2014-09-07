@@ -36,7 +36,7 @@ public class ZoneImpl extends AvailabilityZone implements Zone{
     }
     
     @Override
-    public setZoneName(String zoneName){
+    public void setZoneName(String zoneName){
         throw new UnsupportedOperationException("Zone name can not be modified.");
     }
     
