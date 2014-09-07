@@ -142,7 +142,6 @@ To use AWS ELB implementation, you have to create two files and prepare some con
     servicename=properServiceName
     region=properRegionName
     signer.type=AWS4SignerType
-
 ```
 
   Step6. Save the file.
