@@ -118,6 +118,11 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
         return "{BackendInstanceID: " + getId() + "}";
     }
 
+    @Override
+    public void setInstanceId(String instanceId){
+        throw new UnsupportedOperationException("Backend instance id can not be modified.");
+    }
+
     public static class State implements BackendInstanceState{
 
         private final InstanceState elbInstanceState;
