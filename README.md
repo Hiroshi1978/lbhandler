@@ -118,6 +118,15 @@ Our library has some implementation that works with AWS. Please check the classe
 You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforjava/).
 To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/aws/aws-sdk-java).
 
+### Setting up http client
+
+To use AWS ELB implementation, you have to set up some configuration parameters for http client which communicates with AWS ELB.
+
+  1. Create text file with name 'credentials.txt' int the directory where AWSElasticLoadBalancing.class exists.
+  2. Edit the text file following the sample below.
+    aws.key=YOURAWSACCESSKEY
+    aws.secret=YOURAWSSECRETKEYCORRESPONDINGTOTHEACCESSKEY
+  3. save the text file.
 ### Want to learn ELB or LBA ?
 
  * [Amazon Elastic Load Balancing](http://aws.amazon.com/jp/elasticloadbalancing/)
