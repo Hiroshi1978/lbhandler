@@ -127,7 +127,7 @@ To use AWS ELB implementation, you have to create two files and prepare some con
  Step2. Edit the text file following the sample below.
 
 ```
-    aws.key=YOURAWSACCESSKEY
+    aws.key=_YOURAWSACCESSKEY_
     aws.secret=YOURAWSSECRETKEYCORRESPONDINGTOTHEACCESSKEY
 ```
 
@@ -135,7 +135,7 @@ To use AWS ELB implementation, you have to create two files and prepare some con
 
  Step4. Create text file with name'httpclient_config.txt' in the same directory.
 
- Step5. Edit the text file following the sample below. In most cases, the value to the key 'signer.Type' is 'AWS4SignerType'.
+ Step5. Edit the text file following the sample. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.
 
 ```
     endpoint=protocol://endpoint.of.service/path
