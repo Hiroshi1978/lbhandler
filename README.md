@@ -127,7 +127,7 @@ To use AWS ELB implementation, you have to create two files and prepare some con
  Step2. Edit the text file following the sample below.
 
 ```
-    aws.key=_YOURAWSACCESSKEY_
+    aws.key=YOURAWSACCESSKEY
     aws.secret=YOURAWSSECRETKEYCORRESPONDINGTOTHEACCESSKEY
 ```
 
