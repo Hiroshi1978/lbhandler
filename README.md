@@ -6,7 +6,7 @@ We aim to offer libraries that makes it possible to handle resources of some web
 
 ## Usage and some details
 
- * [create new load balancer](#how-to-create-new-load-balancer-)
+ * [Create new load balancer](#how-to-create-new-load-balancer-)
  * [Get information about load balancer](#how-to-get-information-about-the-created-load-balancer-)
  * [Register web servers with load balancer](#lets-register-your-web-servers-with-the-load-balancer)
  * [Dependency](#dependency)
