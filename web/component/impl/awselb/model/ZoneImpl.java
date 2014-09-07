@@ -15,10 +15,8 @@ import web.component.api.model.Zone;
  */
 public class ZoneImpl extends AvailabilityZone implements Zone{
     
-    private final String name;
-    
     private ZoneImpl(String name){
-        this.name = name;
+        super.setZoneName(name);
     }
     
     public static Zone create(String name){
@@ -27,7 +25,7 @@ public class ZoneImpl extends AvailabilityZone implements Zone{
     
     @Override
     public String getName(){
-        return name;
+        return super.getZoneName();
     }
     
     @Override
@@ -45,6 +43,6 @@ public class ZoneImpl extends AvailabilityZone implements Zone{
 
     @Override
     public String toString(){
-        return "{ZoneName: " + name + "}";
+        return "{ZoneName: " + getName() + "}";
     }
 }
