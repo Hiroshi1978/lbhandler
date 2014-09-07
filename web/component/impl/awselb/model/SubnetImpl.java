@@ -12,17 +12,15 @@ import web.component.api.model.Subnet;
  *
  * @author Hiroshi
  */
-public class SubnetImpl implements Subnet{
+public class SubnetImpl extends com.amazonaws.services.ec2.model.Subnet implements Subnet{
 
-    private final String id;
-    
     private SubnetImpl(String id){
-        this.id = id;
+        super.setSubnetId(id);
     }
     
     @Override
     public String getId() {
-        return id;
+        return super.getSubnetId();
     }
     
     public static Subnet create(String id){
@@ -44,6 +42,11 @@ public class SubnetImpl implements Subnet{
     
     @Override
     public String toString(){
-        return "{SubnetID: " + id + "}";
+        return "{SubnetID: " + getId() + "}";
+    }
+    
+    @Override
+    public void setSubnetId(String subnetId){
+        throw new UnsupportedOperationException("Subnet id can not be modified.");
     }
 }
