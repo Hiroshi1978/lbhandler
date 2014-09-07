@@ -36,6 +36,11 @@ public class ZoneImpl extends AvailabilityZone implements Zone{
     }
     
     @Override
+    public setZoneName(String zoneName){
+        throw new UnsupportedOperationException("Zone name can not be modified.");
+    }
+    
+    @Override
     public int hashCode(){
         //this is wrong, but don't know how to implement this method properly.
         return 31 * this.getName().hashCode();
