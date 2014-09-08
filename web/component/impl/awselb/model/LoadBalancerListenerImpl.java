@@ -178,7 +178,7 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     public int hashCode(){
         //this is wrong, but don't know how to implement this method properly.
         return ( 31 * 
-                 (getLoadBalancer() == null ? 0 : getLoadBalancer().hashCode() + 
+                 ((getLoadBalancer() == null ? 0 : getLoadBalancer().hashCode()) + 
                   getLoadBalancerPort().hashCode() + 
                   getInstancePort().hashCode() + 
                   getInstanceProtocol().hashCode() +
