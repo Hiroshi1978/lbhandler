@@ -7,6 +7,8 @@
 package web.component.impl.awselb.model;
 
 import com.amazonaws.services.ec2.model.AvailabilityZone;
+import java.util.HashMap;
+import java.util.Map;
 import web.component.api.model.Zone;
 
 /**
@@ -14,13 +16,17 @@ import web.component.api.model.Zone;
  * @author Hiroshi
  */
 public class ZoneImpl extends AvailabilityZone implements Zone{
+
+    private static final Map<String,Zone> existZones = new HashMap<>();
+    
+    public static Zone create(String name){
+        if(existZones.get(name) == null)
+            existZones.put(name, new ZoneImpl(name));
+        return existZones.get(name);
+    }
     
     private ZoneImpl(String name){
         super.setZoneName(name);
-    }
-    
-    public static Zone create(String name){
-        return new ZoneImpl(name);
     }
     
     @Override
