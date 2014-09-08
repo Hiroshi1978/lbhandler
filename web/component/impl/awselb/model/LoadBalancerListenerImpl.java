@@ -19,6 +19,9 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
 
     private LoadBalancer lb;
     
+   /*
+    * This consutructor is called from LoadBalancerImpl.class so this is defined as package private.
+    */
     LoadBalancerListenerImpl(){
         
     }
@@ -55,12 +58,16 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
 
     @Override
     public Integer getInstancePort() {
-        return super.getInstancePort();
+        
+        Integer port = super.getInstancePort();
+        return port == null ? -1 : port;
     }
 
     @Override
     public Integer getServicePort() {
-        return super.getLoadBalancerPort();
+
+        Integer port = super.getLoadBalancerPort();
+        return port == null ? -1 : port;
     }
 
     @Override
@@ -83,12 +90,16 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
 
     @Override
     public String getInstanceProtocol() {
-        return super.getInstanceProtocol();
+        
+        String protocol = super.getInstanceProtocol();
+        return protocol == null ? "" : protocol;
     }
 
     @Override
     public String getServiceProtocol() {
-        return super.getProtocol();
+        
+        String protocol = super.getProtocol();
+        return protocol == null ? "" : protocol;
     }
     
     @Override
@@ -100,6 +111,12 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
             throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
     }
 
+    @Override
+    public String getServerCertificate(){
+        String certificateId = super.getSSLCertificateId();
+        return certificateId == null ? "" : certificateId;
+    }
+    
     @Override
     public LoadBalancer getLoadBalancer() {
         return lb;

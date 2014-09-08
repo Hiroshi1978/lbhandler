@@ -156,14 +156,14 @@ public class LoadBalancerImpl implements LoadBalancer{
     /**
      * Add new listeners to this load balancer by calling CreateLoadBalancerListeners API.
      * 
-     * @param listeners List of the listeners to be added to this load balancer.
+     * @param newListeners List of the listeners to be added to this load balancer.
      */
     @Override
-    public void createListeners(List<LoadBalancerListener> listeners) {
+    public void createListeners(List<LoadBalancerListener> newListeners) {
         List<Listener> elbListeners = new ArrayList<>();
-        for(LoadBalancerListener listener : listeners){
-            if(listener instanceof LoadBalancerListenerImpl){
-                elbListeners.add((Listener)listener);
+        for(LoadBalancerListener newListener : newListeners){
+            if(newListener instanceof LoadBalancerListenerImpl){
+                elbListeners.add((Listener)newListener);
             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
@@ -172,11 +172,11 @@ public class LoadBalancerImpl implements LoadBalancer{
     }
 
     @Override
-    public void deleteListeners(List<LoadBalancerListener> listeners) {
+    public void deleteListeners(List<LoadBalancerListener> listenersToDelete) {
         List<Listener> elbListeners = new ArrayList<>();
-        for(LoadBalancerListener listener : listeners){
-            if(listener instanceof LoadBalancerListenerImpl){
-                elbListeners.add((Listener)listener);
+        for(LoadBalancerListener listenerToDelete : listenersToDelete){
+            if(listenerToDelete instanceof LoadBalancerListenerImpl){
+                elbListeners.add((Listener)listenerToDelete);
             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
@@ -185,17 +185,17 @@ public class LoadBalancerImpl implements LoadBalancer{
     }
 
     @Override
-    public void createListener(LoadBalancerListener listener) {
-        List<LoadBalancerListener> listeners = new ArrayList<>();
-        listeners.add(listener);
-        this.createListeners(listeners);
+    public void createListener(LoadBalancerListener newListener) {
+        List<LoadBalancerListener> newListeners = new ArrayList<>();
+        newListeners.add(newListener);
+        this.createListeners(newListeners);
     }
 
     @Override
-    public void deleteListener(LoadBalancerListener listener) {
-        List<LoadBalancerListener> listeners = new ArrayList<>();
-        listeners.add(listener);
-        this.deleteListeners(listeners);
+    public void deleteListener(LoadBalancerListener listenerToDelete) {
+        List<LoadBalancerListener> listenersToDelete = new ArrayList<>();
+        listenersToDelete.add(listenerToDelete);
+        this.deleteListeners(listenersToDelete);
     }
 
     @Override
@@ -520,4 +520,8 @@ public class LoadBalancerImpl implements LoadBalancer{
         return 31 * this.getName().hashCode();
     }
     
+    @Override
+    public String toString(){
+        return elb.getLoadBalancerDescription(name).toString();
+    }
 }
