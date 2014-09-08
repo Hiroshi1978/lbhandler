@@ -256,10 +256,18 @@ public class AWSElasticLoadBalancing implements VendorWebService{
     }
     
    public void deleteLoadBalancerListeners(DeleteLoadBalancerListenersRequest request){
-
+       awsHttpClient.deleteLoadBalancerListeners(request);
    }
    public void deleteLoadBalancerListeners(String loadBalancerName, List<Listener> listeners){
-
+       
+       DeleteLoadBalancerListenersRequest request = new DeleteLoadBalancerListenersRequest();
+       request.setLoadBalancerName(loadBalancerName);
+       List<Integer> ports = new ArrayList<>();
+       for(Listener listener : listeners)
+           ports.add(listener.getLoadBalancerPort());
+       request.setLoadBalancerPorts(ports);
+       
+       deleteLoadBalancerListeners(request);
    }
 
    

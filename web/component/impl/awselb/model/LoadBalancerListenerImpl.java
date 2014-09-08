@@ -128,8 +128,10 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     * Should not be called by outer codes, so this is defined as package private, not as public.
     */
     void setLoadBalancer(LoadBalancer newLb) {
-        if(lb == null)
-            lb = newLb;
+        //if this load balancer listener is already attached to some load balancer,then it can only be set to null.
+        if(lb != null && newLb != null)
+            throw new IllegalArgumentException("Aleady attached to another load balancer.");
+        lb = newLb;
     }
 
     @Override
@@ -137,8 +139,8 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
         if(lb == null){
             if(!(addedTo instanceof LoadBalancerImpl))
                 throw new IllegalArgumentException("Invalid load balancer specified.");
+            //private field lb will be set to 'addedTo' in LoadBalancerIml#createListener()method.
             addedTo.createListener(this);
-            lb = addedTo;
         }else if(!lb.equals(addedTo)){
             throw new IllegalArgumentException("Already attached to another load balancer.");
         }
@@ -146,12 +148,41 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     
     @Override
     public LoadBalancer delete() {
-        LoadBalancer deleteFrom = lb;
-        if(deleteFrom != null ){
-            deleteFrom.deleteListener(this);
-            lb = null;
-        }
-        return deleteFrom;
+        if(lb != null )
+            //private field lb will be set to null in LoadBalancerIml#deleteListener()method.
+            lb.deleteListener(this);
+        return lb;
     }
     
+    @Override
+    public boolean equals(Object toCompare){
+        
+        if(toCompare instanceof LoadBalancerListenerImpl){
+            
+            LoadBalancerListenerImpl asImpl = (LoadBalancerListenerImpl)toCompare;
+            
+            boolean isAttachedToSameLoadBalancer = 
+                    getLoadBalancer() == null ? asImpl.getLoadBalancer() == null :  getLoadBalancer().equals(asImpl.getLoadBalancer());
+            
+            return ( isAttachedToSameLoadBalancer &&
+                     getInstancePort().equals(asImpl.getInstancePort()) && 
+                     getInstanceProtocol().equals(asImpl.getInstanceProtocol()) &&
+                     getServicePort().equals(asImpl.getServicePort()) &&
+                     getServiceProtocol().equals(asImpl.getServiceProtocol()));
+        }
+            
+        return false;
+    }
+    
+    @Override
+    public int hashCode(){
+        //this is wrong, but don't know how to implement this method properly.
+        return ( 31 * 
+                 (getLoadBalancer().hashCode() + 
+                  getLoadBalancerPort().hashCode() + 
+                  getInstancePort().hashCode() + 
+                  getInstanceProtocol().hashCode() +
+                  getServicePort().hashCode() + 
+                  getServiceProtocol().hashCode())    );
+    }
 }

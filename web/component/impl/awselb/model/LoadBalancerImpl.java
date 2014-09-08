@@ -160,28 +160,42 @@ public class LoadBalancerImpl implements LoadBalancer{
      */
     @Override
     public void createListeners(List<LoadBalancerListener> newListeners) {
+        List<LoadBalancerListener> listenersToAdd  = new ArrayList();
         List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener newListener : newListeners){
             if(newListener instanceof LoadBalancerListenerImpl){
-                elbListeners.add((Listener)newListener);
-            }else{
+                if(!listeners.contains(newListener)){
+                    listenersToAdd.add(newListener);
+                    elbListeners.add((Listener)newListener);
+                }
+                            }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
         }
         elb.createLoadBalancerListeners(name,elbListeners);
+        for(LoadBalancerListener listenerToAdd : listenersToAdd)
+            ((LoadBalancerListenerImpl)listenerToAdd).setLoadBalancer(this);
+        listeners.addAll(listenersToAdd);
     }
 
     @Override
     public void deleteListeners(List<LoadBalancerListener> listenersToDelete) {
+        List<LoadBalancerListener> listenersToRemove  = new ArrayList();
         List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener listenerToDelete : listenersToDelete){
             if(listenerToDelete instanceof LoadBalancerListenerImpl){
-                elbListeners.add((Listener)listenerToDelete);
+                if(listeners.contains(listenerToDelete)){
+                    listenersToRemove.add(listenerToDelete);
+                    elbListeners.add((Listener)listenerToDelete);
+                }
             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
         }
         elb.deleteLoadBalancerListeners(name,elbListeners);
+        for(LoadBalancerListener listenerToRemove : listenersToRemove)
+            ((LoadBalancerListenerImpl)listenerToRemove).setLoadBalancer(null);
+        listeners.removeAll(listenersToRemove);
     }
 
     @Override
