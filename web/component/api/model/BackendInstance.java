@@ -38,7 +38,7 @@ public interface BackendInstance {
     * Deregister this backend instance from the specified load balancer.
     */
     public void deregisterFrom(LoadBalancer lb);
-    public BackendInstanceState getBackendInstanceState();
-    public BackendInstanceState getBackendInstanceStateFromLB(LoadBalancer lb);
+    public BackendInstanceState getState();
+    public BackendInstanceState getStateFromLB(LoadBalancer lb);
     
 }
