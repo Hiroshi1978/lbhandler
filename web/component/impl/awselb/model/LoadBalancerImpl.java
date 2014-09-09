@@ -115,9 +115,8 @@ public class LoadBalancerImpl implements LoadBalancer{
         this.name = name;
 
         //set listeners.
-        for(LoadBalancerListener listener : listeners)
-           ((LoadBalancerListenerImpl)listener).setLoadBalancer(this);
-        this.listeners.addAll(listeners);
+        this.connectWithListeners(listeners);
+           
 
         //set zones.
         this.zones.addAll(zones);
@@ -127,11 +126,8 @@ public class LoadBalancerImpl implements LoadBalancer{
             this.subnets.addAll(subnets);
 
         //set backendinstances.
-        if(backendInstances != null && !backendInstances.isEmpty()){
-            for(BackendInstance backendInstance : backendInstances)
-                ((BackendInstanceImpl)backendInstance).setLoadBalancer(this);
-            this.backendInstances.addAll(backendInstances);
-        }
+        if(backendInstances != null && !backendInstances.isEmpty())
+            this.connectWithBackendInstances(backendInstances);
     }
     
     /**
@@ -160,6 +156,10 @@ public class LoadBalancerImpl implements LoadBalancer{
      */
     @Override
     public void createListeners(List<LoadBalancerListener> newListeners) {
+
+        if(isDestroyed())
+            return;
+
         List<LoadBalancerListener> listenersToAdd  = new ArrayList();
         List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener newListener : newListeners){
@@ -172,14 +172,18 @@ public class LoadBalancerImpl implements LoadBalancer{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
         }
-        elb.createLoadBalancerListeners(name,elbListeners);
-        for(LoadBalancerListener listenerToAdd : listenersToAdd)
-            ((LoadBalancerListenerImpl)listenerToAdd).setLoadBalancer(this);
-        listeners.addAll(listenersToAdd);
+        if(!elbListeners.isEmpty())
+            elb.createLoadBalancerListeners(name,elbListeners);
+        if(!listenersToAdd.isEmpty())
+            this.connectWithListeners(listenersToAdd);
     }
 
     @Override
     public void deleteListeners(List<LoadBalancerListener> listenersToDelete) {
+
+        if(isDestroyed())
+            return;
+
         List<LoadBalancerListener> listenersToRemove  = new ArrayList();
         List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener listenerToDelete : listenersToDelete){
@@ -192,14 +196,18 @@ public class LoadBalancerImpl implements LoadBalancer{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
         }
-        elb.deleteLoadBalancerListeners(name,elbListeners);
-        for(LoadBalancerListener listenerToRemove : listenersToRemove)
-            ((LoadBalancerListenerImpl)listenerToRemove).setLoadBalancer(null);
-        listeners.removeAll(listenersToRemove);
+        if(!elbListeners.isEmpty())
+            elb.deleteLoadBalancerListeners(name,elbListeners);
+        if(!listenersToRemove.isEmpty())
+            this.disconnectFromListeners(listenersToRemove);
     }
 
     @Override
     public void createListener(LoadBalancerListener newListener) {
+
+        if(isDestroyed())
+            return;
+
         List<LoadBalancerListener> newListeners = new ArrayList<>();
         newListeners.add(newListener);
         this.createListeners(newListeners);
@@ -207,6 +215,10 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public void deleteListener(LoadBalancerListener listenerToDelete) {
+
+        if(isDestroyed())
+            return;
+
         List<LoadBalancerListener> listenersToDelete = new ArrayList<>();
         listenersToDelete.add(listenerToDelete);
         this.deleteListeners(listenersToDelete);
@@ -214,6 +226,10 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public void registerInstances(List<BackendInstance> newBackendInstances) {
+
+        if(isDestroyed())
+            return;
+
         List<BackendInstance> backendInstancesToAdd = new ArrayList<>();
         List<Instance> elbInstances = new ArrayList<>();
         for(BackendInstance newBackendInstance : newBackendInstances){
@@ -226,14 +242,18 @@ public class LoadBalancerImpl implements LoadBalancer{
                 throw new IllegalArgumentException("Invalid instances specified.");
             }
         }
-        if(!elbInstances.isEmpty()){
+        if(!elbInstances.isEmpty())
             elb.registerInstancesWithLoadBalancer(name, elbInstances);
-            backendInstances.addAll(backendInstancesToAdd);
-        }
+        if(!backendInstancesToAdd.isEmpty())
+            this.connectWithBackendInstances(backendInstancesToAdd);
     }
 
     @Override
     public void deregisterInstances(List<BackendInstance> instancesToDelete) {
+
+        if(isDestroyed())
+            return;
+        
         List<BackendInstance> backendInstancesToRemove = new ArrayList<>();
         List<Instance> elbInstances = new ArrayList<>();
         for(BackendInstance instanceToDelete : instancesToDelete){
@@ -246,14 +266,18 @@ public class LoadBalancerImpl implements LoadBalancer{
                 throw new IllegalArgumentException("Invalid instances specified.");
             }
         }
-        if(!elbInstances.isEmpty()){
+        if(!elbInstances.isEmpty())
             elb.deregisterInstancesFromLoadBalancer(name, elbInstances);
-            backendInstances.removeAll(backendInstancesToRemove);
-        }
+        if(!backendInstancesToRemove.isEmpty())
+            this.disconnectFromBackendInstances(backendInstancesToRemove);
     }
 
     @Override
     public void registerInstance(BackendInstance newBackendInstance) {
+        
+        if(isDestroyed())
+            return;
+
         List<BackendInstance> newBackendInstances = new ArrayList<>();
         newBackendInstances.add(newBackendInstance);
         this.registerInstances(newBackendInstances);
@@ -261,6 +285,10 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public void deregisterInstance(BackendInstance instanceToDelete) {
+
+        if(isDestroyed())
+            return;
+        
         List<BackendInstance> instancesToDelete = new ArrayList<>();
         instancesToDelete.add(instanceToDelete);
         this.deregisterInstances(instancesToDelete);
@@ -268,16 +296,28 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public void enableZones(List<Zone> zones) {
+        
+        if(isDestroyed())
+            return;
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void disableZones(List<Zone> zones) {
+        
+        if(isDestroyed())
+            return;
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void enableZone(Zone zone) {
+        
+        if(isDestroyed())
+            return;
+        
         List<Zone> zones = new ArrayList<>();
         zones.add(zone);
         this.enableZones(zones);
@@ -285,6 +325,10 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public void disableZone(Zone zone) {
+        
+        if(isDestroyed())
+            return;
+        
         List<Zone> zones = new ArrayList<>();
         zones.add(zone);
         this.disableZones(zones);
@@ -292,7 +336,15 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public void delete() {
+        
+        if(isDestroyed())
+            return;
+        
         elb.deleteLoadBalancer(name);
+        listeners.clear();
+        zones.clear();
+        subnets.clear();
+        backendInstances.clear();
         destroyed = true;
     }
 
@@ -374,10 +426,18 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public List<BackendInstance> getBackendInstances() {
+        
+        if(isDestroyed())
+            return null;
+
         return backendInstances.isEmpty() ? this.getBackendInstances(true) : backendInstances;
     }
 
     public List<BackendInstance> getBackendInstances(boolean reload) {
+        
+        if(isDestroyed())
+            return null;
+        
         if(reload){
             List<Instance> elbInstances = elb.getLoadBalancerDescription(name).getInstances();
             List<BackendInstance> latestInstances = new ArrayList<>();
@@ -387,79 +447,81 @@ public class LoadBalancerImpl implements LoadBalancer{
             backendInstances.addAll(latestInstances);
         }
         return backendInstances;
+        
     }
 
     public static class Builder{
         
         private final String name;
-        private List<LoadBalancerListener> listeners;
-        private List<Zone> zones;
-        private List<Subnet> subnets;
+        private final List<LoadBalancerListener> listeners = new ArrayList<>();
+        private final List<Zone> zones = new ArrayList<>();
+        private final List<Subnet> subnets = new ArrayList<>();
         
         public Builder(String name){
             this.name = name;
         }
         
-        public Builder listeners(List<LoadBalancerListener> listeners){
-            this.listeners = listeners;
+        public Builder listeners(List<LoadBalancerListener> newListeners){
+            listeners.addAll(newListeners);
             return this;
         }
         
-        public Builder listener(LoadBalancerListener listener){
-            List<LoadBalancerListener> listeners = new ArrayList<>();
-            listeners.add(listener);
-            return this.listeners(listeners);
+        public Builder listener(LoadBalancerListener newListener){
+            listeners.add(newListener);
+            return this;
         }
         
         public Builder defaultHttpListener(){
+            
             LoadBalancerListener listener = LoadBalancerListenerImpl.create();
             listener.setInstancePort(80);
             listener.setInstanceProtocol("HTTP");
             listener.setServicePort(80);
             listener.setServiceProtocol("HTTP");
-            return this.listener(listener);
+            listeners.add(listener);
+            return this;
         }
         
         public Builder defaultHttpsListener(String serverCertificateId){
+            
             LoadBalancerListener listener = LoadBalancerListenerImpl.create();
             listener.setInstancePort(443);
             listener.setInstanceProtocol("HTTPS");
             listener.setServicePort(443);
             listener.setServiceProtocol("HTTPS");
             listener.setServerCertificate(serverCertificateId);
-            return this.listener(listener);
-        }
-        
-        public Builder zones(List<Zone> zones){
-            this.zones = zones;
+            listeners.add(listener);
             return this;
         }
         
-        public Builder zone(Zone zone){
-            List<Zone> zones = new ArrayList<>();
-            zones.add(zone);
-            return this.zones(zones);
+        public Builder zones(List<Zone> newZones){
+            zones.addAll(newZones);
+            return this;
+        }
+        
+        public Builder zone(Zone newZone){
+            zones.add(newZone);
+            return this;
         }
         
         public Builder zone(String zoneName){
-            Zone zone = ZoneImpl.create(zoneName);
-            return this.zone(zone);
-        }
-        
-        public Builder subnets(List<Subnet> subnets){
-            this.subnets = subnets;
+            zones.add(ZoneImpl.create(zoneName));
             return this;
         }
         
-        public Builder subnet(Subnet subnet){
-            List<Subnet> subnets = new ArrayList<>();
-            subnets.add(subnet);
-            return this.subnets(subnets);
+        public Builder subnets(List<Subnet> newSubnets){
+            subnets.addAll(newSubnets);
+            return this;
+        }
+        
+        public Builder subnet(Subnet newSubnet){
+            subnets.add(newSubnet);
+            return this;
         }
         
         public Builder subnet(String subnetId){
-            Subnet subnet = SubnetImpl.create(subnetId);
-            return this.subnet(subnet);
+            subnets.add(SubnetImpl.create(subnetId));
+            return this;
         }
         
         public LoadBalancer build(){
@@ -472,6 +534,10 @@ public class LoadBalancerImpl implements LoadBalancer{
     }
     
     public List<BackendInstanceState> getInstanceStates(){
+        
+        if(isDestroyed())
+            return null;
+        
         List<InstanceState> elbInstanceStates = elb.describeInstanceHealth(name).getInstanceStates();
         List<BackendInstanceState> states  = new ArrayList<>();
         for(InstanceState elbInstanceState : elbInstanceStates)
@@ -481,6 +547,9 @@ public class LoadBalancerImpl implements LoadBalancer{
     
     public List<BackendInstanceState> getInstanceStates(List<BackendInstance> backendInstances){
 
+        if(isDestroyed())
+            return null;
+        
         List<Instance> elbInstances = new ArrayList<>();
         for(BackendInstance backendInstance : backendInstances){
             if(backendInstance instanceof BackendInstanceImpl){
@@ -502,6 +571,9 @@ public class LoadBalancerImpl implements LoadBalancer{
     
     public List<BackendInstanceState> getInstanceStatesByInstanceId(List<String> backendInstanceIds){
 
+        if(isDestroyed())
+            return null;
+        
         List<Instance> elbInstances = new ArrayList<>();
         for(String id : backendInstanceIds)
             elbInstances.add(new Instance(id));
@@ -515,18 +587,27 @@ public class LoadBalancerImpl implements LoadBalancer{
     }
 
     public BackendInstanceState getInstanceState(String backendInstanceId){
+
+        if(isDestroyed())
+            return null;
+        
         List<String> backendInstanceIds = new ArrayList<>();
         backendInstanceIds.add(backendInstanceId);
         return this.getInstanceStatesByInstanceId(backendInstanceIds).get(0);
     }
     
     public BackendInstanceState getInstanceState(BackendInstance backendInstance){
+
+        if(isDestroyed())
+            return null;
+        
         List<BackendInstance> backendInstances = new ArrayList<>();
         backendInstances.add(backendInstance);
         return this.getInstanceStates(backendInstances).get(0);
     }
 
     public static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
+
         DescribeLoadBalancersResult result = elb.describeLoadBalancers();
         return result;
     }
@@ -547,5 +628,57 @@ public class LoadBalancerImpl implements LoadBalancer{
     @Override
     public String toString(){
         return elb.getLoadBalancerDescription(name).toString();
+    }
+    
+    
+    // Mutual referencial relations between LoadBalancer instance and other component instances, 
+    // such as LoadBalancerListener, BackendInstance, should be controlled through these methods.
+    
+    private void connectWithListeners(List<LoadBalancerListener> newListeners){
+        listeners.addAll(newListeners);
+        for(LoadBalancerListener newListener : newListeners)
+            ((LoadBalancerListenerImpl)newListener).setLoadBalancer(this);
+    }
+   
+    private void disconnectFromListeners(List<LoadBalancerListener> listeners){
+        listeners.removeAll(listeners);
+        for(LoadBalancerListener listener : listeners)
+            ((LoadBalancerListenerImpl)listener).setLoadBalancer(null);
+    }
+
+    private void connectWithListener(LoadBalancerListener toConnect){
+        List<LoadBalancerListener> listToConnect = new ArrayList<>();
+        listToConnect.add(toConnect);
+        connectWithListeners(listToConnect);
+    }
+    
+    private void disconnectFromListener(LoadBalancerListener toDisconnect){
+        List<LoadBalancerListener> listToDisconnect = new ArrayList<>();
+        listToDisconnect.add(toDisconnect);
+        connectWithListeners(listToDisconnect);
+    }
+
+    private void connectWithBackendInstances(List<BackendInstance> backendInstances){
+        backendInstances.addAll(backendInstances);
+        for(BackendInstance backendInstance : backendInstances)
+            ((BackendInstanceImpl)backendInstance).addLoadBalancer(this);
+    }
+
+    private void disconnectFromBackendInstances(List<BackendInstance> backendInstances){
+        backendInstances.removeAll(backendInstances);
+        for(BackendInstance backendInstance : backendInstances)
+            ((BackendInstanceImpl)backendInstance).removeLoadBalancer(this);
+    }
+
+    private void connectWithBackendInstance(BackendInstance toConnect){
+        List<BackendInstance> listToConnect = new ArrayList<>();
+        listToConnect.add(toConnect);
+        connectWithBackendInstances(listToConnect);
+    }
+    
+    private void disconnectFromBackendInstance(BackendInstance toDisconnect){
+        List<BackendInstance> listToDisconnect = new ArrayList<>();
+        listToDisconnect.add(toDisconnect);
+        disconnectFromBackendInstances(listToDisconnect);
     }
 }

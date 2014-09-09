@@ -26,6 +26,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
 
     /*
     * Instance list of the load balancers with which this backend instance is registered.
+    * This field must not be modifyed by this class itself. Only LoadBalancerImpl class can modify this.
     *
     */
     private final List<LoadBalancer> lbs = new ArrayList<>();
@@ -63,12 +64,19 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     }
 
    /*
-    * This method should be called only from the classes in this package, for example, by LoadBalancerImplClass
-    * when its instance is constructed and its backendInstances member is initialized.
-    * Should not be called by outer codes, so this is defined as package private, not as public.
+    * This method should be called only from the instances of LoadBalancerImpl classe in this package,.
+    * Sholud not called by this class itself.
     */
-    void setLoadBalancer(LoadBalancer lb) {
+    void addLoadBalancer(LoadBalancer lb) {
         lbs.add(lb);
+    }
+
+   /*
+    * This method should be called only from the instances of LoadBalancerImpl classe in this package,.
+    * Sholud not called by this class itself.
+    */
+    void removeLoadBalancer(LoadBalancer lb) {
+        lbs.remove(lb);
     }
 
     @Override
@@ -87,10 +95,8 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
         if(newLb == null || !(newLb instanceof LoadBalancerImpl))
             throw new IllegalArgumentException("Invalid load balancer specified.");
             
-        if(!lbs.contains(newLb)){
+        if(!lbs.contains(newLb))
             newLb.registerInstance(this);
-            lbs.add(newLb);
-        }
     }
 
     @Override
@@ -99,10 +105,8 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
         if(lb == null || !(lb instanceof LoadBalancerImpl))
             throw new IllegalArgumentException("Invalid load balancer specified.");
         
-        if(lbs.contains(lb)){
+        if(lbs.contains(lb))
             lb.deregisterInstance(this);
-            lbs.remove(lb);
-        }
     }
 
     @Override

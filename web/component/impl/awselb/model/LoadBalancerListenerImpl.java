@@ -124,9 +124,8 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     }
 
    /*
-    * This method should be called only from the classes in this package, for example, by LoadBalancerImplClass
-    * when its instance is constructed and its listeners member is initialized.
-    * Should not be called by outer codes, so this is defined as package private, not as public.
+    * This method should be called only from the instances of LoadBalancerImpl classe in this package,.
+    * Sholud not called by this class itself.
     */
     void setLoadBalancer(LoadBalancer newLb) {
         //if this load balancer listener is already attached to some load balancer,then it can only be set to null.
