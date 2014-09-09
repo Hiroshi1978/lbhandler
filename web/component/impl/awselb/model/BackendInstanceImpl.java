@@ -123,12 +123,12 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     }
 
     @Override
-    public BackendInstanceState getBackendInstanceState(){
+    public BackendInstanceState getState(){
         return lbs.isEmpty() ? BackendInstanceImpl.State.create(new InstanceState()) : lbs.get(0).getInstanceState(this);
     }
 
     @Override
-    public BackendInstanceState getBackendInstanceStateFromLB(LoadBalancer lb){
+    public BackendInstanceState getStateFromLB(LoadBalancer lb){
         return lbs.contains(lb) ? lb.getInstanceState(this) : BackendInstanceImpl.State.create(new InstanceState());
     }
 
