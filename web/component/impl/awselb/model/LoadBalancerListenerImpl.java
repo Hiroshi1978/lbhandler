@@ -124,8 +124,8 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     }
 
    /*
-    * This method should be called only from the instances of LoadBalancerImpl classe in this package,.
-    * Sholud not called by this class itself.
+    * This method should be called only from the instances of LoadBalancerImpl class in this package.
+    * Should not called by this class itself.
     */
     void setLoadBalancer(LoadBalancer newLb) {
         //if this load balancer listener is already attached to some load balancer,then it can only be set to null.
@@ -139,7 +139,7 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
         if(lb == null){
             if(!(addedTo instanceof LoadBalancerImpl))
                 throw new IllegalArgumentException("Invalid load balancer specified.");
-            //private field lb will be set to 'addedTo' in LoadBalancerIml#createListener()method.
+            //private field lb will be set to 'addedTo' in LoadBalancerIml#createListener method.
             addedTo.createListener(this);
         }else if(!lb.equals(addedTo)){
             throw new IllegalArgumentException("Already attached to another load balancer.");
