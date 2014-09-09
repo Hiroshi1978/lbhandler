@@ -19,14 +19,11 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
 
     private LoadBalancer lb;
     
-   /*
-    * This consutructor is called from LoadBalancerImpl.class so this is defined as package private.
-    */
-    LoadBalancerListenerImpl(){
+    private LoadBalancerListenerImpl(){
         
     }
     
-    LoadBalancerListenerImpl(ListenerDescription description){
+    private LoadBalancerListenerImpl(ListenerDescription description){
         Listener lbaListener = description.getListener();
         this.setInstancePort(lbaListener.getInstancePort());
         this.setInstanceProtocol(lbaListener.getInstanceProtocol());
@@ -34,6 +31,10 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
         this.setServiceProtocol(lbaListener.getProtocol());
     }
     
+    public static LoadBalancerListener create(ListenerDescription description){
+        return new LoadBalancerListenerImpl(description);
+    }
+
     public static LoadBalancerListener create(){
         return new LoadBalancerListenerImpl();
     }

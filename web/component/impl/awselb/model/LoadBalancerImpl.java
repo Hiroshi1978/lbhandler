@@ -214,32 +214,42 @@ public class LoadBalancerImpl implements LoadBalancer{
 
     @Override
     public void registerInstances(List<BackendInstance> newBackendInstances) {
+        List<BackendInstance> backendInstancesToAdd = new ArrayList<>();
         List<Instance> elbInstances = new ArrayList<>();
         for(BackendInstance newBackendInstance : newBackendInstances){
             if(newBackendInstance instanceof BackendInstanceImpl){
                 if(!backendInstances.contains(newBackendInstance)){
-                    backendInstances.add(newBackendInstance);
+                    backendInstancesToAdd.add(newBackendInstance);
                     elbInstances.add((Instance)newBackendInstance);
                 }
             }else{
                 throw new IllegalArgumentException("Invalid instances specified.");
             }
         }
-        elb.registerInstancesWithLoadBalancer(name, elbInstances);
+        if(!elbInstances.isEmpty()){
+            elb.registerInstancesWithLoadBalancer(name, elbInstances);
+            backendInstances.addAll(backendInstancesToAdd);
+        }
     }
 
     @Override
     public void deregisterInstances(List<BackendInstance> instancesToDelete) {
+        List<BackendInstance> backendInstancesToRemove = new ArrayList<>();
         List<Instance> elbInstances = new ArrayList<>();
         for(BackendInstance instanceToDelete : instancesToDelete){
             if(instanceToDelete instanceof BackendInstanceImpl){
-                elbInstances.add((Instance)instanceToDelete);
+                if(backendInstances.contains(instanceToDelete)){
+                    backendInstancesToRemove.add(instanceToDelete);
+                    elbInstances.add((Instance)instanceToDelete);
+                }
             }else{
                 throw new IllegalArgumentException("Invalid instances specified.");
             }
         }
-        elb.deregisterInstancesFromLoadBalancer(name, elbInstances);
-        backendInstances.removeAll(instancesToDelete);
+        if(!elbInstances.isEmpty()){
+            elb.deregisterInstancesFromLoadBalancer(name, elbInstances);
+            backendInstances.removeAll(backendInstancesToRemove);
+        }
     }
 
     @Override
@@ -316,7 +326,7 @@ public class LoadBalancerImpl implements LoadBalancer{
                 List<LoadBalancerListener> listeners = new ArrayList<>();
                 List<ListenerDescription> listenerDescriptions = description.getListenerDescriptions();
                 for(ListenerDescription listenerDescription : listenerDescriptions)
-                    listeners.add(new LoadBalancerListenerImpl(listenerDescription));
+                    listeners.add(LoadBalancerListenerImpl.create(listenerDescription));
                 List<Zone> zones = new ArrayList<>();
                 List<String> zoneNames = description.getAvailabilityZones();
                 for(String zoneName : zoneNames)
@@ -402,7 +412,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
         
         public Builder defaultHttpListener(){
-            LoadBalancerListenerImpl listener = new LoadBalancerListenerImpl();
+            LoadBalancerListener listener = LoadBalancerListenerImpl.create();
             listener.setInstancePort(80);
             listener.setInstanceProtocol("HTTP");
             listener.setServicePort(80);
@@ -411,7 +421,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
         
         public Builder defaultHttpsListener(String serverCertificateId){
-            LoadBalancerListenerImpl listener = new LoadBalancerListenerImpl();
+            LoadBalancerListener listener = LoadBalancerListenerImpl.create();
             listener.setInstancePort(443);
             listener.setInstanceProtocol("HTTPS");
             listener.setServicePort(443);

@@ -9,7 +9,9 @@ package web.component.impl.awselb.model;
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.InstanceState;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import web.component.api.model.BackendInstance;
 import web.component.api.model.BackendInstanceState;
 import web.component.api.model.LoadBalancer;
@@ -20,6 +22,12 @@ import web.component.api.model.LoadBalancer;
  */
 public class BackendInstanceImpl extends Instance implements BackendInstance{
 
+    private static final Map<String,BackendInstance> existBackendInstances = new HashMap<>();
+
+    /*
+    * Instance list of the load balancers with which this backend instance is registered.
+    *
+    */
     private final List<LoadBalancer> lbs = new ArrayList<>();
     
     private BackendInstanceImpl(String id){
@@ -35,11 +43,18 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
     }
     
     public static BackendInstance create(String id){
-        return new BackendInstanceImpl(id);
+        if(existBackendInstances.get(id) == null)
+            existBackendInstances.put(id, new  BackendInstanceImpl(id));
+        return existBackendInstances.get(id);
     }
 
-    public static BackendInstance create(LoadBalancer lb, String id){
-        return new BackendInstanceImpl(lb,id);
+   /*
+    * this method should be called only from LoadBalancerImpl class so defined as package private, not public.
+    */
+    static BackendInstance create(LoadBalancer lb, String id){
+        if(existBackendInstances.get(id) == null)
+            existBackendInstances.put(id, new  BackendInstanceImpl(lb,id));
+        return existBackendInstances.get(id);
     }
 
     @Override
@@ -155,5 +170,9 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
             return elbInstanceState.getState();
         }
         
+        @Override
+        public String toString(){
+            return getDescription();
+        }
     }
 }

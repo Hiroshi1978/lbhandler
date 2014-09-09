@@ -6,6 +6,8 @@
 
 package web.component.impl.awselb.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import web.component.api.model.Subnet;
 
 /**
@@ -14,6 +16,8 @@ import web.component.api.model.Subnet;
  */
 public class SubnetImpl extends com.amazonaws.services.ec2.model.Subnet implements Subnet{
 
+    private static final Map<String,Subnet> existSubnets = new HashMap<>();
+    
     private SubnetImpl(String id){
         super.setSubnetId(id);
     }
@@ -24,7 +28,9 @@ public class SubnetImpl extends com.amazonaws.services.ec2.model.Subnet implemen
     }
     
     public static Subnet create(String id){
-        return new SubnetImpl(id);
+        if(existSubnets.get(id) == null)
+            existSubnets.put(id, new SubnetImpl(id));
+        return existSubnets.get(id);
     }
     
     @Override
