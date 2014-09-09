@@ -341,10 +341,10 @@ public class LoadBalancerImpl implements LoadBalancer{
             return;
         
         elb.deleteLoadBalancer(name);
-        listeners.clear();
+        disconnectFromListeners(new ArrayList(listeners));
+        disconnectFromBackendInstances(new ArrayList(backendInstances));
         zones.clear();
         subnets.clear();
-        backendInstances.clear();
         destroyed = true;
     }
 
