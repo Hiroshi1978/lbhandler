@@ -15,23 +15,20 @@ import web.component.api.model.Zone;
  *
  * @author Hiroshi
  */
-public class ZoneImpl extends AvailabilityZone implements Zone{
+public class ZoneImpl implements Zone{
 
     private static final Map<String,Zone> existZones = new HashMap<>();
     
-    public static Zone create(String name){
-        if(existZones.get(name) == null)
-            existZones.put(name, new ZoneImpl(name));
-        return existZones.get(name);
-    }
+    private final AvailabilityZone elbZone = new AvailabilityZone();
     
-    private ZoneImpl(String name){
-        super.setZoneName(name);
+    private ZoneImpl(Builder builder){
+        
+        elbZone.setZoneName(builder.name);
     }
     
     @Override
     public String getName(){
-        return super.getZoneName();
+        return elbZone.getZoneName();
     }
     
     @Override
@@ -39,11 +36,6 @@ public class ZoneImpl extends AvailabilityZone implements Zone{
         if(toBeCompared instanceof ZoneImpl)
             return this.getName().equals(((ZoneImpl)toBeCompared).getName());
         return false;
-    }
-    
-    @Override
-    public void setZoneName(String zoneName){
-        throw new UnsupportedOperationException("Zone name can not be modified.");
     }
     
     @Override
@@ -55,5 +47,21 @@ public class ZoneImpl extends AvailabilityZone implements Zone{
     @Override
     public String toString(){
         return "{ZoneName: " + getName() + "}";
+    }
+    
+    public static class Builder {
+        
+        private String name;
+        
+        public Builder name(String name){
+            this.name = name;
+            return this;
+        }
+        
+        public Zone build(){
+            if(existZones.get(name) == null)
+                existZones.put(name, new ZoneImpl(this));
+            return existZones.get(name);
+        }
     }
 }
