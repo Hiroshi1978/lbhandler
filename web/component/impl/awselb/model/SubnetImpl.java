@@ -14,23 +14,23 @@ import web.component.api.model.Subnet;
  *
  * @author Hiroshi
  */
-public class SubnetImpl extends com.amazonaws.services.ec2.model.Subnet implements Subnet{
+public class SubnetImpl implements Subnet{
 
     private static final Map<String,Subnet> existSubnets = new HashMap<>();
     
-    private SubnetImpl(String id){
-        super.setSubnetId(id);
+    private final com.amazonaws.services.ec2.model.Subnet elbSubnet = new com.amazonaws.services.ec2.model.Subnet();
+    
+    private SubnetImpl(Builder builder){
+        elbSubnet.setSubnetId(builder.id);
+    }
+    
+    public com.amazonaws.services.ec2.model.Subnet asElbSubnet(){
+        return elbSubnet;
     }
     
     @Override
     public String getId() {
-        return super.getSubnetId();
-    }
-    
-    public static Subnet create(String id){
-        if(existSubnets.get(id) == null)
-            existSubnets.put(id, new SubnetImpl(id));
-        return existSubnets.get(id);
+        return elbSubnet.getSubnetId();
     }
     
     @Override
@@ -50,9 +50,20 @@ public class SubnetImpl extends com.amazonaws.services.ec2.model.Subnet implemen
     public String toString(){
         return "{SubnetID: " + getId() + "}";
     }
+
+    public static class Builder {
     
-    @Override
-    public void setSubnetId(String subnetId){
-        throw new UnsupportedOperationException("Subnet id can not be modified.");
+        private String id;
+        
+        public Builder id(String id){
+            this.id = id;
+            return this;
+        }
+        
+        public Subnet build(){
+            if(existSubnets.get(id) == null)
+                existSubnets.put(id, new SubnetImpl(this));
+            return existSubnets.get(id);
+        }
     }
 }
