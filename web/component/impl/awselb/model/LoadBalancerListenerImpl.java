@@ -17,8 +17,6 @@ import web.component.api.model.LoadBalancerListener;
  */
 public class LoadBalancerListenerImpl implements LoadBalancerListener{
 
-    private LoadBalancer lb;
-    
     private final Listener elbListener = new Listener();
     
     private LoadBalancerListenerImpl(Builder builder){
@@ -87,7 +85,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
     
     @Override
     public LoadBalancer getLoadBalancer() {
-        return lb;
+        throw new UnsupportedOperationException("Not yet supported.");
     }
 
    /*
@@ -95,30 +93,17 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
     * Should not called by this class itself.
     */
     void setLoadBalancer(LoadBalancer newLb) {
-        //if this load balancer listener is already attached to some load balancer,then it can only be set to null.
-        if(lb != null && newLb != null)
-            throw new IllegalArgumentException("Aleady attached to another load balancer.");
-        lb = newLb;
+        throw new UnsupportedOperationException("Not yet supported.");
     }
 
     @Override
     public void addTo(LoadBalancer addedTo){
-        if(lb == null){
-            if(!(addedTo instanceof LoadBalancerImpl))
-                throw new IllegalArgumentException("Invalid load balancer specified.");
-            //private field lb will be set to 'addedTo' in LoadBalancerIml#createListener method.
-            addedTo.createListener(this);
-        }else if(!lb.equals(addedTo)){
-            throw new IllegalArgumentException("Already attached to another load balancer.");
-        }
+        addedTo.createListener(this);
     }
     
     @Override
-    public LoadBalancer delete() {
-        if(lb != null )
-            //private field lb will be set to null in LoadBalancerIml#deleteListener()method.
-            lb.deleteListener(this);
-        return lb;
+    public void deleteFrom(LoadBalancer deletedFrom) {
+        deletedFrom.deleteListener(this);
     }
     
     @Override
@@ -128,11 +113,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
             
             LoadBalancerListenerImpl asImpl = (LoadBalancerListenerImpl)toCompare;
             
-            boolean isAttachedToEqualLoadBalancer = 
-                    getLoadBalancer() == null ? asImpl.getLoadBalancer() == null :  getLoadBalancer().equals(asImpl.getLoadBalancer());
-            
-            return ( isAttachedToEqualLoadBalancer &&
-                     getInstancePort().equals(asImpl.getInstancePort()) && 
+            return ( getInstancePort().equals(asImpl.getInstancePort()) && 
                      getInstanceProtocol().equals(asImpl.getInstanceProtocol()) &&
                      getServicePort().equals(asImpl.getServicePort()) &&
                      getServiceProtocol().equals(asImpl.getServiceProtocol()));
@@ -145,8 +126,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
     public int hashCode(){
         //this is wrong, but don't know how to implement this method properly.
         return ( 31 * 
-                 ((getLoadBalancer() == null ? 0 : getLoadBalancer().hashCode()) + 
-                  getLoadBalancerPort().hashCode() + 
+                 (getLoadBalancerPort().hashCode() + 
                   getInstancePort().hashCode() + 
                   getInstanceProtocol().hashCode() +
                   getServicePort().hashCode() + 
