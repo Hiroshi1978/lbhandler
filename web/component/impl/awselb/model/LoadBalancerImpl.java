@@ -378,7 +378,7 @@ public class LoadBalancerImpl implements LoadBalancer{
                 List<LoadBalancerListener> listeners = new ArrayList<>();
                 List<ListenerDescription> listenerDescriptions = description.getListenerDescriptions();
                 for(ListenerDescription listenerDescription : listenerDescriptions)
-                    listeners.add(new LoadBalancerListenerImpl.Builder().build(listenerDescription));
+                    listeners.add(new LoadBalancerListenerImpl.Builder().description(listenerDescription).build());
                 List<Zone> zones = new ArrayList<>();
                 List<String> zoneNames = description.getAvailabilityZones();
                 for(String zoneName : zoneNames)
