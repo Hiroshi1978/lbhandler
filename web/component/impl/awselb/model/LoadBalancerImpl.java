@@ -47,7 +47,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener listener : builder.listeners){
             if(listener instanceof LoadBalancerListenerImpl){
-                elbListeners.add((Listener) listener);
+                elbListeners.add(listener.asElbListener());
             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
@@ -166,7 +166,7 @@ public class LoadBalancerImpl implements LoadBalancer{
             if(newListener instanceof LoadBalancerListenerImpl){
                 if(!listeners.contains(newListener)){
                     listenersToAdd.add(newListener);
-                    elbListeners.add((Listener)newListener);
+                    elbListeners.add(newListener.asElbListener());
                 }
                             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
@@ -190,7 +190,7 @@ public class LoadBalancerImpl implements LoadBalancer{
             if(listenerToDelete instanceof LoadBalancerListenerImpl){
                 if(listeners.contains(listenerToDelete)){
                     listenersToRemove.add(listenerToDelete);
-                    elbListeners.add((Listener)listenerToDelete);
+                    elbListeners.add(listenerToDelete.asElbListener());
                 }
             }else{
                 throw new IllegalArgumentException("Invalid listeners specified.");
@@ -378,7 +378,7 @@ public class LoadBalancerImpl implements LoadBalancer{
                 List<LoadBalancerListener> listeners = new ArrayList<>();
                 List<ListenerDescription> listenerDescriptions = description.getListenerDescriptions();
                 for(ListenerDescription listenerDescription : listenerDescriptions)
-                    listeners.add(LoadBalancerListenerImpl.create(listenerDescription));
+                    listeners.add(new LoadBalancerListenerImpl.Builder().build(listenerDescription));
                 List<Zone> zones = new ArrayList<>();
                 List<String> zoneNames = description.getAvailabilityZones();
                 for(String zoneName : zoneNames)
@@ -473,23 +473,19 @@ public class LoadBalancerImpl implements LoadBalancer{
         
         public Builder defaultHttpListener(){
             
-            LoadBalancerListener listener = LoadBalancerListenerImpl.create();
-            listener.setInstancePort(80);
-            listener.setInstanceProtocol("HTTP");
-            listener.setServicePort(80);
-            listener.setServiceProtocol("HTTP");
+            LoadBalancerListener listener = new LoadBalancerListenerImpl.Builder().build();
             listeners.add(listener);
             return this;
         }
         
-        public Builder defaultHttpsListener(String serverCertificateId){
+        public Builder defaultHttpsListener(String certificateId){
             
-            LoadBalancerListener listener = LoadBalancerListenerImpl.create();
-            listener.setInstancePort(443);
-            listener.setInstanceProtocol("HTTPS");
-            listener.setServicePort(443);
-            listener.setServiceProtocol("HTTPS");
-            listener.setServerCertificate(serverCertificateId);
+            LoadBalancerListener listener = new LoadBalancerListenerImpl.Builder()
+                .instancePort(443).instanceProtocol("HTTPS")
+                .servicePort(443).serviceProtocol("HTTPS")
+                .certificateId(certificateId)
+                .build();
+
             listeners.add(listener);
             return this;
         }
