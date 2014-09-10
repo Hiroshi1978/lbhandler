@@ -8,7 +8,6 @@ package web.component.impl.awselb.model;
 
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.InstanceState;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,73 +19,33 @@ import web.component.api.model.LoadBalancer;
  *
  * @author Hiroshi
  */
-public class BackendInstanceImpl extends Instance implements BackendInstance{
+public class BackendInstanceImpl implements BackendInstance{
 
     private static final Map<String,BackendInstance> existBackendInstances = new HashMap<>();
 
-    /*
-    * Instance list of the load balancers with which this backend instance is registered.
-    * This field must not be modifyed by this class itself. Only LoadBalancerImpl class can modify this.
-    *
-    */
-    private final List<LoadBalancer> lbs = new ArrayList<>();
+    private final Instance elbInstance = new Instance();
     
     private BackendInstanceImpl(String id){
-        super.setInstanceId(id);
+        elbInstance.setInstanceId(id);
     }
     
-    private BackendInstanceImpl(LoadBalancer lb, String id){
-        
-        if(!(lb instanceof LoadBalancerImpl))
-            throw new IllegalArgumentException("Invalid load balancer specified.");
-        this.lbs.add(lb);
-        super.setInstanceId(id);
+    private BackendInstanceImpl(Builder builder){
+        elbInstance.setInstanceId(builder.id);
     }
     
-    public static BackendInstance create(String id){
-        if(existBackendInstances.get(id) == null)
-            existBackendInstances.put(id, new  BackendInstanceImpl(id));
-        return existBackendInstances.get(id);
-    }
-
-   /*
-    * this method should be called only from LoadBalancerImpl class so defined as package private, not public.
-    */
-    static BackendInstance create(LoadBalancer lb, String id){
-        if(existBackendInstances.get(id) == null)
-            existBackendInstances.put(id, new  BackendInstanceImpl(lb,id));
-        return existBackendInstances.get(id);
-    }
-
     @Override
     public LoadBalancer getLoadBalancer() {
-        return lbs.isEmpty() ? null : lbs.get(0);
-    }
-
-   /*
-    * This method should be called only from the instances of LoadBalancerImpl classe in this package,.
-    * Sholud not called by this class itself.
-    */
-    void addLoadBalancer(LoadBalancer lb) {
-        lbs.add(lb);
-    }
-
-   /*
-    * This method should be called only from the instances of LoadBalancerImpl classe in this package,.
-    * Sholud not called by this class itself.
-    */
-    void removeLoadBalancer(LoadBalancer lb) {
-        lbs.remove(lb);
+        throw new UnsupportedOperationException("Not yet supported.");
     }
 
     @Override
     public List<LoadBalancer> getLoadBalancers(){
-        return lbs;
+        throw new UnsupportedOperationException("Not yet supported.");
     }
     
     @Override
     public String getId() {
-        return super.getInstanceId();
+        return elbInstance.getInstanceId();
     }
 
     @Override
@@ -95,8 +54,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
         if(newLb == null || !(newLb instanceof LoadBalancerImpl))
             throw new IllegalArgumentException("Invalid load balancer specified.");
             
-        if(!lbs.contains(newLb))
-            newLb.registerInstance(this);
+        newLb.registerInstance(this);
     }
 
     @Override
@@ -105,8 +63,7 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
         if(lb == null || !(lb instanceof LoadBalancerImpl))
             throw new IllegalArgumentException("Invalid load balancer specified.");
         
-        if(lbs.contains(lb))
-            lb.deregisterInstance(this);
+        lb.deregisterInstance(this);
     }
 
     @Override
@@ -124,22 +81,17 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
 
     @Override
     public BackendInstanceState getState(){
-        return lbs.isEmpty() ? BackendInstanceImpl.State.create(new InstanceState()) : lbs.get(0).getInstanceState(this);
+        throw new UnsupportedOperationException("Not yet supported.");
     }
 
     @Override
     public BackendInstanceState getStateFromLB(LoadBalancer lb){
-        return lbs.contains(lb) ? lb.getInstanceState(this) : BackendInstanceImpl.State.create(new InstanceState());
+        return lb.getInstanceState(this);
     }
 
     @Override
     public String toString(){
         return "{BackendInstanceID: " + getId() + "}";
-    }
-
-    @Override
-    public void setInstanceId(String instanceId){
-        throw new UnsupportedOperationException("Backend instance id can not be modified.");
     }
 
     public static class State implements BackendInstanceState{
@@ -177,6 +129,23 @@ public class BackendInstanceImpl extends Instance implements BackendInstance{
         @Override
         public String toString(){
             return getDescription();
+        }
+    }
+    
+    public static class Builder {
+        
+        private String id;
+        
+        public Builder id(String id){
+            this.id = id;
+            return this;
+        }
+        
+        public BackendInstance build(){
+            
+            if(existBackendInstances.get(id) == null)
+                existBackendInstances.put(id, new BackendInstanceImpl(this));
+            return existBackendInstances.get(id);
         }
     }
 }
