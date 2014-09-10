@@ -183,7 +183,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
         }
         public Builder description(LoadBalancerListenerDescription desc){
 
-            Listener source = description.getListener();
+            Listener source = desc.getListener();
             this.instancePort = source.getInstancePort();
             this.instanceProtocol = source.getInstanceProtocol();
             this.servicePort = source.getLoadBalancerPort();
