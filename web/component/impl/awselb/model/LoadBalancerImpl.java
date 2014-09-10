@@ -58,7 +58,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         if(builder.zones != null){
             for(Zone zone : builder.zones){
                 if(zone instanceof ZoneImpl){
-                    availabilityZones.add((AvailabilityZone)zone);
+                    availabilityZones.add(zone.asElbZone());
                 }else{
                     throw new IllegalArgumentException("Invalid zones specified.");
                 }
@@ -382,7 +382,7 @@ public class LoadBalancerImpl implements LoadBalancer{
                 List<Zone> zones = new ArrayList<>();
                 List<String> zoneNames = description.getAvailabilityZones();
                 for(String zoneName : zoneNames)
-                    zones.add(ZoneImpl.create(zoneName));
+                    zones.add(new ZoneImpl.Builder().name(zoneName).build());
                 
                 List<Subnet> subnets = new ArrayList<>();
                 List<String> subnetIds = description.getSubnets();
