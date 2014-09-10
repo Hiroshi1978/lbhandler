@@ -24,13 +24,12 @@ public interface LoadBalancerListener {
     public LoadBalancer getLoadBalancer();
     
    /*
-    * Add this load balancer listener to load balancer.
+    * Add this load balancer listener to specified load balancer.
     */
     public void addTo(LoadBalancer lb);
     
    /*
-    * Delete this load balancer listener from load balancer, and return the load balancer instance.
-    * If this listener is not attached to any load balancer, return null.
+    * Delete this load balancer listener from specified load balancer.
     */
-    public LoadBalancer delete();
+    public void deleteFrom(LoadBalancer lb);
 }
