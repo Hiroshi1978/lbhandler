@@ -127,7 +127,7 @@ public class LoadBalancerImpl implements LoadBalancer{
 
         //set backendinstances.
         if(backendInstances != null && !backendInstances.isEmpty())
-            this.connectWithBackendInstances(backendInstances);
+            this.backendInstances.addAll(backendInstances);
     }
     
     /**
@@ -245,7 +245,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         if(!elbInstances.isEmpty())
             elb.registerInstancesWithLoadBalancer(name, elbInstances);
         if(!backendInstancesToAdd.isEmpty())
-            this.connectWithBackendInstances(backendInstancesToAdd);
+            this.backendInstances.addAll(backendInstancesToAdd);
     }
 
     @Override
@@ -269,7 +269,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         if(!elbInstances.isEmpty())
             elb.deregisterInstancesFromLoadBalancer(name, elbInstances);
         if(!backendInstancesToRemove.isEmpty())
-            this.disconnectFromBackendInstances(backendInstancesToRemove);
+            this.backendInstances.removeAll(backendInstancesToRemove);
     }
 
     @Override
@@ -342,7 +342,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         
         elb.deleteLoadBalancer(name);
         listeners.clear();
-        disconnectFromBackendInstances(new ArrayList(backendInstances));
+        backendInstances.clear();
         zones.clear();
         subnets.clear();
         destroyed = true;
@@ -624,33 +624,5 @@ public class LoadBalancerImpl implements LoadBalancer{
     @Override
     public String toString(){
         return elb.getLoadBalancerDescription(name).toString();
-    }
-    
-    
-    // Mutual referencial relations between LoadBalancer instance and other component instances, 
-    // such as BackendInstance, should be controlled through these methods.
-    
-    private void connectWithBackendInstances(List<BackendInstance> backendInstances){
-        backendInstances.addAll(backendInstances);
-        for(BackendInstance backendInstance : backendInstances)
-            ((BackendInstanceImpl)backendInstance).addLoadBalancer(this);
-    }
-
-    private void disconnectFromBackendInstances(List<BackendInstance> backendInstances){
-        backendInstances.removeAll(backendInstances);
-        for(BackendInstance backendInstance : backendInstances)
-            ((BackendInstanceImpl)backendInstance).removeLoadBalancer(this);
-    }
-
-    private void connectWithBackendInstance(BackendInstance toConnect){
-        List<BackendInstance> listToConnect = new ArrayList<>();
-        listToConnect.add(toConnect);
-        connectWithBackendInstances(listToConnect);
-    }
-    
-    private void disconnectFromBackendInstance(BackendInstance toDisconnect){
-        List<BackendInstance> listToDisconnect = new ArrayList<>();
-        listToDisconnect.add(toDisconnect);
-        disconnectFromBackendInstances(listToDisconnect);
     }
 }
