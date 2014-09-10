@@ -387,7 +387,7 @@ public class LoadBalancerImpl implements LoadBalancer{
                 List<Subnet> subnets = new ArrayList<>();
                 List<String> subnetIds = description.getSubnets();
                 for(String subnetId : subnetIds)
-                    subnets.add(SubnetImpl.create(subnetId));
+                    subnets.add(new SubnetImpl.Builder().id(subnetId).build());
                 
                 List<BackendInstance> backendInstances = new ArrayList<>();
                 List<Instance> instances = description.getInstances();
@@ -516,7 +516,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
         
         public Builder subnet(String subnetId){
-            subnets.add(SubnetImpl.create(subnetId));
+            subnets.add(new SubnetImpl.Builder().id(subnetId).build());
             return this;
         }
         
