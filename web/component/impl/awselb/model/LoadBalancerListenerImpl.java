@@ -30,6 +30,10 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
         elbListener.serCertificateId(builder.certificateId);
     }
     
+    Listener asElbListener(){
+        return elbListener;
+    }
+    
     @Override
     public void setInstancePort(int instancePort) {
         throw new UnsupportedOperationException("Can not modify load balancer listener.");
