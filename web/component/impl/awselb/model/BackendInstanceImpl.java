@@ -32,6 +32,10 @@ public class BackendInstanceImpl implements BackendInstance{
     private BackendInstanceImpl(Builder builder){
         elbInstance.setInstanceId(builder.id);
     }
+
+    public Instance asElbInstance(){
+        return elbInstance;
+    }
     
     @Override
     public LoadBalancer getLoadBalancer() {
