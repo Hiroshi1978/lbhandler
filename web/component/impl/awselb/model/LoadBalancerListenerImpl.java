@@ -46,16 +46,12 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
 
     @Override
     public Integer getInstancePort() {
-        
-        Integer port = super.getInstancePort();
-        return port == null ? -1 : port;
+        return elbListener.getInstancePort();
     }
 
     @Override
     public Integer getServicePort() {
-
-        Integer port = super.getLoadBalancerPort();
-        return port == null ? -1 : port;
+        return elbListener.getLoadBalancerPort();
     }
 
     @Override
@@ -70,16 +66,12 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
 
     @Override
     public String getInstanceProtocol() {
-        
-        String protocol = super.getInstanceProtocol();
-        return protocol == null ? "" : protocol;
+        return elbListener.getInstanceProtocol();
     }
 
     @Override
     public String getServiceProtocol() {
-        
-        String protocol = super.getProtocol();
-        return protocol == null ? "" : protocol;
+        return elbListener.getProtocol();
     }
     
     @Override
@@ -89,7 +81,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
 
     @Override
     public String getServerCertificate(){
-        String certificateId = super.getSSLCertificateId();
+        String certificateId = elbListener.getSSLCertificateId();
         return certificateId == null ? "" : certificateId;
     }
     
