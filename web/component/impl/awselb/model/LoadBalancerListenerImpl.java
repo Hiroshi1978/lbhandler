@@ -128,10 +128,10 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
             
             LoadBalancerListenerImpl asImpl = (LoadBalancerListenerImpl)toCompare;
             
-            boolean isAttachedToSameLoadBalancer = 
+            boolean isAttachedToEqualLoadBalancer = 
                     getLoadBalancer() == null ? asImpl.getLoadBalancer() == null :  getLoadBalancer().equals(asImpl.getLoadBalancer());
             
-            return ( isAttachedToSameLoadBalancer &&
+            return ( isAttachedToEqualLoadBalancer &&
                      getInstancePort().equals(asImpl.getInstancePort()) && 
                      getInstanceProtocol().equals(asImpl.getInstanceProtocol()) &&
                      getServicePort().equals(asImpl.getServicePort()) &&
