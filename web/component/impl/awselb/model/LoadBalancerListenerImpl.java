@@ -15,46 +15,29 @@ import web.component.api.model.LoadBalancerListener;
  *
  * @author Hiroshi
  */
-public class LoadBalancerListenerImpl extends Listener implements LoadBalancerListener{
+public class LoadBalancerListenerImpl implements LoadBalancerListener{
 
     private LoadBalancer lb;
     
-    private LoadBalancerListenerImpl(){
+    private final Listener elbListener = new Listener();
+    
+    private LoadBalancerListenerImpl(Builder builder){
         
+        elbListener.setInstancePort(builder.instancePort);
+        elbListener.setInstanceProtocol(builder.instanceProtocol);
+        elbListener.setLoadBalancerPort(builder.servicePort);
+        elbListener.setProtocol(builder.serviceProtocol);
+        elbListener.serCertificateId(builder.certificateId);
     }
     
-    private LoadBalancerListenerImpl(ListenerDescription description){
-        Listener lbaListener = description.getListener();
-        this.setInstancePort(lbaListener.getInstancePort());
-        this.setInstanceProtocol(lbaListener.getInstanceProtocol());
-        this.setServicePort(lbaListener.getLoadBalancerPort());
-        this.setServiceProtocol(lbaListener.getProtocol());
-    }
-    
-    public static LoadBalancerListener create(ListenerDescription description){
-        return new LoadBalancerListenerImpl(description);
-    }
-
-    public static LoadBalancerListener create(){
-        return new LoadBalancerListenerImpl();
-    }
-
     @Override
     public void setInstancePort(int instancePort) {
-        //can set only before this listener is added to any load balancer.
-        if(lb == null)
-            super.setInstancePort(instancePort);
-        else
-            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
+        throw new UnsupportedOperationException("Can not modify load balancer listener.");
     }
 
     @Override
     public void setServicePort(int servciePort) {
-        //can set only before this listener is added to any load balancer.
-        if(lb == null)
-            super.setLoadBalancerPort(servciePort);
-        else
-            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
+        throw new UnsupportedOperationException("Can not modify load balancer listener.");
     }
 
     @Override
@@ -73,20 +56,12 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
 
     @Override
     public void setInstanceProtocol(String instanceProtocol) {
-        //can set only before this listener is added to any load balancer.
-        if(lb == null)
-            super.setInstanceProtocol(instanceProtocol);
-        else
-            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
+        throw new UnsupportedOperationException("Can not modify load balancer listener.");
     }
 
     @Override
     public void setServiceProtocol(String serviceProtocol) {
-        //can set only before this listener is added to any load balancer.
-        if(lb == null)
-            super.setProtocol(serviceProtocol);
-        else
-            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
+        throw new UnsupportedOperationException("Can not modify load balancer listener.");
     }
 
     @Override
@@ -105,11 +80,7 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
     
     @Override
     public void setServerCertificate(String serverCertificateId){
-        //can set only before this listener is added to any load balancer.
-        if(lb == null)
-            super.setSSLCertificateId(serverCertificateId);
-        else
-            throw new UnsupportedOperationException("Can not modify load balancer listener while it is attached to load balancer.");
+        throw new UnsupportedOperationException("Can not modify load balancer listener.");
     }
 
     @Override
@@ -184,5 +155,48 @@ public class LoadBalancerListenerImpl extends Listener implements LoadBalancerLi
                   getInstanceProtocol().hashCode() +
                   getServicePort().hashCode() + 
                   getServiceProtocol().hashCode())    );
+    }
+    
+    public static class Builder{
+        
+        private int instancePort = 80;
+        private String instanceProtocol = "HTTP";
+        private int servicePort = 80;
+        private String serviceProtocol = "HTTP";
+        private String certificateId;
+        
+        public Builder instancePort(int instancePort){
+            this.instancePort = instancePort;
+            return this;
+        }
+        public Builder instanceProtocol(int instanceProtocol){
+            this.instanceProtocol = instanceProtocol;
+            return this;
+        }
+        public Builder servicePort(int servicePort){
+            this.servicePort = servicePort;
+            return this;
+        }
+        public Builder serviceProtocol(String serviceProtocol){
+            this.serviceProtocol = serviceProtocol;
+            return this;
+        }
+        public Builder certificateId(String certificateId){
+            this.certificateId = certificateId;
+            return this;
+        }
+        public Builder description(LoadBalancerListenerDescription desc){
+
+            Listener source = description.getListener();
+            this.instancePort = source.getInstancePort();
+            this.instanceProtocol = source.getInstanceProtocol();
+            this.servicePort = source.getLoadBalancerPort();
+            this.serviceProtocol = source.getProtocol();
+            this.certificateId = source.getSSLCertificateId();
+        }
+        
+        public LoadBalancerListener build(){
+            return new LoadBalancerListenerImpl(this);
+        }
     }
 }
