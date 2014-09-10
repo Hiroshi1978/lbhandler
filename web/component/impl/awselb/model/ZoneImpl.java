@@ -26,6 +26,10 @@ public class ZoneImpl implements Zone{
         elbZone.setZoneName(builder.name);
     }
     
+    public AvailabilityZone asElbZone(){
+        return elbZone;
+    }
+    
     @Override
     public String getName(){
         return elbZone.getZoneName();
