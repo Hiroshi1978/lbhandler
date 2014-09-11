@@ -46,19 +46,19 @@ public interface LoadBalancer {
     public void deleteListener(LoadBalancerListener listener);
     
     
-    public void registerInstances(List<BackendInstance> instances);
-    public void deregisterInstances(List<BackendInstance> instances);
-    public void registerInstance(BackendInstance instance);
-    public void deregisterInstance(BackendInstance instance);
+    public void registerInstances(List<Instance> instances);
+    public void deregisterInstances(List<Instance> instances);
+    public void registerInstance(Instance instance);
+    public void deregisterInstance(Instance instance);
     public void enableZones(List<Zone> zones);
     public void enableZone(Zone zone);
     public void disableZones(List<Zone> zones);
     public void disableZone(Zone zone);
     public void delete();
     
-    public List<BackendInstanceState> getInstanceStates();
-    public List<BackendInstanceState> getInstanceStates(List<BackendInstance> backendInstances);
-    public BackendInstanceState getInstanceState(BackendInstance backendInstance);
+    public List<InstanceState> getInstanceStates();
+    public List<InstanceState> getInstanceStates(List<Instance> backendInstances);
+    public InstanceState getInstanceState(Instance backendInstance);
     
     /**
      * Check if this load balancer is destroyed.
@@ -71,5 +71,5 @@ public interface LoadBalancer {
     public List<LoadBalancerListener> getListeners();
     public List<Zone> getZones();
     public List<Subnet> getSubnets(); 
-    public List<BackendInstance> getBackendInstances();
+    public List<Instance> getBackendInstances();
 }

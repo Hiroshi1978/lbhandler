@@ -10,6 +10,9 @@ package web.component.api.model;
  *
  * @author Hiroshi
  */
-public interface Subnet {
+public interface InstanceState {
+    public String getDescription();
     public String getId();
+    public String getReasonCode();
+    public String getState();
 }

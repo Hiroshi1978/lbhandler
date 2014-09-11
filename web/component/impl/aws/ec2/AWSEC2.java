@@ -18,13 +18,13 @@ import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesResult;
 import java.io.IOException;
 import java.util.Properties;
-import web.component.impl.VendorWebService;
+import web.component.impl.CloudComponent;
 
 /**
  *
  * @author Hiroshi
  */
-public class AWSEC2 implements VendorWebService{
+public class AWSEC2 implements CloudComponent{
     
     private final AmazonEC2 awsHttpClient;
     

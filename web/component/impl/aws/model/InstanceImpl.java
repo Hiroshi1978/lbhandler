@@ -4,37 +4,42 @@
  * and open the template in the editor.
  */
 
-package web.component.impl.aws.elb.model;
+package web.component.impl.aws.model;
 
-import com.amazonaws.services.elasticloadbalancing.model.Instance;
-import com.amazonaws.services.elasticloadbalancing.model.InstanceState;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import web.component.api.model.BackendInstance;
-import web.component.api.model.BackendInstanceState;
+import web.component.api.model.Instance;
+import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
+import web.component.impl.aws.AWS;
+import web.component.impl.aws.ec2.AWSEC2;
 
 /**
  *
  * @author Hiroshi
  */
-public class BackendInstanceImpl implements BackendInstance{
+public class InstanceImpl implements Instance{
 
-    private static final Map<String,BackendInstance> existBackendInstances = new HashMap<>();
-
-    private final Instance elbInstance = new Instance();
-    
-    private BackendInstanceImpl(String id){
+    private static final Map<String,Instance> existInstances = new HashMap<>();
+    private final AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.ComponentName.EC2);
+    private final com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance = new com.amazonaws.services.elasticloadbalancing.model.Instance();
+    private final com.amazonaws.services.ec2.model.Instance ec2Instance = new com.amazonaws.services.ec2.model.Instance();
+;
+    private InstanceImpl(String id){
         elbInstance.setInstanceId(id);
     }
     
-    private BackendInstanceImpl(Builder builder){
+    private InstanceImpl(Builder builder){
         elbInstance.setInstanceId(builder.id);
     }
 
-    public Instance asElbInstance(){
+    public com.amazonaws.services.elasticloadbalancing.model.Instance asElbInstance(){
         return elbInstance;
+    }
+    
+    public com.amazonaws.services.ec2.model.Instance asEc2Instance(){
+        return ec2Instance;
     }
     
     @Override
@@ -72,8 +77,8 @@ public class BackendInstanceImpl implements BackendInstance{
 
     @Override
     public boolean equals(Object toCompare){
-        if(toCompare instanceof BackendInstanceImpl)
-            return this.getId().equals(((BackendInstanceImpl)toCompare).getId());
+        if(toCompare instanceof InstanceImpl)
+            return this.getId().equals(((InstanceImpl)toCompare).getId());
         return false;
     }
 
@@ -84,12 +89,12 @@ public class BackendInstanceImpl implements BackendInstance{
     }
 
     @Override
-    public BackendInstanceState getState(){
+    public InstanceState getState(){
         throw new UnsupportedOperationException("Not yet supported.");
     }
 
     @Override
-    public BackendInstanceState getStateFromLB(LoadBalancer lb){
+    public InstanceState getStateFromLB(LoadBalancer lb){
         return lb.getInstanceState(this);
     }
 
@@ -98,15 +103,15 @@ public class BackendInstanceImpl implements BackendInstance{
         return "{BackendInstanceID: " + getId() + "}";
     }
 
-    public static class State implements BackendInstanceState{
+    public static class State implements InstanceState{
 
-        private final InstanceState elbInstanceState;
-        
-        private State(InstanceState elbInstanceState){
+        private final com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState;
+
+        private State(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState){
          this.elbInstanceState = elbInstanceState;
         }
         
-        public static State create(InstanceState elbInstanceState){
+        public static State create(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState){
             return new State(elbInstanceState);
         }
         
@@ -145,11 +150,11 @@ public class BackendInstanceImpl implements BackendInstance{
             return this;
         }
         
-        public BackendInstance build(){
+        public Instance build(){
             
-            if(existBackendInstances.get(id) == null)
-                existBackendInstances.put(id, new BackendInstanceImpl(this));
-            return existBackendInstances.get(id);
+            if(existInstances.get(id) == null)
+                existInstances.put(id, new InstanceImpl(this));
+            return existInstances.get(id);
         }
     }
 }

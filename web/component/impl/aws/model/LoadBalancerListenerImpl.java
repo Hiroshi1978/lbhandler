@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package web.component.impl.aws.elb.model;
+package web.component.impl.aws.model;
 
 import com.amazonaws.services.elasticloadbalancing.model.Listener;
 import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;

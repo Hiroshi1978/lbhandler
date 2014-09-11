@@ -40,17 +40,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import web.component.impl.VendorWebService;
+import web.component.impl.CloudComponent;
 
 /**
  *
  * @author Hiroshi
  */
-public class AWSElasticLoadBalancing implements VendorWebService{
+public class AWSELB implements CloudComponent{
     
     private final AmazonElasticLoadBalancing awsHttpClient;
     
-    private AWSElasticLoadBalancing(){
+    private AWSELB(){
         
         Properties conf = new Properties();
         try {
@@ -85,8 +85,8 @@ public class AWSElasticLoadBalancing implements VendorWebService{
         awsELBClient.setServiceNameIntern(serviceName);
     }
     
-    public static AWSElasticLoadBalancing create(){
-        return new AWSElasticLoadBalancing();
+    public static AWSELB create(){
+        return new AWSELB();
     }
 
     public DescribeLoadBalancersResult describeLoadBalancers(){

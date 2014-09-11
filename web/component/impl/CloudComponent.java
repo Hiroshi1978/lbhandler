@@ -4,12 +4,12 @@
  * and open the template in the editor.
  */
 
-package web.component.api.model;
+package web.component.impl;
 
 /**
  *
  * @author Hiroshi
  */
-public interface Subnet {
-    public String getId();
+public interface CloudComponent {
+    
 }

@@ -4,25 +4,24 @@
  * and open the template in the editor.
  */
 
-package web.component.impl.aws.elb.model;
+package web.component.impl.aws.model;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersResult;
-import com.amazonaws.services.elasticloadbalancing.model.Instance;
-import com.amazonaws.services.elasticloadbalancing.model.InstanceState;
 import com.amazonaws.services.elasticloadbalancing.model.Listener;
 import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import java.util.ArrayList;
 import java.util.List;
-import web.component.api.model.BackendInstance;
-import web.component.api.model.BackendInstanceState;
+import web.component.api.model.Instance;
+import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
 import web.component.api.model.Subnet;
 import web.component.api.model.Zone;
-import web.component.impl.aws.elb.AWSElasticLoadBalancing;
+import web.component.impl.aws.AWS;
+import web.component.impl.aws.elb.AWSELB;
 
 /**
  *
@@ -30,12 +29,12 @@ import web.component.impl.aws.elb.AWSElasticLoadBalancing;
  */
 public class LoadBalancerImpl implements LoadBalancer{
 
-    private static final AWSElasticLoadBalancing elb = AWSElasticLoadBalancing.create();
+    private final AWSELB elb = (AWSELB)AWS.get(AWS.ComponentName.ELB);
     private final String name;
     private final List<LoadBalancerListener> listeners = new ArrayList<>();
     private final List<Zone> zones = new ArrayList<>();
     private final List<Subnet> subnets = new ArrayList<>();
-    private final List<BackendInstance> backendInstances = new ArrayList<>();
+    private final List<Instance> instances = new ArrayList<>();
     
     private volatile boolean started;
     private volatile boolean destroyed;
@@ -101,7 +100,7 @@ public class LoadBalancerImpl implements LoadBalancer{
             List<LoadBalancerListener> listeners,
             List<Zone> zones,
             List<Subnet> subnets,
-            List<BackendInstance> backendInstances
+            List<Instance> backendInstances
     ) {
         
         if(name == null || name.isEmpty())
@@ -127,7 +126,7 @@ public class LoadBalancerImpl implements LoadBalancer{
 
         //set backendinstances.
         if(backendInstances != null && !backendInstances.isEmpty())
-            this.backendInstances.addAll(backendInstances);
+            this.instances.addAll(backendInstances);
     }
     
     /**
@@ -225,18 +224,18 @@ public class LoadBalancerImpl implements LoadBalancer{
     }
 
     @Override
-    public void registerInstances(List<BackendInstance> newBackendInstances) {
+    public void registerInstances(List<Instance> newInstances) {
 
         if(isDestroyed())
             return;
 
-        List<BackendInstance> backendInstancesToAdd = new ArrayList<>();
-        List<Instance> elbInstances = new ArrayList<>();
-        for(BackendInstance newBackendInstance : newBackendInstances){
-            if(newBackendInstance instanceof BackendInstanceImpl){
-                if(!backendInstances.contains(newBackendInstance)){
-                    backendInstancesToAdd.add(newBackendInstance);
-                    elbInstances.add(((BackendInstanceImpl)newBackendInstance).asElbInstance());
+        List<Instance> backendInstancesToAdd = new ArrayList<>();
+        List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = new ArrayList<>();
+        for(Instance newInstance : newInstances){
+            if(newInstance instanceof InstanceImpl){
+                if(!instances.contains(newInstance)){
+                    backendInstancesToAdd.add(newInstance);
+                    elbInstances.add(((InstanceImpl)newInstance).asElbInstance());
                 }
             }else{
                 throw new IllegalArgumentException("Invalid instances specified.");
@@ -245,22 +244,22 @@ public class LoadBalancerImpl implements LoadBalancer{
         if(!elbInstances.isEmpty())
             elb.registerInstancesWithLoadBalancer(name, elbInstances);
         if(!backendInstancesToAdd.isEmpty())
-            this.backendInstances.addAll(backendInstancesToAdd);
+            this.instances.addAll(backendInstancesToAdd);
     }
 
     @Override
-    public void deregisterInstances(List<BackendInstance> instancesToDelete) {
+    public void deregisterInstances(List<Instance> instancesToDelete) {
 
         if(isDestroyed())
             return;
         
-        List<BackendInstance> backendInstancesToRemove = new ArrayList<>();
-        List<Instance> elbInstances = new ArrayList<>();
-        for(BackendInstance instanceToDelete : instancesToDelete){
-            if(instanceToDelete instanceof BackendInstanceImpl){
-                if(backendInstances.contains(instanceToDelete)){
+        List<Instance> backendInstancesToRemove = new ArrayList<>();
+        List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = new ArrayList<>();
+        for(Instance instanceToDelete : instancesToDelete){
+            if(instanceToDelete instanceof InstanceImpl){
+                if(instances.contains(instanceToDelete)){
                     backendInstancesToRemove.add(instanceToDelete);
-                    elbInstances.add(((BackendInstanceImpl)instanceToDelete).asElbInstance());
+                    elbInstances.add(((InstanceImpl)instanceToDelete).asElbInstance());
                 }
             }else{
                 throw new IllegalArgumentException("Invalid instances specified.");
@@ -269,27 +268,27 @@ public class LoadBalancerImpl implements LoadBalancer{
         if(!elbInstances.isEmpty())
             elb.deregisterInstancesFromLoadBalancer(name, elbInstances);
         if(!backendInstancesToRemove.isEmpty())
-            this.backendInstances.removeAll(backendInstancesToRemove);
+            this.instances.removeAll(backendInstancesToRemove);
     }
 
     @Override
-    public void registerInstance(BackendInstance newBackendInstance) {
+    public void registerInstance(Instance newBackendInstance) {
         
         if(isDestroyed())
             return;
 
-        List<BackendInstance> newBackendInstances = new ArrayList<>();
+        List<Instance> newBackendInstances = new ArrayList<>();
         newBackendInstances.add(newBackendInstance);
         this.registerInstances(newBackendInstances);
     }
 
     @Override
-    public void deregisterInstance(BackendInstance instanceToDelete) {
+    public void deregisterInstance(Instance instanceToDelete) {
 
         if(isDestroyed())
             return;
         
-        List<BackendInstance> instancesToDelete = new ArrayList<>();
+        List<Instance> instancesToDelete = new ArrayList<>();
         instancesToDelete.add(instanceToDelete);
         this.deregisterInstances(instancesToDelete);
     }
@@ -342,7 +341,7 @@ public class LoadBalancerImpl implements LoadBalancer{
         
         elb.deleteLoadBalancer(name);
         listeners.clear();
-        backendInstances.clear();
+        instances.clear();
         zones.clear();
         subnets.clear();
         destroyed = true;
@@ -370,7 +369,8 @@ public class LoadBalancerImpl implements LoadBalancer{
     public static LoadBalancer getExistLoadBalancerByName(String name){
         
         LoadBalancer loadBalancer = null;
-        
+        AWSELB elb = (AWSELB)AWS.get(AWS.ComponentName.ELB);
+
         try{
             LoadBalancerDescription description = elb.getLoadBalancerDescription(name);
             if(name.equals(description.getLoadBalancerName())){
@@ -389,12 +389,12 @@ public class LoadBalancerImpl implements LoadBalancer{
                 for(String subnetId : subnetIds)
                     subnets.add(new SubnetImpl.Builder().id(subnetId).build());
                 
-                List<BackendInstance> backendInstances = new ArrayList<>();
-                List<Instance> instances = description.getInstances();
-                for(Instance instance : instances)
-                    backendInstances.add(new BackendInstanceImpl.Builder().id(instance.getInstanceId()).build());
+                List<Instance> registeredInstances = new ArrayList<>();
+                List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = description.getInstances();
+                for(com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance : elbInstances)
+                    registeredInstances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).build());
 
-                loadBalancer = new LoadBalancerImpl(name,listeners,zones,subnets,backendInstances);
+                loadBalancer = new LoadBalancerImpl(name,listeners,zones,subnets,registeredInstances);
             }
         }catch(AmazonServiceException ase){
             System.out.println(ase.getMessage());
@@ -425,28 +425,28 @@ public class LoadBalancerImpl implements LoadBalancer{
     }
 
     @Override
-    public List<BackendInstance> getBackendInstances() {
+    public List<Instance> getBackendInstances() {
         
         if(isDestroyed())
             return null;
 
-        return backendInstances.isEmpty() ? this.getBackendInstances(true) : backendInstances;
+        return instances.isEmpty() ? this.getBackendInstances(true) : instances;
     }
 
-    public List<BackendInstance> getBackendInstances(boolean reload) {
+    public List<Instance> getBackendInstances(boolean reload) {
         
         if(isDestroyed())
             return null;
         
         if(reload){
-            List<Instance> elbInstances = elb.getLoadBalancerDescription(name).getInstances();
-            List<BackendInstance> latestInstances = new ArrayList<>();
-            for(Instance elbInstance : elbInstances)
-                latestInstances.add(new BackendInstanceImpl.Builder().id(elbInstance.getInstanceId()).build());
-            backendInstances.clear();
-            backendInstances.addAll(latestInstances);
+            List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = elb.getLoadBalancerDescription(name).getInstances();
+            List<Instance> latestInstances = new ArrayList<>();
+            for(com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance : elbInstances)
+                latestInstances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).build());
+            instances.clear();
+            instances.addAll(latestInstances);
         }
-        return backendInstances;
+        return instances;
         
     }
 
@@ -529,60 +529,60 @@ public class LoadBalancerImpl implements LoadBalancer{
         }
     }
     
-    public List<BackendInstanceState> getInstanceStates(){
+    public List<InstanceState> getInstanceStates(){
         
         if(isDestroyed())
             return null;
         
-        List<InstanceState> elbInstanceStates = elb.describeInstanceHealth(name).getInstanceStates();
-        List<BackendInstanceState> states  = new ArrayList<>();
-        for(InstanceState elbInstanceState : elbInstanceStates)
-            states.add( BackendInstanceImpl.State.create(elbInstanceState));
+        List<com.amazonaws.services.elasticloadbalancing.model.InstanceState> elbInstanceStates = elb.describeInstanceHealth(name).getInstanceStates();
+        List<InstanceState> states  = new ArrayList<>();
+        for(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState : elbInstanceStates)
+            states.add( InstanceImpl.State.create(elbInstanceState));
         return states;
     }
     
-    public List<BackendInstanceState> getInstanceStates(List<BackendInstance> backendInstances){
+    public List<InstanceState> getInstanceStates(List<Instance> instancesToCheck){
 
         if(isDestroyed())
             return null;
         
-        List<Instance> elbInstances = new ArrayList<>();
-        for(BackendInstance backendInstance : backendInstances){
-            if(backendInstance instanceof BackendInstanceImpl){
-                elbInstances.add(((BackendInstanceImpl)backendInstance).asElbInstance());
+        List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = new ArrayList<>();
+        for(Instance instanceToCheck : instancesToCheck){
+            if(instanceToCheck instanceof InstanceImpl){
+                elbInstances.add(((InstanceImpl)instanceToCheck).asElbInstance());
             }else{
-                Instance elbInstance = new Instance();
-                elbInstance.setInstanceId(backendInstance.getId());
+                com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance = new com.amazonaws.services.elasticloadbalancing.model.Instance();
+                elbInstance.setInstanceId(instanceToCheck.getId());
                 elbInstances.add(elbInstance);
             }
         }
         
-        List<InstanceState> elbInstanceStates = elb.describeInstanceHealth(name, elbInstances).getInstanceStates();
-        List<BackendInstanceState> states  = new ArrayList<>();
-        for(InstanceState elbInstanceState : elbInstanceStates)
-            states.add( BackendInstanceImpl.State.create(elbInstanceState));
+        List<com.amazonaws.services.elasticloadbalancing.model.InstanceState> elbInstanceStates = elb.describeInstanceHealth(name, elbInstances).getInstanceStates();
+        List<InstanceState> states  = new ArrayList<>();
+        for(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState : elbInstanceStates)
+            states.add( InstanceImpl.State.create(elbInstanceState));
         
         return states;
     }
     
-    public List<BackendInstanceState> getInstanceStatesByInstanceId(List<String> backendInstanceIds){
+    public List<InstanceState> getInstanceStatesByInstanceId(List<String> instanceIds){
 
         if(isDestroyed())
             return null;
         
-        List<Instance> elbInstances = new ArrayList<>();
-        for(String id : backendInstanceIds)
-            elbInstances.add(new Instance(id));
+        List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = new ArrayList<>();
+        for(String id : instanceIds)
+            elbInstances.add(new com.amazonaws.services.elasticloadbalancing.model.Instance(id));
         
-        List<InstanceState> elbInstanceStates = elb.describeInstanceHealth(name, elbInstances).getInstanceStates();
-        List<BackendInstanceState> states  = new ArrayList<>();
-        for(InstanceState elbInstanceState : elbInstanceStates)
-            states.add( BackendInstanceImpl.State.create(elbInstanceState));
+        List<com.amazonaws.services.elasticloadbalancing.model.InstanceState> elbInstanceStates = elb.describeInstanceHealth(name, elbInstances).getInstanceStates();
+        List<InstanceState> states  = new ArrayList<>();
+        for(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState : elbInstanceStates)
+            states.add( InstanceImpl.State.create(elbInstanceState));
         
         return states;
     }
 
-    public BackendInstanceState getInstanceState(String backendInstanceId){
+    public InstanceState getInstanceState(String backendInstanceId){
 
         if(isDestroyed())
             return null;
@@ -592,18 +592,19 @@ public class LoadBalancerImpl implements LoadBalancer{
         return this.getInstanceStatesByInstanceId(backendInstanceIds).get(0);
     }
     
-    public BackendInstanceState getInstanceState(BackendInstance backendInstance){
+    public InstanceState getInstanceState(Instance backendInstance){
 
         if(isDestroyed())
             return null;
         
-        List<BackendInstance> backendInstances = new ArrayList<>();
+        List<Instance> backendInstances = new ArrayList<>();
         backendInstances.add(backendInstance);
         return this.getInstanceStates(backendInstances).get(0);
     }
 
     public static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
 
+        AWSELB elb = (AWSELB)AWS.get(AWS.ComponentName.ELB);
         DescribeLoadBalancersResult result = elb.describeLoadBalancers();
         return result;
     }
