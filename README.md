@@ -126,7 +126,7 @@ And again, this is as good.
 
 ### Dependency
 
-Our library has some implementation that works with AWS. Please check the classes in [web.component.impl.awselb packages](https://github.com/Hiroshi1978/lbhandler/tree/master/web/component/impl/awselb) for such codes. Those classes needs AWS SDK for Java. It is necessary for paths to the JAR files that contain SDK to be included in your class path.
+Our library has some implementation that works with AWS. Please check the classes in [web.component.impl.aws.elb packages](https://github.com/Hiroshi1978/lbhandler/tree/master/web/component/impl/aws.elb) for such codes. Those classes needs AWS SDK for Java. It is necessary for paths to the JAR files that contain SDK to be included in your class path.
 You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforjava/).
 To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/aws/aws-sdk-java).
 
@@ -135,7 +135,7 @@ To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/
 To use AWS ELB implementation, you have to create two files and prepare some configuration parameters for http client which communicates with AWS ELB following these steps.
 
 ###### Step 1. 
-Create text file with name 'credentials.txt' int the directory where AWSElasticLoadBalancing.class exists.
+Create text file with name 'credentials.txt' in the parent directory of the directory where AWSElasticLoadBalancing.class exists (web/component/impl/aws).
 
 ###### Step 2. 
 Edit it following the sample below, and save it.
@@ -146,7 +146,7 @@ Edit it following the sample below, and save it.
 ```
 
 ###### Step 3. 
-Create text file with name'httpclient_config.txt' in the same directory.
+Create text file with name 'httpclient_config.txt' in the same directory.
 
 ###### Step 4. 
 Edit it following the sample below, and save it. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.
