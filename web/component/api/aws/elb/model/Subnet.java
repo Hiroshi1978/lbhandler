@@ -4,15 +4,12 @@
  * and open the template in the editor.
  */
 
-package web.component.api.model;
+package web.component.api.aws.elb.model;
 
 /**
  *
  * @author Hiroshi
  */
-public interface BackendInstanceState {
-    public String getDescription();
+public interface Subnet {
     public String getId();
-    public String getReasonCode();
-    public String getState();
 }

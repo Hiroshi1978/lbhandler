@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package web.component.api.model;
+package web.component.api.aws.elb.model;
 
 import java.util.List;
 
