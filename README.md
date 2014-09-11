@@ -146,7 +146,7 @@ Edit it following the sample below, and save it.
 ```
 
 ###### Step 3. 
-Create text file with name 'httpclient_config.txt' in the same directory.
+Create text file with name 'httpclient_config.txt' in the same directory where AWSElasticLoadBalancing.class exists (web/component/impl/aws/elb).
 
 ###### Step 4. 
 Edit it following the sample below, and save it. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.
