@@ -4,7 +4,9 @@
  * and open the template in the editor.
  */
 
-package web.component.api.aws.elb.model;
+package web.component.api.model;
+
+import web.component.api.aws.elb.model.*;
 
 /**
  *
