@@ -25,7 +25,7 @@ public class InstanceImpl implements Instance{
     private final AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.ComponentName.EC2);
     private final com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance = new com.amazonaws.services.elasticloadbalancing.model.Instance();
     private final com.amazonaws.services.ec2.model.Instance ec2Instance = new com.amazonaws.services.ec2.model.Instance();
-;
+
     private InstanceImpl(String id){
         elbInstance.setInstanceId(id);
     }
