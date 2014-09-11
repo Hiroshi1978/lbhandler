@@ -54,7 +54,7 @@ public class AWSElasticLoadBalancing implements VendorWebService{
         
         Properties conf = new Properties();
         try {
-            conf.load(this.getClass().getResourceAsStream("./credentials.txt"));
+            conf.load(this.getClass().getResourceAsStream("../credentials.txt"));
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -72,7 +72,7 @@ public class AWSElasticLoadBalancing implements VendorWebService{
 
         Properties conf = new Properties();
         try {
-            conf.load(this.getClass().getResourceAsStream("./httpclient_config.txt"));
+            conf.load(this.getClass().getResourceAsStream("../httpclient_config.txt"));
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
