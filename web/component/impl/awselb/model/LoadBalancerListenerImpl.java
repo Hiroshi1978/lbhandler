@@ -25,7 +25,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
         elbListener.setInstanceProtocol(builder.instanceProtocol);
         elbListener.setLoadBalancerPort(builder.servicePort);
         elbListener.setProtocol(builder.serviceProtocol);
-        elbListener.serCertificateId(builder.certificateId);
+        elbListener.setSSLCertificateId(builder.certificateId);
     }
     
     Listener asElbListener(){
@@ -114,9 +114,9 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
             LoadBalancerListenerImpl asImpl = (LoadBalancerListenerImpl)toCompare;
             
             return ( getInstancePort().equals(asImpl.getInstancePort()) && 
-                     getInstanceProtocol().equals(asImpl.getInstanceProtocol()) &&
+                     getInstanceProtocol().equalsIgnoreCase(asImpl.getInstanceProtocol()) &&
                      getServicePort().equals(asImpl.getServicePort()) &&
-                     getServiceProtocol().equals(asImpl.getServiceProtocol()));
+                     getServiceProtocol().equalsIgnoreCase(asImpl.getServiceProtocol()));
         }
             
         return false;
@@ -126,11 +126,11 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
     public int hashCode(){
         //this is wrong, but don't know how to implement this method properly.
         return ( 31 * 
-                 (getLoadBalancerPort().hashCode() + 
-                  getInstancePort().hashCode() + 
-                  getInstanceProtocol().hashCode() +
-                  getServicePort().hashCode() + 
-                  getServiceProtocol().hashCode())    );
+                 ( getInstancePort().hashCode() + 
+                   getInstanceProtocol().toLowerCase().hashCode() +
+                   getServicePort().hashCode() + 
+                   getServiceProtocol().toLowerCase().hashCode() +
+                   ( getServerCertificate() == null ? 0 : getServerCertificate().hashCode() ) ) );
     }
     
     public static class Builder{
@@ -145,7 +145,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
             this.instancePort = instancePort;
             return this;
         }
-        public Builder instanceProtocol(int instanceProtocol){
+        public Builder instanceProtocol(String instanceProtocol){
             this.instanceProtocol = instanceProtocol;
             return this;
         }
@@ -161,7 +161,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
             this.certificateId = certificateId;
             return this;
         }
-        public Builder description(LoadBalancerListenerDescription desc){
+        public Builder description(ListenerDescription desc){
 
             Listener source = desc.getListener();
             this.instancePort = source.getInstancePort();
@@ -169,6 +169,7 @@ public class LoadBalancerListenerImpl implements LoadBalancerListener{
             this.servicePort = source.getLoadBalancerPort();
             this.serviceProtocol = source.getProtocol();
             this.certificateId = source.getSSLCertificateId();
+            return this;
         }
         
         public LoadBalancerListener build(){
