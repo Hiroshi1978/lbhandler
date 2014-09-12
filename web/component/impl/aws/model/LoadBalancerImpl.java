@@ -56,7 +56,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(builder.zones != null){
             for(Zone zone : builder.zones){
                 if(zone instanceof ZoneImpl){
-                    availabilityZones.add(((ZoneImpl)zone).asElbZone());
+                    availabilityZones.add(((ZoneImpl)zone).asEc2Zone());
                 }else{
                     throw new IllegalArgumentException("Invalid zones specified.");
                 }
