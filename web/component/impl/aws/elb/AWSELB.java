@@ -40,13 +40,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import web.component.impl.CloudComponent;
+import web.component.impl.CloudBlock;
 
 /**
  *
  * @author Hiroshi
  */
-public class AWSELB implements CloudComponent{
+public class AWSELB implements CloudBlock{
     
     private final AmazonElasticLoadBalancing awsHttpClient;
     
@@ -72,7 +72,7 @@ public class AWSELB implements CloudComponent{
 
         Properties conf = new Properties();
         try {
-            conf.load(this.getClass().getResourceAsStream("../httpclient_config.txt"));
+            conf.load(this.getClass().getResourceAsStream("./httpclient_config.txt"));
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -85,7 +85,7 @@ public class AWSELB implements CloudComponent{
         awsELBClient.setServiceNameIntern(serviceName);
     }
     
-    public static AWSELB create(){
+    public static AWSELB get(){
         return new AWSELB();
     }
 
@@ -305,7 +305,7 @@ public class AWSELB implements CloudComponent{
        if(listeners == null || listeners.isEmpty())
            throw new IllegalArgumentException("Listeners not specified.");
        if(availabilityZones == null || availabilityZones.isEmpty())
-           throw new IllegalArgumentException("Subnets not specified.");
+           throw new IllegalArgumentException("Availability zones not specified.");
 
        CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName);
        request.setListeners(listeners);
@@ -317,6 +317,27 @@ public class AWSELB implements CloudComponent{
        return awsHttpClient.createLoadBalancer(request);
     }
 
+    public CreateLoadBalancerResult createLoadBalancerWithAvailabilityZonesAndSubnets(String loadBalancerName, List<Listener> listeners, List<AvailabilityZone> availabilityZones, List<String> subnetIds){
+        
+        if(loadBalancerName == null || loadBalancerName.equals(""))
+            throw new IllegalArgumentException("Load Balancer Name not specified.");
+        if(listeners == null || listeners.isEmpty())
+            throw new IllegalArgumentException("Listeners not specified.");
+        if(availabilityZones == null || availabilityZones.isEmpty())
+            throw new IllegalArgumentException("Availability zones not specified.");
+        if(subnetIds == null || subnetIds.isEmpty())
+            throw new IllegalArgumentException("Subnets not specified.");
+        
+       CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName);
+       request.setListeners(listeners);
+       List<String> availabilityZoneNames = new ArrayList<>();
+       for(AvailabilityZone avz : availabilityZones)
+           availabilityZoneNames.add(avz.getZoneName());
+       request.setAvailabilityZones(availabilityZoneNames);
+       request.setSubnets(subnetIds);
+       return awsHttpClient.createLoadBalancer(request);
+    }
+    
     private Listener getDefaultHttpListener(){
 
        Listener listener = new Listener();

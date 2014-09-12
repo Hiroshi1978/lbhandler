@@ -15,7 +15,7 @@ import web.component.api.model.LoadBalancerListener;
  *
  * @author Hiroshi
  */
-public class LoadBalancerListenerImpl implements LoadBalancerListener{
+public class LoadBalancerListenerImpl extends AWSModelBase implements LoadBalancerListener{
 
     private final Listener elbListener = new Listener();
     

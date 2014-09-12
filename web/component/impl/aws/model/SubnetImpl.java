@@ -14,7 +14,7 @@ import web.component.api.model.Subnet;
  *
  * @author Hiroshi
  */
-public class SubnetImpl implements Subnet{
+public class SubnetImpl extends AWSModelBase implements Subnet{
 
     private static final Map<String,Subnet> existSubnets = new HashMap<>();
     

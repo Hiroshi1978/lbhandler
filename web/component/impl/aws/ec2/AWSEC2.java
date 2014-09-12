@@ -18,13 +18,13 @@ import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesResult;
 import java.io.IOException;
 import java.util.Properties;
-import web.component.impl.CloudComponent;
+import web.component.impl.CloudBlock;
 
 /**
  *
  * @author Hiroshi
  */
-public class AWSEC2 implements CloudComponent{
+public class AWSEC2 implements CloudBlock{
     
     private final AmazonEC2 awsHttpClient;
     
@@ -63,7 +63,7 @@ public class AWSEC2 implements CloudComponent{
         awsEC2Client.setServiceNameIntern(serviceName);
     }
     
-    public static AWSEC2 create(){
+    public static AWSEC2 get(){
         return new AWSEC2();
     }
     

@@ -10,6 +10,6 @@ package web.component.impl;
  *
  * @author Hiroshi
  */
-public interface CloudComponent {
+public interface CloudBlock {
     
 }

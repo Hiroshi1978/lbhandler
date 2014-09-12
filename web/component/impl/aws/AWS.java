@@ -9,7 +9,7 @@ package web.component.impl.aws;
 import java.util.HashMap;
 import java.util.Map;
 import web.component.impl.Cloud;
-import web.component.impl.CloudComponent;
+import web.component.impl.CloudBlock;
 import web.component.impl.aws.ec2.AWSEC2;
 import web.component.impl.aws.elb.AWSELB;
 
@@ -21,18 +21,18 @@ public class AWS implements Cloud{
     
     private static AWS instance = new AWS();
     
-    private final Map<ComponentName, CloudComponent> components = new HashMap<>();
+    private final Map<BlockName, CloudBlock> components = new HashMap<>();
 
     private AWS(){
-        components.put(ComponentName.EC2, AWSEC2.create());
-        components.put(ComponentName.ELB, AWSELB.create());        
+        components.put(BlockName.EC2, AWSEC2.get());
+        components.put(BlockName.ELB, AWSELB.get());        
     }
     
-    public static CloudComponent get(ComponentName name){
+    public static CloudBlock get(BlockName name){
         return instance.components.get(name);
     }
     
-    public static enum ComponentName{
+    public static enum BlockName{
         EC2,ELB;
     }
 }

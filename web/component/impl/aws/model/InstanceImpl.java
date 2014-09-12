@@ -12,17 +12,14 @@ import java.util.Map;
 import web.component.api.model.Instance;
 import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
-import web.component.impl.aws.AWS;
-import web.component.impl.aws.ec2.AWSEC2;
 
 /**
  *
  * @author Hiroshi
  */
-public class InstanceImpl implements Instance{
+public class InstanceImpl extends AWSModelBase implements Instance{
 
     private static final Map<String,Instance> existInstances = new HashMap<>();
-    private final AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.ComponentName.EC2);
     private final com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance = new com.amazonaws.services.elasticloadbalancing.model.Instance();
     private final com.amazonaws.services.ec2.model.Instance ec2Instance = new com.amazonaws.services.ec2.model.Instance();
 

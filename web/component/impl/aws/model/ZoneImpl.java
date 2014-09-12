@@ -15,7 +15,7 @@ import web.component.api.model.Zone;
  *
  * @author Hiroshi
  */
-public class ZoneImpl implements Zone{
+public class ZoneImpl extends AWSModelBase implements Zone{
 
     private static final Map<String,Zone> existZones = new HashMap<>();
     
