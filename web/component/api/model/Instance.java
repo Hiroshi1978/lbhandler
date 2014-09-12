@@ -41,4 +41,7 @@ public interface Instance {
     public InstanceState getState();
     public InstanceState getStateFromLB(LoadBalancer lb);
     
+    public void start();
+    public void stop();
+    
 }

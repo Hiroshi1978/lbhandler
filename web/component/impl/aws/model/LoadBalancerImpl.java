@@ -391,7 +391,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
                 List<Instance> registeredInstances = new ArrayList<>();
                 List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = description.getInstances();
                 for(com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance : elbInstances)
-                    registeredInstances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).build());
+                    registeredInstances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).get());
 
                 loadBalancer = new LoadBalancerImpl(name,listeners,zones,subnets,registeredInstances);
             }
@@ -441,7 +441,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
             List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = elb().getLoadBalancerDescription(name).getInstances();
             List<Instance> latestInstances = new ArrayList<>();
             for(com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance : elbInstances)
-                latestInstances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).build());
+                latestInstances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).get());
             instances.clear();
             instances.addAll(latestInstances);
         }

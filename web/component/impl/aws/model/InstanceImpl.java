@@ -6,12 +6,19 @@
 
 package web.component.impl.aws.model;
 
+import com.amazonaws.services.ec2.model.RunInstancesRequest;
+import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.amazonaws.services.ec2.model.StartInstancesRequest;
+import com.amazonaws.services.ec2.model.StopInstancesRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import web.component.api.model.Instance;
 import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
+import web.component.impl.aws.AWS;
+import web.component.impl.aws.ec2.AWSEC2;
 
 /**
  *
@@ -27,10 +34,48 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         elbInstance.setInstanceId(id);
     }
     
-    private InstanceImpl(Builder builder){
-        elbInstance.setInstanceId(builder.id);
+   /*
+    * Build new instance of this class form Instance of EC2 class instance.
+    * This costructor should be called when new instance is launched in cloud.
+    */
+    private InstanceImpl(com.amazonaws.services.ec2.model.Instance newEc2Instance){
+        
+        //initialize EC2 instance.
+        ec2Instance.setInstanceId(newEc2Instance.getInstanceId());
+        ec2Instance.setInstanceType(newEc2Instance.getInstanceType());
+        ec2Instance.setInstanceLifecycle(newEc2Instance.getInstanceLifecycle());
+        ec2Instance.setImageId(newEc2Instance.getImageId());
+        ec2Instance.setLaunchTime(newEc2Instance.getLaunchTime());
+        ec2Instance.setPlacement(newEc2Instance.getPlacement());
+        
+        //initialize ELB instance.
+        elbInstance.setInstanceId(newEc2Instance.getInstanceId());
     }
 
+   /*
+    * return new instance of this class through specified Instance of EC2 class instance.
+    * This static method should be called when new instance is launched in cloud.
+    */
+    private static Instance create(Builder builder){
+        
+        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        RunInstancesRequest request = new RunInstancesRequest();
+        request.setImageId(builder.imageId);
+        request.setInstanceType(builder.type);
+        request.setMinCount(1);
+        request.setMaxCount(1);
+        RunInstancesResult result = ec2.runInstances(request);
+        com.amazonaws.services.ec2.model.Instance newEc2Instance = result.getReservation().getInstances().get(0);
+        InstanceImpl newInstance = new InstanceImpl(newEc2Instance);
+        existInstances.put(newInstance.getId(), newInstance);
+        
+        return existInstances.get(newInstance.getId());
+    }
+    
+    private static InstanceImpl get(Builder builder){
+        return null;
+    }
+    
     public com.amazonaws.services.elasticloadbalancing.model.Instance asElbInstance(){
         return elbInstance;
     }
@@ -100,6 +145,24 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         return "{BackendInstanceID: " + getId() + "}";
     }
 
+    @Override
+    public void start() {
+        StartInstancesRequest request = new StartInstancesRequest();
+        List<String> ids = new ArrayList<>();
+        ids.add(getId());
+        request.setInstanceIds(ids);
+        ec2().startInstances(request);
+    }
+
+    @Override
+    public void stop() {
+        StopInstancesRequest request = new StopInstancesRequest();
+        List<String> ids = new ArrayList<>();
+        ids.add(getId());
+        request.setInstanceIds(ids);
+        ec2().stopInstances(request);
+    }
+
     public static class State implements InstanceState{
 
         private final com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState;
@@ -141,17 +204,48 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     public static class Builder {
         
         private String id;
+        private String imageId;
+        private String type;
+        private String placement;
         
         public Builder id(String id){
             this.id = id;
             return this;
         }
         
-        public Instance build(){
+       /*
+        * Return instance that exists in cloud.
+        */
+        public Instance get(){
             
-            if(existInstances.get(id) == null)
-                existInstances.put(id, new InstanceImpl(this));
-            return existInstances.get(id);
+            if(id == null)
+                throw new IllegalArgumentException("Instance ID not specified.");
+            
+            return InstanceImpl.get(this);
+        }
+        
+        public Builder imageId(String imageId){
+            this.imageId = imageId;
+            return this;
+        }
+        public Builder type(String type){
+            this.type = type;
+            return this;
+        }
+        public Builder placement(String placement){
+            this.placement = placement;
+            return this;
+        }
+        
+       /*
+        * Create new instance in cloud and return it.
+        */
+        public Instance create(){
+            
+            if(this.imageId == null || this.type == null)
+                throw new IllegalArgumentException("Image ID and Instance Type must be specified.");
+            
+            return InstanceImpl.create(this);
         }
     }
 }
