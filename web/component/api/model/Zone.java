@@ -12,4 +12,6 @@ package web.component.api.model;
  */
 public interface Zone {
     public String getName();
+    public String getRegionName();
+    public String getState();
 }
