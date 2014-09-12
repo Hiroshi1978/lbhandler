@@ -146,13 +146,13 @@ Edit it following the sample below, and save it.
 ```
 
 ###### Step 3. 
-Create text file with name 'httpclient_config.txt' in the same directory where AWSElasticLoadBalancing.class exists (web/component/impl/aws/elb).
+Create text files with name 'httpclient_config.txt' in the directory where AWSELB class exists (web/component/impl/aws/elb), and alo in the directory where AWSEC2 class exists (web/component/impl/aws/ec2).
 
 ###### Step 4. 
-Edit it following the sample below, and save it. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.
+Edit them following the sample below, and save it. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.The value to the key 'endpoint' must be set to each service's specific value. The file for AWSEC2 must be configurated with the endpoint for AWS EC2, and the one for AWSELB must be with the endpoint for AWS ELB.
 
 ```
-    endpoint=protocol://endpoint.of.service/path
+    endpoint=protocol://endpoint.of.each.service/path
     servicename=properServiceName
     region=properRegionName
     signer.type=AWS4SignerType
