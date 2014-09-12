@@ -19,7 +19,7 @@ import web.component.impl.aws.elb.AWSELB;
  */
 public class AWS implements Cloud{
     
-    private static AWS instance = new AWS();
+    private static final AWS INSTANCE = new AWS();
     
     private final Map<BlockName, CloudBlock> components = new HashMap<>();
 
@@ -28,8 +28,8 @@ public class AWS implements Cloud{
         components.put(BlockName.ELB, AWSELB.get());        
     }
     
-    public static CloudBlock get(BlockName name){
-        return instance.components.get(name);
+    public static final CloudBlock get(BlockName name){
+        return INSTANCE.components.get(name);
     }
     
     public static enum BlockName{

@@ -79,8 +79,6 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
             this.subnets.addAll(builder.subnets);
         
         if(this.zones != null && !this.zones.isEmpty()){
-            if(this.subnets != null && !this.subnets.isEmpty())
-                elb().createLoadBalancerWithAvailabilityZonesAndSubnets(name, elbListeners, availabilityZones, subnetIds);
             elb().createLoadBalancerWithAvailabilityZones(name, elbListeners, availabilityZones);
         }else if(this.subnets != null && !this.subnets.isEmpty()){
             elb().createLoadBalancerWithSubnets(name, elbListeners, subnetIds);

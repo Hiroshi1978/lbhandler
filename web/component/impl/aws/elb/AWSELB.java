@@ -316,27 +316,6 @@ public class AWSELB implements CloudBlock{
        
        return awsHttpClient.createLoadBalancer(request);
     }
-
-    public CreateLoadBalancerResult createLoadBalancerWithAvailabilityZonesAndSubnets(String loadBalancerName, List<Listener> listeners, List<AvailabilityZone> availabilityZones, List<String> subnetIds){
-        
-        if(loadBalancerName == null || loadBalancerName.equals(""))
-            throw new IllegalArgumentException("Load Balancer Name not specified.");
-        if(listeners == null || listeners.isEmpty())
-            throw new IllegalArgumentException("Listeners not specified.");
-        if(availabilityZones == null || availabilityZones.isEmpty())
-            throw new IllegalArgumentException("Availability zones not specified.");
-        if(subnetIds == null || subnetIds.isEmpty())
-            throw new IllegalArgumentException("Subnets not specified.");
-        
-       CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName);
-       request.setListeners(listeners);
-       List<String> availabilityZoneNames = new ArrayList<>();
-       for(AvailabilityZone avz : availabilityZones)
-           availabilityZoneNames.add(avz.getZoneName());
-       request.setAvailabilityZones(availabilityZoneNames);
-       request.setSubnets(subnetIds);
-       return awsHttpClient.createLoadBalancer(request);
-    }
     
     private Listener getDefaultHttpListener(){
 
