@@ -149,7 +149,7 @@ Edit it following the sample below, and save it.
 Create text files with name 'httpclient_config.txt' in the directory where AWSELB class exists (web/component/impl/aws/elb), and alo in the directory where AWSEC2 class exists (web/component/impl/aws/ec2).
 
 ###### Step 4. 
-Edit them following the sample below, and save it. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'.The value to the key 'endpoint' and 'servicename' must be set to each service's specific value. 
+Edit them following the sample below, and save it. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'. The value to the key 'endpoint' and 'servicename' must be set to each service's specific value. 
 
 ```
     endpoint=protocol://endpoint.of.each.service/path
