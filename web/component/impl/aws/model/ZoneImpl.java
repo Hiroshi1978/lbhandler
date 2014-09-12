@@ -19,48 +19,73 @@ public class ZoneImpl extends AWSModelBase implements Zone{
 
     private static final Map<String,Zone> existZones = new HashMap<>();
     
-    private final AvailabilityZone elbZone = new AvailabilityZone();
+    private final AvailabilityZone ec2Zone = new AvailabilityZone();
     
     private ZoneImpl(Builder builder){
         
-        elbZone.setZoneName(builder.name);
+        ec2Zone.setZoneName(builder.name);
     }
     
-    public AvailabilityZone asElbZone(){
-        return elbZone;
+    public AvailabilityZone asEc2Zone(){
+        return ec2Zone;
     }
     
     @Override
     public String getName(){
-        return elbZone.getZoneName();
+        return ec2Zone.getZoneName();
     }
     
     @Override
     public String getRegionName(){
-        return elbZone.getRegionName();    
+        
+        String regionName = ec2Zone.getRegionName();
+        
+        if(regionName == null || regionName.isEmpty()){
+
+            regionName = "";
+
+            try{
+                regionName = ec2().getEc2AvailabilitiZone(getName()).getRegionName();
+                ec2Zone.setRegionName(regionName);
+            }catch(RuntimeException e){
+                //do nothing.
+            }
+        }
+        
+        return regionName;    
     }
     
     @Override
     public String getState(){
-        return elbZone.getState();    
+        
+        String state = "Unknown state.";
+        
+        try{
+            state = ec2().getEc2AvailabilitiZone(getName()).getState();
+        }catch(){
+            //do nothing.
+        }
+        
+        return state;    
     }
     
     @Override
     public boolean equals(Object toBeCompared){
         if(toBeCompared instanceof ZoneImpl)
-            return this.getName().equals(((ZoneImpl)toBeCompared).getName());
+            ZoneImpl asZoneImpl = (ZoneImpl)toBeCompared;
+            return getName().equals(asZoneImpl.getName()) && getRegionName().equals(asZoneImpl.getRegionName());
         return false;
     }
     
     @Override
     public int hashCode(){
         //this is wrong, but don't know how to implement this method properly.
-        return 31 * this.getName().hashCode();
+        return 31 * ( getName().hashCode() + getRegionName().hashCode() );
     }
 
     @Override
     public String toString(){
-        return "{ZoneName: " + getName() + "}";
+        return "{ZoneName: " + getName() + ", RegionName: " + getRegionName() + "}";
     }
     
     public static class Builder {
