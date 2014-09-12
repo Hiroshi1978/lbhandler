@@ -10,6 +10,8 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesRequest;
+import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
@@ -76,5 +78,7 @@ public class AWSEC2 implements CloudBlock{
     public StopInstancesResult stopInstances(StopInstancesRequest request){
         return awsHttpClient.stopInstances(request);
     }
-    
+    public DescribeAvailabilityZonesResult describeAvailabilityZones(DescribeAvailabilityZonesRequest request){
+        return awsHttpClient.describeAvailabilityZones(request);
+    }
 }
