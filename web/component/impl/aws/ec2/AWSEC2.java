@@ -78,7 +78,18 @@ public class AWSEC2 implements CloudBlock{
     public StopInstancesResult stopInstances(StopInstancesRequest request){
         return awsHttpClient.stopInstances(request);
     }
+    
     public DescribeAvailabilityZonesResult describeAvailabilityZones(DescribeAvailabilityZonesRequest request){
         return awsHttpClient.describeAvailabilityZones(request);
+    }
+    public DescribeAvailabilityZonesResult describeAvailabilityZones(List<String> zoneNames){
+        DescribeAvailabilityZonesRequest request = new DescribeAvailabilityZonesRequest();
+        request.setZoneNames(zoneNames);
+        return describeAvailabilityZones(request);
+    }
+    public DescribeAvailabilityZonesResult describeAvailabilityZones(String zoneName){
+        List<String> zoneNames = new ArrayList<>();
+        zoneNames.add(zoneName);
+        return describeAvailabilityZones(zoneNames);
     }
 }
