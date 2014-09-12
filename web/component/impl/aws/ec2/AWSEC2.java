@@ -92,4 +92,7 @@ public class AWSEC2 implements CloudBlock{
         zoneNames.add(zoneName);
         return describeAvailabilityZones(zoneNames);
     }
+    publi AvailabilityZone getEc2AvailabilityZone(String zoneName){
+        return describeAvailabilityZone(zoneName).getAvailabilityZones().get(0);
+    }
 }
