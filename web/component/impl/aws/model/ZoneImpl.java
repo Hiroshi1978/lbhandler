@@ -36,6 +36,16 @@ public class ZoneImpl extends AWSModelBase implements Zone{
     }
     
     @Override
+    public String getRegionName(){
+        return elbZone.getRegionName();    
+    }
+    
+    @Override
+    public String getState(){
+        return elbZone.getState();    
+    }
+    
+    @Override
     public boolean equals(Object toBeCompared){
         if(toBeCompared instanceof ZoneImpl)
             return this.getName().equals(((ZoneImpl)toBeCompared).getName());
