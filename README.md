@@ -171,5 +171,6 @@ Edit them following the sample below, and save it. In most cases the value to th
 
 ### Want to learn ELB or LBA ?
 
+ * [Amazon EC2](http://aws.amazon.com/jp/ec2/)
  * [Amazon Elastic Load Balancing](http://aws.amazon.com/jp/elasticloadbalancing/)
  * [Cloudn Load Balancing Advanced (LBA)](http://www.ntt.com/cloudn/data/lba.html)
