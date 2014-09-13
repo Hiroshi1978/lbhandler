@@ -99,24 +99,20 @@ It's very simple.
 ```java
     List<Instance> webServers = new ArrayList<>();
 
-    myWebServers.add(webServerNo1);
-    myWebServers.add(webServerNo2);
+    webServers.add(webServerNo1);
+    eebServers.add(webServerNo2);
     . . . . . .
-    myWebServers.add(webServerNo20);
+    webServers.add(webServerNo20);
 
-    for(Instance webServer : myWebServers){
-        webServer.start();
-        lb.registerInstances(webServers);
-    }
+    for(Instance webServer : eebServers)
+        lb.registerInstances(webServer);
 ```
 
 Or, you can do the same thing in this way also.
 
 ```java
-    for(Instance webServer : webServers){
-        webServer.start();
+    for(Instance webServer : webServers)
         webServer.registerWith(lb);
-    }
 ```
 
 For checking the state of the server,
