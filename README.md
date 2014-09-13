@@ -15,7 +15,7 @@ We aim to offer libraries that makes it possible to handle resources of some web
 
  * [Dependency](#dependency)
  * [Set up HTTP Client](#setting-up-http-client)
- * [Further learning](#want-to-learn-elb-or-lba-)
+ * [For further learning](#want-to-learn-elb-or-lba-)
 
 ### Launch web servers.
 
