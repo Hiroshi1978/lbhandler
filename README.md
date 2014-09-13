@@ -16,6 +16,14 @@ We aim to offer libraries that makes it possible to handle resources of some web
  * [Set up HTTP Client](#setting-up-http-client)
  * [Further learning](#want-to-learn-elb-or-lba-)
 
+### How to create web server ?
+
+Make sure you have your own AMI that contains your web server application. Next code will launch the new instance.
+
+```java
+    Instance webServerNo1 = new InstanceImpl.Builder().imageId("id-of-your-own-ami").type("instance-type").create();
+```
+
 ### How to create new load balancer ?
 
 Maybe you can write like this.
