@@ -97,26 +97,26 @@ And the result may be like this.
 It's very simple.
 
 ```java
-    webServerNo1.start();
-    webServerNo2.start();
-    . . . . . .
-    webServerNo10.start();
-    
     List<Instance> webServers = new ArrayList<>();
 
     myWebServers.add(webServerNo1);
     myWebServers.add(webServerNo2);
     . . . . . .
-    myWebServers.add(webServerNo10);
+    myWebServers.add(webServerNo20);
 
-    lb.registerInstances(webServers);
+    for(Instance webServer : myWebServers){
+        webServer.start();
+        lb.registerInstances(webServers);
+    }
 ```
 
 Or, you can do the same thing in this way also.
 
 ```java
-    for(Instance webServer : webServers)
+    for(Instance webServer : webServers){
+        webServer.start();
         webServer.registerWith(lb);
+    }
 ```
 
 For checking the state of the server,
