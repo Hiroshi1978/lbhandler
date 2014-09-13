@@ -1,7 +1,7 @@
 lbhandler
 =========
 
-We aim to offer libraries that makes it possible to handle resources of some web services including AWS Elastic Load Balancing (ELB), Cloudn Load Balancing Advanced (LBA), as the ordinary instances of Java classes on running JVM. And so help build your application that utilizes ELB or LBA.
+We aim to offer libraries that makes it possible to handle resources of some web services including Amazon EC2 and Amazon Elastic Load Balancing (ELB) seemlessly as the ordinary instances of Java classes on running JVM. And so help build your application that utilizes those web services.
 
 
 ## Usage
@@ -169,7 +169,7 @@ Edit them following the sample below, and save it. In most cases the value to th
 ```
 
 
-### Want to learn ELB or LBA ?
+### Want to learn more?
 
  * [Amazon EC2](http://aws.amazon.com/jp/ec2/)
  * [Amazon Elastic Load Balancing](http://aws.amazon.com/jp/elasticloadbalancing/)
