@@ -28,7 +28,8 @@ public interface Instance {
      */
     public List<LoadBalancer> getLoadBalancers();
     public String getId();
-
+    public String getPlacement();
+    
     /*
     * Register this backend instance with the specified load balancer.
     */
@@ -43,5 +44,6 @@ public interface Instance {
     
     public void start();
     public void stop();
+    public void terminate();
     
 }

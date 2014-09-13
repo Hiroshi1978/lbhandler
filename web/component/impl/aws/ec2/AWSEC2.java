@@ -10,15 +10,23 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesRequest;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StartInstancesResult;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesResult;
+import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import web.component.impl.CloudBlock;
 
@@ -72,11 +80,73 @@ public class AWSEC2 implements CloudBlock{
     public RunInstancesResult runInstances(RunInstancesRequest request){
         return awsHttpClient.runInstances(request);
     }
+    public Instance createInstance(String imageId, String instanceType){
+        
+        RunInstancesRequest request = new RunInstancesRequest();
+        request.setImageId(imageId);
+        request.setInstanceType(instanceType);
+        request.setMinCount(1);
+        request.setMaxCount(1);
+        RunInstancesResult  result = runInstances(request);
+        Instance newInstance = result.getReservation().getInstances().get(0);
+        
+        return newInstance;
+    }
+    
     public StartInstancesResult startInstances(StartInstancesRequest request){
         return awsHttpClient.startInstances(request);
     }
+    public StartInstancesResult startInstances(List<String> instanceIds){
+        StartInstancesRequest request = new StartInstancesRequest(instanceIds);
+        return startInstances(request);
+    }
+    public StartInstancesResult startInstance(String instanceId){
+        List<String> instanceIds = new ArrayList<>();
+        instanceIds.add(instanceId);
+        return startInstances(instanceIds);
+    }    
+    
     public StopInstancesResult stopInstances(StopInstancesRequest request){
         return awsHttpClient.stopInstances(request);
+    }
+    public StopInstancesResult stopInstances(List<String> instanceIds){
+        StopInstancesRequest request = new StopInstancesRequest(instanceIds);
+        return stopInstances(request);
+    }
+    public StopInstancesResult stopInstance(String instanceId){
+        List<String> instanceIds = new ArrayList<>();
+        instanceIds.add(instanceId);
+        return stopInstances(instanceIds);
+    }
+    
+    public DescribeInstancesResult describeInstances(DescribeInstancesRequest request){
+        return awsHttpClient.describeInstances(request);
+    }
+    public DescribeInstancesResult describeInstances(List<String> instanceIds){
+        DescribeInstancesRequest request = new DescribeInstancesRequest();
+        request.setInstanceIds(instanceIds);
+        return describeInstances(request);
+    }
+    public DescribeInstancesResult describeInstance(String instanceId){
+        List<String> instanceIds = new ArrayList<>();
+        instanceIds.add(instanceId);
+        return describeInstances(instanceIds);
+    }
+    public Instance getExistInstance(String instanceId){
+        return describeInstance(instanceId).getReservations().get(0).getInstances().get(0);
+    }
+    
+    public TerminateInstancesResult terminateInstances(TerminateInstancesRequest request){
+        return awsHttpClient.terminateInstances(request);
+    }
+    public TerminateInstancesResult terminateInstances(List<String> instanceIds){
+        TerminateInstancesRequest request = new TerminateInstancesRequest(instanceIds);
+        return terminateInstances(request);
+    }
+    public TerminateInstancesResult terminateInstance(String instanceId){
+        List<String> instanceIds = new ArrayList<>();
+        instanceIds.add(instanceId);
+        return terminateInstances(instanceIds);
     }
     
     public DescribeAvailabilityZonesResult describeAvailabilityZones(DescribeAvailabilityZonesRequest request){
@@ -92,7 +162,7 @@ public class AWSEC2 implements CloudBlock{
         zoneNames.add(zoneName);
         return describeAvailabilityZones(zoneNames);
     }
-    publi AvailabilityZone getEc2AvailabilityZone(String zoneName){
+    public AvailabilityZone getEc2AvailabilityZone(String zoneName){
         return describeAvailabilityZone(zoneName).getAvailabilityZones().get(0);
     }
 }

@@ -45,7 +45,7 @@ public class ZoneImpl extends AWSModelBase implements Zone{
             regionName = "";
 
             try{
-                regionName = ec2().getEc2AvailabilitiZone(getName()).getRegionName();
+                regionName = ec2().getEc2AvailabilityZone(getName()).getRegionName();
                 ec2Zone.setRegionName(regionName);
             }catch(RuntimeException e){
                 //do nothing.
@@ -61,8 +61,8 @@ public class ZoneImpl extends AWSModelBase implements Zone{
         String state = "Unknown state.";
         
         try{
-            state = ec2().getEc2AvailabilitiZone(getName()).getState();
-        }catch(){
+            state = ec2().getEc2AvailabilityZone(getName()).getState();
+        }catch(RuntimeException e){
             //do nothing.
         }
         
@@ -71,9 +71,10 @@ public class ZoneImpl extends AWSModelBase implements Zone{
     
     @Override
     public boolean equals(Object toBeCompared){
-        if(toBeCompared instanceof ZoneImpl)
+        if(toBeCompared instanceof ZoneImpl){
             ZoneImpl asZoneImpl = (ZoneImpl)toBeCompared;
             return getName().equals(asZoneImpl.getName()) && getRegionName().equals(asZoneImpl.getRegionName());
+        }
         return false;
     }
     

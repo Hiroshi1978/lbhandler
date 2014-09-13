@@ -6,11 +6,6 @@
 
 package web.component.impl.aws.model;
 
-import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.amazonaws.services.ec2.model.StartInstancesRequest;
-import com.amazonaws.services.ec2.model.StopInstancesRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,21 +54,17 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     private static Instance create(Builder builder){
         
         AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
-        RunInstancesRequest request = new RunInstancesRequest();
-        request.setImageId(builder.imageId);
-        request.setInstanceType(builder.type);
-        request.setMinCount(1);
-        request.setMaxCount(1);
-        RunInstancesResult result = ec2.runInstances(request);
-        com.amazonaws.services.ec2.model.Instance newEc2Instance = result.getReservation().getInstances().get(0);
-        InstanceImpl newInstance = new InstanceImpl(newEc2Instance);
+        com.amazonaws.services.ec2.model.Instance newEc2Instance = ec2.createInstance(builder.imageId, builder.type);
+        Instance newInstance = new InstanceImpl(newEc2Instance);
         existInstances.put(newInstance.getId(), newInstance);
         
         return existInstances.get(newInstance.getId());
     }
     
-    private static InstanceImpl get(Builder builder){
-        return null;
+    private static Instance get(Builder builder){
+        if(existInstances.get(builder.id) == null)
+            existInstances.put(builder.id, new InstanceImpl(builder.id));
+        return existInstances.get(builder.id);
     }
     
     public com.amazonaws.services.elasticloadbalancing.model.Instance asElbInstance(){
@@ -130,7 +121,6 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         return 31 * getId().hashCode();
     }
 
-    @Override
     public InstanceState getState(){
         throw new UnsupportedOperationException("Not yet supported.");
     }
@@ -147,20 +137,30 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public void start() {
-        StartInstancesRequest request = new StartInstancesRequest();
-        List<String> ids = new ArrayList<>();
-        ids.add(getId());
-        request.setInstanceIds(ids);
-        ec2().startInstances(request);
+        ec2().startInstance(getId());
     }
 
     @Override
     public void stop() {
-        StopInstancesRequest request = new StopInstancesRequest();
-        List<String> ids = new ArrayList<>();
-        ids.add(getId());
-        request.setInstanceIds(ids);
-        ec2().stopInstances(request);
+        ec2().stopInstance(getId());
+    }
+
+    @Override
+    public String getPlacement() {
+        String placement =  ec2Instance.getPlacement().toString();
+        if(placement == null){
+            try{
+                placement = ec2().getExistInstance(getId()).getPlacement().toString();
+            }catch(RuntimeException e){
+                System.err.println(e.getMessage());
+            }
+        }
+        return placement;
+    }
+
+    @Override
+    public void terminate() {
+        ec2().terminateInstance(getId());
     }
 
     public static class State implements InstanceState{
