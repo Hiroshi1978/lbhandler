@@ -6,6 +6,7 @@ We aim to offer libraries that makes it possible to handle resources of some web
 
 ## Usage
 
+ * [Launch web servers](#launch-web-servers)
  * [Create new load balancer](#how-to-create-new-load-balancer-)
  * [Get information about load balancer](#how-to-get-information-about-the-created-load-balancer-)
  * [Register and deregister web servers](#lets-register-your-web-servers-with-the-load-balancer)
@@ -16,12 +17,13 @@ We aim to offer libraries that makes it possible to handle resources of some web
  * [Set up HTTP Client](#setting-up-http-client)
  * [Further learning](#want-to-learn-elb-or-lba-)
 
-### How to create web server ?
+### Launch web servers.
 
 Make sure you have your own AMI that contains your web server application. Next code will launch the new instance.
 
 ```java
-    Instance webServerNo1 = new InstanceImpl.Builder().imageId("id-of-your-own-ami").type("instance-type").create();
+    Instance webServerNo1 = new InstanceImpl.Builder()
+                        .imageId("id-of-your-ami").type("instance-type").create();
 ```
 
 ### How to create new load balancer ?
@@ -85,10 +87,10 @@ And the result may be like this.
 It's very simple.
 
 ```java
-    BackendInstance webServerNo1  = BackendInstanceImpl.create("web-server-1");
-    BackendInstance webServerNo2  = BackendInstanceImpl.create("web-server-2");
+    webServerNo1.start();
+    webServerNo2.start();
     . . . . . .
-    BackendInstance webServerNo10 = BackendInstanceImpl.create("web-server-10");
+    webServerNo10.start();
     
     List<BackendInstance> webServers = new ArrayList<>();
 
