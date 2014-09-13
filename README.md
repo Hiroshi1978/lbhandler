@@ -136,7 +136,7 @@ And again, this is as good.
 
 ### Dependency
 
-Our library has some implementation that works with AWS. Please check the classes in [web.component.impl.aws.elb packages](https://github.com/Hiroshi1978/lbhandler/tree/master/web/component/impl/aws/elb) for such codes. Those classes needs AWS SDK for Java. It is necessary for paths to the JAR files that contain SDK to be included in your class path.
+Our library has some implementation that works with AWS. Please check the classes in [web.component.impl.aws packages](https://github.com/Hiroshi1978/lbhandler/tree/master/src/web/component/impl/aws) for such codes. Those classes needs AWS SDK for Java. It is necessary for paths to the JAR files that contain SDK to be included in your class path.
 You can download AWS SDK for Java from [here](https://aws.amazon.com/jp/sdkforjava/).
 To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/aws/aws-sdk-java).
 
