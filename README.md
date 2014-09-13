@@ -6,7 +6,7 @@ We aim to offer libraries that makes it possible to handle resources of some web
 
 ## Usage
 
- * [Launch web servers ...](#launch-web-servers)
+ * [Launch your web server ...](#launch-web-servers)
  * [Create new load balancer ...](#how-to-create-new-load-balancer-)
  * [Get information about load balancer ...](#how-to-get-information-about-the-created-load-balancer-)
  * [Register and deregister web servers ...](#lets-register-your-web-servers-with-the-load-balancer)
@@ -22,8 +22,18 @@ We aim to offer libraries that makes it possible to handle resources of some web
 Make sure you have your own AMI that contains your web server application. Next code will launch the new instance.
 
 ```java
-    Instance webServerNo1 = new InstanceImpl.Builder()
-                        .imageId("id-of-your-ami").type("instance-type").create();
+    Instance server = new InstanceImpl.Builder()
+                        .imageId("id-of-your-ami").type("instance.type").create();
+```
+
+When stop it,
+```java
+    server.stop();
+```
+
+And then for restarting,
+```java
+    server.start();
 ```
 
 ### How to create new load balancer ?
