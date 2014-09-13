@@ -92,7 +92,7 @@ It's very simple.
     . . . . . .
     webServerNo10.start();
     
-    List<BackendInstance> webServers = new ArrayList<>();
+    List<Instance> webServers = new ArrayList<>();
 
     myWebServers.add(webServerNo1);
     myWebServers.add(webServerNo2);
@@ -105,14 +105,14 @@ It's very simple.
 Or, you can do the same thing in this way also.
 
 ```java
-    for(BackendInstance webServer : webServers)
+    for(Instance webServer : webServers)
         webServer.registerWith(lb);
 ```
 
 For checking the state of the server,
 
 ```java
-    BackendInstanceState state = webServerNo1.getBackendInstanceState();
+    InstanceState state = webServerNo1.getInstanceState();
     
     System.out.println("ID            : " + state.getId());
     System.out.println("Service state : " + state.getState());
@@ -130,7 +130,7 @@ Then, if you want to deregister them,
 And again, this is as good.
 
 ```java
-    for(BackendInstance webServer : webServers)
+    for(Instance webServer : webServers)
         webServer.deregisterFrom(lb);
 ```
 
