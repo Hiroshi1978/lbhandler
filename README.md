@@ -38,14 +38,14 @@ And then for restarting,
 
 ### How to create new load balancer ?
 
-Maybe you can write like this.
+You can write like this.
 
 ```java
     LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB")
                         .defaultHttpListener().zones("zone-name").build();
 ```
 
-Or, if you use VPC,
+If you use VPC,
 
 ```java
     LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB")
