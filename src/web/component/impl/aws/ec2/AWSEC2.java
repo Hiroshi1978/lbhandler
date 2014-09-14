@@ -16,6 +16,7 @@ import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Placement;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
@@ -78,6 +79,16 @@ public class AWSEC2 implements CloudBlock{
     }
     
     public RunInstancesResult runInstances(RunInstancesRequest request){
+        
+        if(request.getImageId() == null || request.getImageId().isEmpty())
+            throw new IllegalArgumentException("Image ID not specified.");
+        if(request.getInstanceType() == null || request.getInstanceType().isEmpty())
+            throw new IllegalArgumentException("Instance type not specified.");
+        if(request.getMinCount() == null)
+            request.setMinCount(1);
+        if(request.getMaxCount() == null)
+            request.setMaxCount(1);
+            
         return awsHttpClient.runInstances(request);
     }
     public Instance createInstance(String imageId, String instanceType){
@@ -85,8 +96,17 @@ public class AWSEC2 implements CloudBlock{
         RunInstancesRequest request = new RunInstancesRequest();
         request.setImageId(imageId);
         request.setInstanceType(instanceType);
-        request.setMinCount(1);
-        request.setMaxCount(1);
+        RunInstancesResult  result = runInstances(request);
+        Instance newInstance = result.getReservation().getInstances().get(0);
+        
+        return newInstance;
+    }
+    public Instance createInstance(String imageId, String instanceType, String zoneName){
+        
+        RunInstancesRequest request = new RunInstancesRequest();
+        request.setImageId(imageId);
+        request.setInstanceType(instanceType);
+        request.setPlacement(new Placement(zoneName));
         RunInstancesResult  result = runInstances(request);
         Instance newInstance = result.getReservation().getInstances().get(0);
         
