@@ -19,6 +19,7 @@ import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.Placement;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StartInstancesResult;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
@@ -108,6 +109,10 @@ public class AWSEC2 implements CloudBlock{
     }
     
     public StartInstancesResult startInstances(StartInstancesRequest request){
+
+        if(request.getInstanceIds() == null || request.getInstanceIds().isEmpty())
+            throw new IllegalArgumentException("Instance ID not specified.");
+        
         return awsHttpClient.startInstances(request);
     }
     public StartInstancesResult startInstances(List<String> instanceIds){
@@ -121,6 +126,10 @@ public class AWSEC2 implements CloudBlock{
     }    
     
     public StopInstancesResult stopInstances(StopInstancesRequest request){
+
+        if(request.getInstanceIds() == null || request.getInstanceIds().isEmpty())
+            throw new IllegalArgumentException("Instance ID not specified.");
+        
         return awsHttpClient.stopInstances(request);
     }
     public StopInstancesResult stopInstances(List<String> instanceIds){
@@ -134,6 +143,10 @@ public class AWSEC2 implements CloudBlock{
     }
     
     public DescribeInstancesResult describeInstances(DescribeInstancesRequest request){
+
+        if(request.getInstanceIds() == null || request.getInstanceIds().isEmpty())
+            throw new IllegalArgumentException("Instance ID not specified.");
+        
         return awsHttpClient.describeInstances(request);
     }
     public DescribeInstancesResult describeInstances(List<String> instanceIds){
@@ -147,10 +160,21 @@ public class AWSEC2 implements CloudBlock{
         return describeInstances(instanceIds);
     }
     public Instance getExistInstance(String instanceId){
-        return describeInstance(instanceId).getReservations().get(0).getInstances().get(0);
+        
+        Instance existInstance = null;
+        List<Reservation> reservs = describeInstance(instanceId).getReservations();
+        if(reservs != null && !reservs.isEmpty()){
+            exsitInstance = reservs.get(0).getInstances().get(0);
+        }
+        
+        return exsitInstance;
     }
     
     public TerminateInstancesResult terminateInstances(TerminateInstancesRequest request){
+
+        if(request.getInstanceIds() == null || request.getInstanceIds().isEmpty())
+            throw new IllegalArgumentException("Instance ID not specified.");
+        
         return awsHttpClient.terminateInstances(request);
     }
     public TerminateInstancesResult terminateInstances(List<String> instanceIds){
@@ -164,11 +188,24 @@ public class AWSEC2 implements CloudBlock{
     }
     
     public DescribeAvailabilityZonesResult describeAvailabilityZones(DescribeAvailabilityZonesRequest request){
+
+        if(request.getAvailabilityZones() == null || request.getAvailabilityZones().isEmpty())
+            throw new IllegalArgumentException("Availability zones not specified.");
+        for(AvailabilityZone zone : request.getAvailabilityZones())
+            if(zone.getZoneName() == null || zone.getZoneName().isEmpty())
+                throw new IllegalArgumentException("Availability zones not specified.");
+                
         return awsHttpClient.describeAvailabilityZones(request);
     }
     public DescribeAvailabilityZonesResult describeAvailabilityZones(List<String> zoneNames){
+        List<AvailabilityZone> zones = new ArrayList<>();
+        for(String zoneName : zoneNames){
+            AvailabilityZone zone = new AvailabilityZone();
+            zone.setZoneName(zoneName);
+            zones.add(zone);
+        }
         DescribeAvailabilityZonesRequest request = new DescribeAvailabilityZonesRequest();
-        request.setZoneNames(zoneNames);
+        request.setAvailabilityZones(zones);
         return describeAvailabilityZones(request);
     }
     public DescribeAvailabilityZonesResult describeAvailabilityZone(String zoneName){
