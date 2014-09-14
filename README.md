@@ -102,7 +102,7 @@ It's very simple.
     servers.add(serverNo1);
     servers.add(serverNo2);
     . . . . . .
-    webServers.add(serverNo20);
+    servers.add(serverNo20);
 
     for(Instance server : servers)
         lb.registerInstances(server);
