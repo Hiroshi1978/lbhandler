@@ -97,28 +97,28 @@ And the result may be like this.
 It's very simple.
 
 ```java
-    List<Instance> webServers = new ArrayList<>();
+    List<Instance> servers = new ArrayList<>();
 
-    webServers.add(webServerNo1);
-    eebServers.add(webServerNo2);
+    servers.add(serverNo1);
+    servers.add(serverNo2);
     . . . . . .
-    webServers.add(webServerNo20);
+    webServers.add(serverNo20);
 
-    for(Instance webServer : eebServers)
-        lb.registerInstances(webServer);
+    for(Instance server : servers)
+        lb.registerInstances(server);
 ```
 
 Or, you can do the same thing in this way also.
 
 ```java
-    for(Instance webServer : webServers)
-        webServer.registerWith(lb);
+    for(Instance server : servers)
+        server.registerWith(lb);
 ```
 
 For checking the state of the server,
 
 ```java
-    InstanceState state = webServerNo1.getInstanceState();
+    InstanceState state = serverNo1.getInstanceState();
     
     System.out.println("ID            : " + state.getId());
     System.out.println("Service state : " + state.getState());
@@ -130,14 +130,14 @@ For checking the state of the server,
 Then, if you want to deregister them,
 
 ```java
-    lb.deregisterInstances(webServers);
+    lb.deregisterInstances(servers);
 ```
 
 And again, this is as good.
 
 ```java
-    for(Instance webServer : webServers)
-        webServer.deregisterFrom(lb);
+    for(Instance server : servers)
+        server.deregisterFrom(lb);
 ```
 
 ### Dependency
