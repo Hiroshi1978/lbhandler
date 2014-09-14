@@ -34,11 +34,11 @@ public class InstanceImplTest {
     
     @BeforeClass
     public static void setUpClass() {
-        //build instance from create method.
+        //build instance from create method to obtain reference to the object of the newly created instance.
         Instance testInstance1 = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).create();
         testInstanceId = testInstance1.getId();
         
-        //build instance from get method.
+        //build instance from get method to obtain reference to the object of the same instance.
         Instance testInstance2 = new InstanceImpl.Builder().id(testInstanceId).get();
 
         testInstances.add(testInstance1);
@@ -47,6 +47,10 @@ public class InstanceImplTest {
     
     @AfterClass
     public static void tearDownClass() {
+        //stop and terminated the test instance.
+        Instance testInstance = testInstances.get(0);
+        testInstance.stop();
+        testInstance.terminate();
     }
     
     @Before
