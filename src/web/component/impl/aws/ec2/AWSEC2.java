@@ -91,26 +91,20 @@ public class AWSEC2 implements CloudBlock{
             
         return awsHttpClient.runInstances(request);
     }
-    public Instance createInstance(String imageId, String instanceType){
-        
-        RunInstancesRequest request = new RunInstancesRequest();
-        request.setImageId(imageId);
-        request.setInstanceType(instanceType);
-        RunInstancesResult  result = runInstances(request);
-        Instance newInstance = result.getReservation().getInstances().get(0);
-        
-        return newInstance;
-    }
     public Instance createInstance(String imageId, String instanceType, String zoneName){
         
         RunInstancesRequest request = new RunInstancesRequest();
         request.setImageId(imageId);
         request.setInstanceType(instanceType);
-        request.setPlacement(new Placement(zoneName));
+        if(zoneName != null && !zoneName.isEmpty())
+            request.setPlacement(new Placement(zoneName));
         RunInstancesResult  result = runInstances(request);
         Instance newInstance = result.getReservation().getInstances().get(0);
         
         return newInstance;
+    }
+    public Instance createInstance(String imageId, String instanceType){
+        return createInstance(imageId, instanceType, null);
     }
     
     public StartInstancesResult startInstances(StartInstancesRequest request){
