@@ -54,7 +54,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     private static Instance create(Builder builder){
         
         AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
-        com.amazonaws.services.ec2.model.Instance newEc2Instance = ec2.createInstance(builder.imageId, builder.type);
+        com.amazonaws.services.ec2.model.Instance newEc2Instance = ec2.createInstance(builder.imageId, builder.type, builder.zoneName);
         Instance newInstance = new InstanceImpl(newEc2Instance);
         existInstances.put(newInstance.getId(), newInstance);
         
@@ -206,7 +206,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         private String id;
         private String imageId;
         private String type;
-        private String placement;
+        private String zoneName;
         
         public Builder id(String id){
             this.id = id;
@@ -232,8 +232,8 @@ public class InstanceImpl extends AWSModelBase implements Instance{
             this.type = type;
             return this;
         }
-        public Builder placement(String placement){
-            this.placement = placement;
+        public Builder zoneName(String zoneName){
+            this.zoneName = zoneName;
             return this;
         }
         
