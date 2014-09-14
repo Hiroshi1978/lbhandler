@@ -47,7 +47,7 @@ public class InstanceImplTest {
     
     @AfterClass
     public static void tearDownClass() {
-        //stop and terminated the test instance.
+        //stop and terminate the test instance.
         Instance testInstance = testInstances.get(0);
         testInstance.stop();
         testInstance.terminate();
