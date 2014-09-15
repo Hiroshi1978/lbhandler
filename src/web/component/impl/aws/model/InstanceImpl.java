@@ -26,7 +26,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     private final com.amazonaws.services.ec2.model.Instance ec2Instance = new com.amazonaws.services.ec2.model.Instance();
 
     private InstanceImpl(String id){
-        elbInstance.setInstanceId(id);
+        initializeAWSInstances(ec2().getExistInstance(id));
     }
     
    /*
@@ -34,7 +34,11 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     * This costructor should be called when new instance is launched in cloud.
     */
     private InstanceImpl(com.amazonaws.services.ec2.model.Instance newEc2Instance){
-        
+        initializeAWSInstances(newEc2Instance);
+    }
+
+    private void initializeAWSInstances(com.amazonaws.services.ec2.model.Instance newEc2Instance){
+
         //initialize EC2 instance.
         ec2Instance.setInstanceId(newEc2Instance.getInstanceId());
         ec2Instance.setInstanceType(newEc2Instance.getInstanceType());
@@ -44,9 +48,9 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         ec2Instance.setPlacement(newEc2Instance.getPlacement());
         
         //initialize ELB instance.
-        elbInstance.setInstanceId(newEc2Instance.getInstanceId());
+        elbInstance.setInstanceId(newEc2Instance.getInstanceId());        
     }
-
+    
    /*
     * return new instance of this class through specified Instance of EC2 class instance.
     * This static method should be called when new instance is launched in cloud.
@@ -164,15 +168,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public String getPlacement() {
-        String placement =  ec2Instance.getPlacement().toString();
-        if(placement == null){
-            try{
-                placement = ec2().getExistInstance(getId()).getPlacement().toString();
-            }catch(RuntimeException e){
-                System.err.println(e.getMessage());
-            }
-        }
-        return placement;
+        return ec2Instance.getPlacement().toString();
     }
 
     @Override
