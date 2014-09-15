@@ -45,6 +45,9 @@ public interface Instance {
     public String getPublicIpAddress();
     public String getSubnetId();
     public String getVpcId();
+    public String getImageId();
+    public String getInstanceType();
+    public String getLifeCycle();
     
     public void start();
     public void stop();

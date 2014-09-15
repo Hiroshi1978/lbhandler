@@ -72,13 +72,63 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     }
     
     public com.amazonaws.services.elasticloadbalancing.model.Instance asElbInstance(){
-        return elbInstance;
+        return copyElbInstance(elbInstance);
     }
     
     public com.amazonaws.services.ec2.model.Instance asEc2Instance(){
-        return ec2Instance;
+        return copyEc2Instance(ec2Instance);
     }
     
+    private com.amazonaws.services.elasticloadbalancing.model.Instance copyElbInstance(com.amazonaws.services.elasticloadbalancing.model.Instance original){
+        
+        com.amazonaws.services.elasticloadbalancing.model.Instance copy = new com.amazonaws.services.elasticloadbalancing.model.Instance();
+        copy.setInstanceId(original.getInstanceId());
+        return copy;
+    }
+    
+    private com.amazonaws.services.ec2.model.Instance copyEc2Instance(com.amazonaws.services.ec2.model.Instance original){
+        
+        com.amazonaws.services.ec2.model.Instance copy = new com.amazonaws.services.ec2.model.Instance();
+
+        copy.setAmiLaunchIndex(original.getAmiLaunchIndex());
+        copy.setArchitecture(original.getArchitecture());
+        copy.setBlockDeviceMappings(original.getBlockDeviceMappings());
+        copy.setClientToken(original.getClientToken());
+        copy.setEbsOptimized(original.getEbsOptimized());
+        copy.setHypervisor(original.getHypervisor());
+        copy.setIamInstanceProfile(original.getIamInstanceProfile());
+        copy.setImageId(original.getImageId());
+        copy.setInstanceId(original.getInstanceId());
+        copy.setInstanceLifecycle(original.getInstanceLifecycle());
+        copy.setInstanceType(original.getInstanceType());
+        copy.setKernelId(original.getKernelId());
+        copy.setKeyName(original.getKeyName());
+        copy.setLaunchTime(original.getLaunchTime());
+        copy.setMonitoring(original.getMonitoring());
+        copy.setNetworkInterfaces(original.getNetworkInterfaces());
+        copy.setPlacement(original.getPlacement());
+        copy.setPlatform(original.getPlatform());
+        copy.setPrivateDnsName(original.getPrivateDnsName());
+        copy.setPrivateIpAddress(original.getPrivateIpAddress());
+        copy.setProductCodes(original.getProductCodes());
+        copy.setPublicDnsName(original.getPublicDnsName());
+        copy.setPublicIpAddress(original.getPublicIpAddress());
+        copy.setMonitoring(original.getMonitoring());
+        copy.setRamdiskId(original.getRamdiskId());
+        copy.setRootDeviceName(original.getRootDeviceName());
+        copy.setRootDeviceType(original.getRootDeviceType());
+        copy.setSecurityGroups(original.getSecurityGroups());
+        copy.setSourceDestCheck(original.getSourceDestCheck());
+        copy.setSpotInstanceRequestId(original.getSpotInstanceRequestId());
+        copy.setSriovNetSupport(original.getSriovNetSupport());
+        copy.setSubnetId(original.getSubnetId());
+        copy.setTags(original.getTags());
+        copy.setVirtualizationType(original.getVirtualizationType());
+        copy.setVpcId(original.getVpcId());
+        
+        return copy;
+    }
+
     @Override
     public LoadBalancer getLoadBalancer() {
         throw new UnsupportedOperationException("Not yet supported.");
@@ -92,6 +142,21 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     @Override
     public String getId() {
         return elbInstance.getInstanceId();
+    }
+
+    @Override
+    public String getImageId(){
+        return ec2Instance.getImageId();
+    }
+
+    @Override
+    public String getInstanceType(){
+        return ec2Instance.getInstanceType();
+    }
+
+    @Override
+    public String getLifeCycle(){
+        return ec2Instance.getInstanceLifecycle();
     }
 
     @Override
