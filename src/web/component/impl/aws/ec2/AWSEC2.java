@@ -16,10 +16,11 @@ import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Placement;
+import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StartInstancesResult;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
@@ -164,10 +165,20 @@ public class AWSEC2 implements CloudBlock{
         Instance existInstance = null;
         List<Reservation> reservs = describeInstance(instanceId).getReservations();
         if(reservs != null && !reservs.isEmpty()){
-            exsitInstance = reservs.get(0).getInstances().get(0);
+            existInstance = reservs.get(0).getInstances().get(0);
         }
         
-        return exsitInstance;
+        return existInstance;
+    }
+    public String getInstanceState(String instanceId){
+        
+        Instance existInstance = getExistInstance(instanceId);
+        return existInstance == null ? "Unknown state" : existInstance.getState().toString();
+    }
+    public String getInstanceStateTransitionReason(String instanceId){
+        
+        Instance existInstance = getExistInstance(instanceId);
+        return existInstance == null ? "Unknown reason" : existInstance.getStateTransitionReason();
     }
     
     public TerminateInstancesResult terminateInstances(TerminateInstancesRequest request){
@@ -189,23 +200,14 @@ public class AWSEC2 implements CloudBlock{
     
     public DescribeAvailabilityZonesResult describeAvailabilityZones(DescribeAvailabilityZonesRequest request){
 
-        if(request.getAvailabilityZones() == null || request.getAvailabilityZones().isEmpty())
+        if(request.getZoneNames()== null || request.getZoneNames().isEmpty())
             throw new IllegalArgumentException("Availability zones not specified.");
-        for(AvailabilityZone zone : request.getAvailabilityZones())
-            if(zone.getZoneName() == null || zone.getZoneName().isEmpty())
-                throw new IllegalArgumentException("Availability zones not specified.");
-                
+               
         return awsHttpClient.describeAvailabilityZones(request);
     }
     public DescribeAvailabilityZonesResult describeAvailabilityZones(List<String> zoneNames){
-        List<AvailabilityZone> zones = new ArrayList<>();
-        for(String zoneName : zoneNames){
-            AvailabilityZone zone = new AvailabilityZone();
-            zone.setZoneName(zoneName);
-            zones.add(zone);
-        }
         DescribeAvailabilityZonesRequest request = new DescribeAvailabilityZonesRequest();
-        request.setAvailabilityZones(zones);
+        request.setZoneNames(zoneNames);
         return describeAvailabilityZones(request);
     }
     public DescribeAvailabilityZonesResult describeAvailabilityZone(String zoneName){

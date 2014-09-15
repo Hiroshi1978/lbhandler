@@ -121,13 +121,30 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         return 31 * getId().hashCode();
     }
 
-    public InstanceState getState(){
-        throw new UnsupportedOperationException("Not yet supported.");
+    @Override
+    public String getState(){
+        return ec2().getInstanceState(getId());
+    }
+
+
+    @Override
+    public String getStateTransitionReason(){
+        return ec2().getInstanceStateTransitionReason(getId());
     }
 
     @Override
-    public InstanceState getStateFromLB(LoadBalancer lb){
-        return lb.getInstanceState(this);
+    public String getPublicIpAddress(){
+        return ec2Instance.getPublicIpAddress();
+    }
+    
+    @Override
+    public String getSubnetId(){
+        return ec2Instance.getSubnetId();
+    }
+
+    @Override
+    public String getVpcId(){
+        return ec2Instance.getVpcId();
     }
 
     @Override

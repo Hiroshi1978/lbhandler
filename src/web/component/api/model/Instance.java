@@ -39,8 +39,12 @@ public interface Instance {
     * Deregister this backend instance from the specified load balancer.
     */
     public void deregisterFrom(LoadBalancer lb);
-    public InstanceState getState();
-    public InstanceState getStateFromLB(LoadBalancer lb);
+
+    public String getState();
+    public String getStateTransitionReason();
+    public String getPublicIpAddress();
+    public String getSubnetId();
+    public String getVpcId();
     
     public void start();
     public void stop();
