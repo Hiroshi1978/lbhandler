@@ -197,7 +197,21 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         return ec2().getInstanceState(getId());
     }
 
-
+    @Override
+    public boolean isStarted(){
+        return getState().equals("running");
+    }
+    
+    @Override
+    public boolean isStopped(){
+        return getState().equals("stopped");
+    }
+    
+    @Override
+    public boolean isTerminated(){
+        return getState().equals("terminated");
+    }
+    
     @Override
     public String getStateTransitionReason(){
         return ec2().getInstanceStateTransitionReason(getId());
@@ -225,12 +239,22 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public void start() {
-        ec2().startInstance(getId());
+        if(shouldStart())
+            ec2().startInstance(getId());
     }
-
+    private boolean shouldStart(){
+        String state = getState();
+        return !state.equals("running") && !state.equals("terminated");
+    }
+    
     @Override
     public void stop() {
-        ec2().stopInstance(getId());
+        if(shouldStop())
+            ec2().stopInstance(getId());
+    }
+    private boolean shouldStop(){
+        String state = getState();
+        return !state.equals("stopped") && !state.equals("terminated");
     }
 
     @Override
@@ -240,7 +264,8 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public void terminate() {
-        ec2().terminateInstance(getId());
+        if(!isTerminated())
+            ec2().terminateInstance(getId());
     }
 
     public static class State implements InstanceState{

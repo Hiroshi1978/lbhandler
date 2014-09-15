@@ -53,4 +53,7 @@ public interface Instance {
     public void stop();
     public void terminate();
     
+    public boolean isStarted();
+    public boolean isStopped();
+    public boolean isTerminated();
 }
