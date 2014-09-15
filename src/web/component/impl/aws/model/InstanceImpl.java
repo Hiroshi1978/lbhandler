@@ -22,35 +22,31 @@ import web.component.impl.aws.ec2.AWSEC2;
 public class InstanceImpl extends AWSModelBase implements Instance{
 
     private static final Map<String,Instance> existInstances = new HashMap<>();
-    private final com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance = new com.amazonaws.services.elasticloadbalancing.model.Instance();
-    private final com.amazonaws.services.ec2.model.Instance ec2Instance = new com.amazonaws.services.ec2.model.Instance();
+    private final com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance;
+    private final com.amazonaws.services.ec2.model.Instance ec2Instance;
 
+   /*
+    * Build new instance of this class that communicates with the VM identified by the specified instance ID in cloud.
+    */
     private InstanceImpl(String id){
-        initializeAWSInstances(ec2().getExistInstance(id));
+        //initialize EC2 instance.
+        ec2Instance = copyEc2Instance(ec2().getExistInstance(id));
+        //initialize ELB instance.
+        elbInstance = new com.amazonaws.services.elasticloadbalancing.model.Instance(ec2Instance.getInstanceId());
     }
     
    /*
-    * Build new instance of this class form Instance of EC2 class instance.
-    * This costructor should be called when new instance is launched in cloud.
+    * Build new instance of this class from the specified instance of EC2 Instance class.
+    * This costructor should be called when the new VM is launched in cloud.
     */
     private InstanceImpl(com.amazonaws.services.ec2.model.Instance newEc2Instance){
-        initializeAWSInstances(newEc2Instance);
-    }
-
-    private void initializeAWSInstances(com.amazonaws.services.ec2.model.Instance newEc2Instance){
-
-        //initialize EC2 instance.
-        ec2Instance.setInstanceId(newEc2Instance.getInstanceId());
-        ec2Instance.setInstanceType(newEc2Instance.getInstanceType());
-        ec2Instance.setInstanceLifecycle(newEc2Instance.getInstanceLifecycle());
-        ec2Instance.setImageId(newEc2Instance.getImageId());
-        ec2Instance.setLaunchTime(newEc2Instance.getLaunchTime());
-        ec2Instance.setPlacement(newEc2Instance.getPlacement());
         
+        //initialize EC2 instance.
+        ec2Instance = copyEc2Instance(newEc2Instance);
         //initialize ELB instance.
-        elbInstance.setInstanceId(newEc2Instance.getInstanceId());        
+        elbInstance = new com.amazonaws.services.elasticloadbalancing.model.Instance(ec2Instance.getInstanceId());
     }
-    
+
    /*
     * return new instance of this class through specified Instance of EC2 class instance.
     * This static method should be called when new instance is launched in cloud.
@@ -71,11 +67,17 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         return existInstances.get(builder.id);
     }
     
+   /*
+    * Offer the view of this instance as EC2 Instance.
+    * This method returns the new instance of com.amazonaws.services.elasticloadbalancing.model.Instance class.
+    */
     public com.amazonaws.services.elasticloadbalancing.model.Instance asElbInstance(){
+        //return the copy of the instance the field 'elbInstance' of this object refers.
         return copyElbInstance(elbInstance);
     }
     
     public com.amazonaws.services.ec2.model.Instance asEc2Instance(){
+        //return the copy of the instance the field 'ec2Instance' of this object refers.
         return copyEc2Instance(ec2Instance);
     }
     
