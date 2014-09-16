@@ -70,7 +70,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     }
     
    /*
-    * Offer the view of this instance as EC2 Instance.
+    * Offer the view of this instance as ELB Instance.
     * This method returns the new instance of com.amazonaws.services.elasticloadbalancing.model.Instance class.
     */
     public com.amazonaws.services.elasticloadbalancing.model.Instance asElbInstance(){
