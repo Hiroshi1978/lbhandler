@@ -193,23 +193,23 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     }
 
     @Override
-    public String getState(){
-        return ec2().getInstanceState(getId());
+    public String getStateName(){
+        return ec2().getInstanceStateName(getId());
     }
 
     @Override
     public boolean isStarted(){
-        return getState().equals("running");
+        return getStateName().equals("running");
     }
     
     @Override
     public boolean isStopped(){
-        return getState().equals("stopped");
+        return getStateName().equals("stopped");
     }
     
     @Override
     public boolean isTerminated(){
-        return getState().equals("terminated");
+        return getStateName().equals("terminated");
     }
     
     @Override
@@ -233,6 +233,11 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     }
 
     @Override
+    public String getZoneName(){
+        return ec2Instance.getPlacement().getAvailabilityZone();
+    }
+    
+    @Override
     public String toString(){
         return "{BackendInstanceID: " + getId() + "}";
     }
@@ -243,7 +248,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
             ec2().startInstance(getId());
     }
     private boolean shouldStart(){
-        String state = getState();
+        String state = getStateName();
         return !state.equals("running") && !state.equals("terminated");
     }
     
@@ -253,7 +258,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
             ec2().stopInstance(getId());
     }
     private boolean shouldStop(){
-        String state = getState();
+        String state = getStateName();
         return !state.equals("stopped") && !state.equals("terminated");
     }
 

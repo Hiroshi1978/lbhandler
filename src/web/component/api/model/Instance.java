@@ -40,7 +40,7 @@ public interface Instance {
     */
     public void deregisterFrom(LoadBalancer lb);
 
-    public String getState();
+    public String getStateName();
     public String getStateTransitionReason();
     public String getPublicIpAddress();
     public String getSubnetId();
@@ -48,6 +48,7 @@ public interface Instance {
     public String getImageId();
     public String getInstanceType();
     public String getLifeCycle();
+    public String getZoneName();
     
     public void start();
     public void stop();

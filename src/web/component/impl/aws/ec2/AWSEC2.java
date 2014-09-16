@@ -170,10 +170,14 @@ public class AWSEC2 implements CloudBlock{
         
         return existInstance;
     }
-    public String getInstanceState(String instanceId){
+    public InstanceState getInstanceState(String instanceId){
+        Instance existInstance = getExistInstance(instanceId);
+        return existInstance == null ? null : existInstance.getState();
+    }
+    public String getInstanceStateName(String instanceId){
         
         Instance existInstance = getExistInstance(instanceId);
-        return existInstance == null ? "Unknown state" : existInstance.getState().toString();
+        return existInstance == null ? "Unknown state" : existInstance.getState().getName();
     }
     public String getInstanceStateTransitionReason(String instanceId){
         
