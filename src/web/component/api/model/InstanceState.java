@@ -11,8 +11,17 @@ package web.component.api.model;
  * @author Hiroshi
  */
 public interface InstanceState {
+    
+    //interface as ec2 instance.
+    
+    public Integer getCode();
+    public String getName();
+    
+    
+    //interface as elb instance.
+
+    public String getInstanceId();
     public String getDescription();
-    public String getId();
     public String getReasonCode();
     public String getState();
 }

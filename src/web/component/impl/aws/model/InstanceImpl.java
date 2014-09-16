@@ -14,6 +14,7 @@ import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
 import web.component.impl.aws.AWS;
 import web.component.impl.aws.ec2.AWSEC2;
+import web.component.impl.aws.elb.AWSELB;
 
 /**
  *
@@ -198,6 +199,11 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     }
 
     @Override
+    public Integer getStateCode(){
+        return ec2().getInstanceStateCode(getId());
+    }
+
+    @Override
     public boolean isStarted(){
         return getStateName().equals("running");
     }
@@ -244,22 +250,22 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public void start() {
-        if(shouldStart())
+        if(shouldActuallyStart())
             ec2().startInstance(getId());
     }
-    private boolean shouldStart(){
-        String state = getStateName();
-        return !state.equals("running") && !state.equals("terminated");
+    private boolean shouldActuallyStart(){
+        String stateName = getStateName();
+        return !stateName.equals("running") && !stateName.equals("terminated") && !stateName.equals("pending") && !stateName.equals("shutting-down");
     }
     
     @Override
     public void stop() {
-        if(shouldStop())
+        if(shouldActuallyStop())
             ec2().stopInstance(getId());
     }
-    private boolean shouldStop(){
-        String state = getStateName();
-        return !state.equals("stopped") && !state.equals("terminated");
+    private boolean shouldActuallyStop(){
+        String stateName = getStateName();
+        return !stateName.equals("stopped") && !stateName.equals("terminated") && !stateName.equals("pending") && !stateName.equals("stopping") && !stateName.equals("shutting-down");
     }
 
     @Override
@@ -269,32 +275,92 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public void terminate() {
-        if(!isTerminated())
+        if(shouldActuallyTerminate())
             ec2().terminateInstance(getId());
     }
+    private boolean shouldActuallyTerminate(){
+        String stateName = getStateName();
+        return !stateName.equals("terminated") && !stateName.equals("shutting-down");
+    }
 
+    @Override
+    public InstanceState getInstanceState(){
+        return State.create(this);
+    }
+
+    @Override
+    public InstanceState getInstanceStateAsBackendOf(LoadBalancer lb) {
+        return State.create(this, lb);
+    }
+    
+   /*
+    * The instance of this class expresses snapshot of the state of the specified Instance (VM).
+    * So this is immutable and this class's equal method never returns true unless it is compared with itself.
+    */
     public static class State implements InstanceState{
 
+        private final com.amazonaws.services.ec2.model.InstanceState ec2InstanceState;
         private final com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState;
 
-        private State(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState){
-         this.elbInstanceState = elbInstanceState;
+        private State(Instance instance, LoadBalancer lb){
+            
+            AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+            ec2InstanceState = ec2.getInstanceState(instance.getId());
+            
+            elbInstanceState = new com.amazonaws.services.elasticloadbalancing.model.InstanceState();
+            if(lb != null ){
+                try{
+                    AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+                    com.amazonaws.services.elasticloadbalancing.model.InstanceState source = 
+                        elb.describeInstanceHealth(lb.getName(), ((InstanceImpl)instance).asElbInstance()).getInstanceStates().get(0);
+                    elbInstanceState.setDescription(source.getDescription());
+                    elbInstanceState.setInstanceId(source.getInstanceId());
+                    elbInstanceState.setReasonCode(source.getReasonCode());
+                    elbInstanceState.setState(source.getState());
+                }catch(RuntimeException e){
+                    System.out.println("Could not get instance state through specified load balancer. Load balancer name : " + lb.getName());
+                }
+            }
         }
         
-        public static State create(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState){
-            return new State(elbInstanceState);
+        private State(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceStateSource){
+            ec2InstanceState = new com.amazonaws.services.ec2.model.InstanceState();
+            elbInstanceState = elbInstanceStateSource;
         }
         
+        //only InstanceImpl class can create instance.
+        private static InstanceState create(Instance instance, LoadBalancer lb){
+            return new State(instance, lb);
+        }
+        private static InstanceState create(Instance instance){
+            return create(instance, null);
+        }
+        
+        //only the classes in this package can create instance.
+        static InstanceState create(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceStateSource){
+            return new State(elbInstanceStateSource);
+        }
+        
+        @Override
+        public Integer getCode(){
+            return ec2InstanceState.getCode();
+        }
+        
+        @Override
+        public String getName(){
+            return ec2InstanceState.getName();
+        }
+        
+        @Override
+        public String getInstanceId() {
+            return elbInstanceState.getInstanceId();
+        }
+
         @Override
         public String getDescription() {
             return elbInstanceState.getDescription();
         }
-
-        @Override
-        public String getId() {
-            return elbInstanceState.getInstanceId();
-        }
-
+        
         @Override
         public String getReasonCode() {
             return elbInstanceState.getReasonCode();
@@ -304,7 +370,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         public String getState() {
             return elbInstanceState.getState();
         }
-        
+
         @Override
         public String toString(){
             return getDescription();

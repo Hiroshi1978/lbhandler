@@ -40,6 +40,16 @@ public interface Instance {
     */
     public void deregisterFrom(LoadBalancer lb);
 
+   /*
+    * Return the state of the VM in cloud.
+    */
+    public InstanceState getInstanceState();
+   /*
+    * Return the state as the backend server of the specified load balancer.
+    */
+    public InstanceState getInstanceStateAsBackendOf(LoadBalancer lb);
+    
+    public Integer getStateCode();
     public String getStateName();
     public String getStateTransitionReason();
     public String getPublicIpAddress();
