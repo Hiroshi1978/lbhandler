@@ -295,7 +295,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     
    /*
     * The instance of this class expresses snapshot of the state of the specified Instance (VM).
-    * So the instance of this class is immutable and its equal method never returns true unless it is compared with itself.
+    * So it is immutable and its equal method never returns true unless it is compared with itself.
     */
     public static class State implements InstanceState{
 
