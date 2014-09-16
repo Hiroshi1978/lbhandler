@@ -196,10 +196,10 @@ public class InstanceImpl extends AWSModelBase implements Instance{
    /*
     * [AWS EC2 instance state transition]
     *
-    *   pending   =>    running    =>  stopping  =>  stopped  => shutting-down => terminated
-    *                                <----- startable() ----->
-    *               <-stoppable()->
-    *               <------------ terminatable() ------------>
+    *   pending =>     running     =>  stopping  =>  stopped  => shutting-down => terminated
+    *                                <---- isStartable() ---->
+    *             <-isStoppable()->
+    *             <------------ isTerminatable() ------------>
     */
     @Override
     public String getStateName(){
