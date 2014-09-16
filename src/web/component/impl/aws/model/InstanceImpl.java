@@ -297,60 +297,34 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     }
 
     @Override
-    public InstanceState getInstanceStateAsBackendOf(LoadBalancer lb) {
+    public BackendState getInstanceStateAsBackendOf(LoadBalancer lb) {
         if(lb == null)
             throw new IllegalArgumentException("Load balancer not specified.");
-        return State.create(this, lb);
+        return BackendStateImpl.create(this, lb);
     }
     
    /*
     * The instance of this class expresses snapshot of the state of the specified Instance (VM).
     * So it is immutable and its equal method never returns true unless it is compared with itself.
     */
-    public static class State implements InstanceState{
+    public static class InstanceStateImpl implements InstanceState{
 
-        private final com.amazonaws.services.ec2.model.InstanceState ec2InstanceState;
-        private final com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState;
-
-        private State(Instance instance, LoadBalancer lb){
+        private final com.amazonaws.services.ec2.model.InstanceState ec2InstanceState = 
+                                        new com.amazonaws.services.ec2.model.InstanceState();
+    
+        private InstanceStateImpl(Instance instance){
             
             AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
-            ec2InstanceState = ec2.getInstanceState(instance.getId());
-            
-            elbInstanceState = new com.amazonaws.services.elasticloadbalancing.model.InstanceState();
-            if(lb != null ){
-                try{
-                    AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
-                    com.amazonaws.services.elasticloadbalancing.model.InstanceState source = 
-                        elb.describeInstanceHealth(lb.getName(), ((InstanceImpl)instance).asElbInstance()).getInstanceStates().get(0);
-                    elbInstanceState.setDescription(source.getDescription());
-                    elbInstanceState.setInstanceId(source.getInstanceId());
-                    elbInstanceState.setReasonCode(source.getReasonCode());
-                    elbInstanceState.setState(source.getState());
-                }catch(RuntimeException e){
-                    System.out.println("Could not get instance state through specified load balancer. Load balancer name : " + lb.getName());
-                }
-            }
-        }
-        
-        private State(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceStateSource){
-            ec2InstanceState = new com.amazonaws.services.ec2.model.InstanceState();
-            elbInstanceState = elbInstanceStateSource;
+            com.amazonaws.services.ec2.model.InstanceState source = ec2.getInstanceState(instance.getId());
+            ec2InstanceState.setCode(source.getCode());
+            ec2InstanceState.setName(source.getName());
         }
         
         //only InstanceImpl class can create instance.
-        private static InstanceState create(Instance instance, LoadBalancer lb){
-            return new State(instance, lb);
-        }
         private static InstanceState create(Instance instance){
-            return create(instance, null);
+            return new InstanceStateImpl(instance);
         }
-        
-        //only the classes in this package can create instance.
-        static InstanceState create(com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceStateSource){
-            return new State(elbInstanceStateSource);
-        }
-        
+
         @Override
         public Integer getCode(){
             return ec2InstanceState.getCode();
@@ -359,6 +333,48 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         @Override
         public String getName(){
             return ec2InstanceState.getName();
+        }
+        
+        @Override
+        public String toString(){
+            return ec2InstanceState.toString();
+        }
+    }
+    
+    public static class BackendStateImpl implements BackendState {
+
+        private final com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState = 
+                                        new com.amazonaws.services.elasticloadbalancing.model.InstanceState();
+
+        private BackendStateImpl(Instance instance, LoadBalancer lb){
+            
+            if(instance == null || lb == null)
+                throw new IllegalArgumentException("Both instance and load balancer must be specified.");
+                
+            AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+            com.amazonaws.services.elasticloadbalancing.model.InstanceState source = 
+                elb.describeInstanceHealth(lb.getName(), ((InstanceImpl)instance).asElbInstance()).getInstanceStates().get(0);
+            elbInstanceState.setDescription(source.getDescription());
+            elbInstanceState.setInstanceId(source.getInstanceId());
+            elbInstanceState.setReasonCode(source.getReasonCode());
+            elbInstanceState.setState(source.getState());
+        }
+        
+        private BackendStateImpl(com.amazonaws.services.elasticloadbalancing.model.InstanceState source){
+            elbInstanceState.setDescription(source.getDescription());
+            elbInstanceState.setInstanceId(source.getInstanceId());
+            elbInstanceState.setReasonCode(source.getReasonCode());
+            elbInstanceState.setState(source.getState());
+        }
+        
+        //only InstanceImpl class can create instance.
+        private static BackendState create(Instance instance, LoadBalancer lb){
+            return new BackendStateImpl(instance, lb);
+        }
+
+        //only the classes in this package can create instance.
+        static BackendState create(com.amazonaws.services.elasticloadbalancing.model.InstanceState source){
+            return new BackendStateImpl(source);
         }
         
         @Override
@@ -383,7 +399,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
         @Override
         public String toString(){
-            return getDescription();
+            return elbInstanceState.toString();
         }
     }
     
