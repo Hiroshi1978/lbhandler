@@ -193,6 +193,14 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         return 31 * getId().hashCode();
     }
 
+   /*
+    * [AWS EC2 instance state transition]
+    *
+    *   pending   =>    running    =>  stopping  =>  stopped  => shutting-down => terminated
+    *                                <----- startable() ----->
+    *               <-stoppable()->
+    *               <------------ terminatable() ------------>
+    */
     @Override
     public String getStateName(){
         return ec2().getInstanceStateName(getId());
@@ -250,22 +258,22 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public void start() {
-        if(shouldActuallyStart())
+        if(isStartable())
             ec2().startInstance(getId());
     }
-    private boolean shouldActuallyStart(){
+    private boolean isStartable(){
         String stateName = getStateName();
-        return !stateName.equals("running") && !stateName.equals("terminated") && !stateName.equals("pending") && !stateName.equals("shutting-down");
+        return stateName.equals("stopped") || stateName.equals("stopping");
     }
     
     @Override
     public void stop() {
-        if(shouldActuallyStop())
+        if(isStoppable())
             ec2().stopInstance(getId());
     }
-    private boolean shouldActuallyStop(){
+    private boolean isStoppable(){
         String stateName = getStateName();
-        return !stateName.equals("stopped") && !stateName.equals("terminated") && !stateName.equals("pending") && !stateName.equals("stopping") && !stateName.equals("shutting-down");
+        return stateName.equals("running") ;
     }
 
     @Override
@@ -275,10 +283,10 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public void terminate() {
-        if(shouldActuallyTerminate())
+        if(isTerminatable())
             ec2().terminateInstance(getId());
     }
-    private boolean shouldActuallyTerminate(){
+    private boolean isTerminatable(){
         String stateName = getStateName();
         return !stateName.equals("terminated") && !stateName.equals("shutting-down");
     }
@@ -290,6 +298,8 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public InstanceState getInstanceStateAsBackendOf(LoadBalancer lb) {
+        if(lb == null)
+            throw new IllegalArgumentException("Load balancer not specified.");
         return State.create(this, lb);
     }
     
