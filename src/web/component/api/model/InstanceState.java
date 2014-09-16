@@ -16,12 +16,4 @@ public interface InstanceState {
     
     public Integer getCode();
     public String getName();
-    
-    
-    //interface as elb instance.
-
-    public String getInstanceId();
-    public String getDescription();
-    public String getReasonCode();
-    public String getState();
 }
