@@ -56,9 +56,9 @@ public interface LoadBalancer {
     public void disableZone(Zone zone);
     public void delete();
     
-    public List<InstanceState> getInstanceStates();
-    public List<InstanceState> getInstanceStates(List<Instance> backendInstances);
-    public InstanceState getInstanceState(Instance backendInstance);
+    public List<BackendState> getInstanceStates();
+    public List<BackendState> getInstanceStates(List<Instance> backendInstances);
+    public BackendState getInstanceState(Instance backendInstance);
     
     /**
      * Check if this load balancer is destroyed.

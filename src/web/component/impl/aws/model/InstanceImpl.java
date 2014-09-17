@@ -294,11 +294,11 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public InstanceState getInstanceState(){
-        return State.create(this);
+        return InstanceStateImpl.create(this);
     }
 
     @Override
-    public BackendState getInstanceStateAsBackendOf(LoadBalancer lb) {
+    public BackendState getBackendStateOf(LoadBalancer lb) {
         if(lb == null)
             throw new IllegalArgumentException("Load balancer not specified.");
         return BackendStateImpl.create(this, lb);

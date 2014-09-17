@@ -47,7 +47,7 @@ public interface Instance {
    /*
     * Return the state as the backend server of the specified load balancer.
     */
-    public InstanceState getInstanceStateAsBackendOf(LoadBalancer lb);
+    public BackendState getBackendStateOf(LoadBalancer lb);
     
     public Integer getStateCode();
     public String getStateName();
