@@ -9,7 +9,9 @@ We aim to offer libraries that makes it possible to handle resources of some web
  * [Launch your web server ...](#launch-web-servers)
  * [Create new load balancer ...](#how-to-create-new-load-balancer-)
  * [Get information about load balancer ...](#how-to-get-information-about-the-created-load-balancer-)
- * [Register and deregister web servers ...](#lets-register-your-web-servers-with-the-load-balancer)
+ * [Register web servers ...](#lets-register-your-web-servers-with-the-load-balancer)
+ * [Inspect the state of web servers ...](#inspect-the-state-of-the-server)
+ * [Deregister web servers ...](#deregister-the-server)
 
 ## Some details
 
