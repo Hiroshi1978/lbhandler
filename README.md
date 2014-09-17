@@ -115,6 +115,8 @@ Or, you can do the same thing in this way also.
         server.registerWith(lb);
 ```
 
+### Inspect the state of the server.
+
 You can inspect the state of the server as the backend of the load balancer, through BackendState interface with the sample code below.
 
 ```java
@@ -134,6 +136,8 @@ On the other hand, You can get the running state of the same server itself direc
     System.out.println("Code : " + state.getCode());
     System.out.println("Name : " + state.getName());
 ```
+
+### Deregister the server.
 
 Then, if you want to deregister them,
 
