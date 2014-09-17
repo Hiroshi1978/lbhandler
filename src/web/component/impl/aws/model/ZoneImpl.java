@@ -7,6 +7,7 @@
 package web.component.impl.aws.model;
 
 import com.amazonaws.services.ec2.model.AvailabilityZone;
+import com.amazonaws.services.ec2.model.AvailabilityZoneMessage;
 import java.util.HashMap;
 import java.util.Map;
 import web.component.api.model.Zone;
@@ -23,7 +24,10 @@ public class ZoneImpl extends AWSModelBase implements Zone{
     
     private ZoneImpl(Builder builder){
         
-        ec2Zone.setZoneName(builder.name);
+        AvailabilityZone source = ec2().getEc2AvailabilityZone(builder.name);
+        ec2Zone.setMessages(source.getMessages());
+        ec2Zone.setRegionName(source.getRegionName());
+        ec2Zone.setZoneName(source.getZoneName());
     }
     
     public AvailabilityZone asEc2Zone(){
@@ -31,28 +35,22 @@ public class ZoneImpl extends AWSModelBase implements Zone{
     }
     
     @Override
+    public List<String> getMessages(){
+        List<AvailabilityZoneMessage> messages = ec2Zone.getMessages();
+        List<String> messageStrings = new ArrayList<>();
+        for(AvailabilityZoneMessage message : messages)
+            messageStrings.add(message.getMessage());
+        return messageStrings;
+    }
+
+    @Override
     public String getName(){
         return ec2Zone.getZoneName();
     }
     
     @Override
     public String getRegionName(){
-        
-        String regionName = ec2Zone.getRegionName();
-        
-        if(regionName == null || regionName.isEmpty()){
-
-            regionName = "";
-
-            try{
-                regionName = ec2().getEc2AvailabilityZone(getName()).getRegionName();
-                ec2Zone.setRegionName(regionName);
-            }catch(RuntimeException e){
-                //do nothing.
-            }
-        }
-        
-        return regionName;    
+        return ec2Zone.getRegionName();    
     }
     
     @Override
