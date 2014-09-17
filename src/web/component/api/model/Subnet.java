@@ -12,4 +12,11 @@ package web.component.api.model;
  */
 public interface Subnet {
     public String getId();
+    public String getZone();
+    public Integer getAvailableIpAddressCount();
+    public String getCidrBlock();
+    public boolean getDefaultForAz();
+    public boolean getMapPublicIpOnLaunch();
+    public String getState();
+    public String getVpcId();
 }
