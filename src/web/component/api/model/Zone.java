@@ -11,6 +11,7 @@ package web.component.api.model;
  * @author Hiroshi
  */
 public interface Zone {
+    public List<String> getMessages();
     public String getName();
     public String getRegionName();
     public String getState();
