@@ -200,7 +200,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     *   pending =>     running     =>  stopping  =>  stopped  => shutting-down => terminated
     *                                <---- isStartable() ---->
     *             <-isStoppable()->
-    *             <------------ isTerminatable() ------------>
+    *   <----------------------- isTerminatable() ---------------------------->
     */
     @Override
     public String getStateName(){
@@ -289,7 +289,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     }
     private boolean isTerminatable(){
         String stateName = getStateName();
-        return !stateName.equals("terminated") && !stateName.equals("shutting-down");
+        return !stateName.equals("terminated");
     }
 
     @Override
