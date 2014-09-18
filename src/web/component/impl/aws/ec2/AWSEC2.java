@@ -163,7 +163,7 @@ public class AWSEC2 implements CloudBlock{
         instanceIds.add(instanceId);
         return describeInstances(instanceIds);
     }
-    public Instance getExistInstance(String instanceId){
+    public Instance getExistEc2Instance(String instanceId){
         
         Instance existInstance = null;
         List<Reservation> reservs = describeInstance(instanceId).getReservations();
@@ -174,22 +174,22 @@ public class AWSEC2 implements CloudBlock{
         return existInstance;
     }
     public InstanceState getInstanceState(String instanceId){
-        Instance existInstance = getExistInstance(instanceId);
+        Instance existInstance = getExistEc2Instance(instanceId);
         return existInstance == null ? null : existInstance.getState();
     }
     public String getInstanceStateName(String instanceId){
         
-        Instance existInstance = getExistInstance(instanceId);
+        Instance existInstance = getExistEc2Instance(instanceId);
         return existInstance == null ? "Unknown state" : existInstance.getState().getName();
     }
     public Integer getInstanceStateCode(String instanceId){
         
-        Instance existInstance = getExistInstance(instanceId);
+        Instance existInstance = getExistEc2Instance(instanceId);
         return existInstance == null ? -1 : existInstance.getState().getCode();
     }
     public String getInstanceStateTransitionReason(String instanceId){
         
-        Instance existInstance = getExistInstance(instanceId);
+        Instance existInstance = getExistEc2Instance(instanceId);
         return existInstance == null ? "Unknown reason" : existInstance.getStateTransitionReason();
     }
     
@@ -227,7 +227,7 @@ public class AWSEC2 implements CloudBlock{
         zoneNames.add(zoneName);
         return describeAvailabilityZones(zoneNames);
     }
-    public AvailabilityZone getEc2AvailabilityZone(String zoneName){
+    public AvailabilityZone getExistEc2AvailabilityZone(String zoneName){
         return describeAvailabilityZone(zoneName).getAvailabilityZones().get(0);
     }
     
@@ -246,7 +246,7 @@ public class AWSEC2 implements CloudBlock{
         subnetIds.add(subnetId);
         return describeSubnets(subnetIds);
     }
-    public Subnet getExistSubnet(String subnetId){
+    public Subnet getExistEc2Subnet(String subnetId){
         return describeSubnet(subnetId).getSubnets().get(0);
     }
 }

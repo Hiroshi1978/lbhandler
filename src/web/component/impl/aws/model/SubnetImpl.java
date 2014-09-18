@@ -21,7 +21,7 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
     private final com.amazonaws.services.ec2.model.Subnet ec2Subnet = new com.amazonaws.services.ec2.model.Subnet();
     
     private SubnetImpl(Builder builder){
-        com.amazonaws.services.ec2.model.Subnet source = ec2().getExistSubnet(builder.id);
+        com.amazonaws.services.ec2.model.Subnet source = ec2().getExistEc2Subnet(builder.id);
         ec2Subnet.setSubnetId(source.getSubnetId());
         ec2Subnet.setAvailabilityZone(source.getAvailabilityZone());
         ec2Subnet.setAvailableIpAddressCount(source.getAvailableIpAddressCount());
@@ -90,7 +90,7 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
         String state = "Unknown state";
         
         try{
-            state = ec2().getExistSubnet(getId()).getState();
+            state = ec2().getExistEc2Subnet(getId()).getState();
         }catch(RuntimeException e){
             //do nothing.
         }

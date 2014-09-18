@@ -26,7 +26,7 @@ public class ZoneImpl extends AWSModelBase implements Zone{
     
     private ZoneImpl(Builder builder){
         
-        AvailabilityZone source = ec2().getEc2AvailabilityZone(builder.name);
+        AvailabilityZone source = ec2().getExistEc2AvailabilityZone(builder.name);
         ec2Zone.setMessages(source.getMessages());
         ec2Zone.setRegionName(source.getRegionName());
         ec2Zone.setZoneName(source.getZoneName());
@@ -61,7 +61,7 @@ public class ZoneImpl extends AWSModelBase implements Zone{
         String state = "Unknown state.";
         
         try{
-            state = ec2().getEc2AvailabilityZone(getName()).getState();
+            state = ec2().getExistEc2AvailabilityZone(getName()).getState();
         }catch(RuntimeException e){
             //do nothing.
         }

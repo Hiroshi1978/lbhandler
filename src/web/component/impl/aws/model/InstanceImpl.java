@@ -32,7 +32,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     */
     private InstanceImpl(String id){
         //initialize EC2 instance.
-        ec2Instance = copyEc2Instance(ec2().getExistInstance(id));
+        ec2Instance = copyEc2Instance(ec2().getExistEc2Instance(id));
         //initialize ELB instance.
         elbInstance = new com.amazonaws.services.elasticloadbalancing.model.Instance(ec2Instance.getInstanceId());
     }
