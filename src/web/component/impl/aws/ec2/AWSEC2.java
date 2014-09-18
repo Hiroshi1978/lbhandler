@@ -15,6 +15,8 @@ import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesRequest;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.DescribeSubnetsRequest;
+import com.amazonaws.services.ec2.model.DescribeSubnetsResult;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Placement;
@@ -25,6 +27,7 @@ import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StartInstancesResult;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesResult;
+import com.amazonaws.services.ec2.model.Subnet;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 import java.io.IOException;
@@ -226,5 +229,24 @@ public class AWSEC2 implements CloudBlock{
     }
     public AvailabilityZone getEc2AvailabilityZone(String zoneName){
         return describeAvailabilityZone(zoneName).getAvailabilityZones().get(0);
+    }
+    
+    public DescribeSubnetsResult describeSubnets(DescribeSubnetsRequest request){
+        if(request.getSubnetIds() == null || request.getSubnetIds().isEmpty())
+            throw new IllegalArgumentException("Subnet IDs not specified.");
+        return awsHttpClient.describeSubnets(request);
+    }    
+    public DescribeSubnetsResult describeSubnets(List<String> subnetIds){
+        DescribeSubnetsRequest request = new DescribeSubnetsRequest();
+        request.setSubnetIds(subnetIds);
+        return describeSubnets(request);
+    }
+    public DescribeSubnetsResult describeSubnet(String subnetId){
+        List<String> subnetIds = new ArrayList<>();
+        subnetIds.add(subnetId);
+        return describeSubnets(subnetIds);
+    }
+    public Subnet getExistSubnet(String subnetId){
+        return describeSubnet(subnetId).getSubnets().get(0);
     }
 }

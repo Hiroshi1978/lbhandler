@@ -8,7 +8,9 @@ package web.component.impl.aws.model;
 
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.ec2.model.AvailabilityZoneMessage;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import web.component.api.model.Zone;
 

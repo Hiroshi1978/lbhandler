@@ -18,19 +18,27 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
 
     private static final Map<String,Subnet> existSubnets = new HashMap<>();
     
-    private final com.amazonaws.services.ec2.model.Subnet elbSubnet = new com.amazonaws.services.ec2.model.Subnet();
+    private final com.amazonaws.services.ec2.model.Subnet ec2Subnet = new com.amazonaws.services.ec2.model.Subnet();
     
     private SubnetImpl(Builder builder){
-        elbSubnet.setSubnetId(builder.id);
+        com.amazonaws.services.ec2.model.Subnet source = ec2().getExistSubnet(builder.id);
+        ec2Subnet.setSubnetId(source.getSubnetId());
+        ec2Subnet.setAvailabilityZone(source.getAvailabilityZone());
+        ec2Subnet.setAvailableIpAddressCount(source.getAvailableIpAddressCount());
+        ec2Subnet.setCidrBlock(source.getCidrBlock());
+        ec2Subnet.setDefaultForAz(source.getDefaultForAz());
+        ec2Subnet.setMapPublicIpOnLaunch(source.getMapPublicIpOnLaunch());
+        ec2Subnet.setTags(source.getTags());
+        ec2Subnet.setVpcId(source.getVpcId());
     }
     
     public com.amazonaws.services.ec2.model.Subnet asElbSubnet(){
-        return elbSubnet;
+        return ec2Subnet;
     }
     
     @Override
     public String getId() {
-        return elbSubnet.getSubnetId();
+        return ec2Subnet.getSubnetId();
     }
     
     @Override
@@ -49,6 +57,50 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
     @Override
     public String toString(){
         return "{SubnetID: " + getId() + "}";
+    }
+
+    @Override
+    public String getZone() {
+        return ec2Subnet.getAvailabilityZone();
+    }
+
+    @Override
+    public Integer getAvailableIpAddressCount() {
+        return ec2Subnet.getAvailableIpAddressCount();
+    }
+
+    @Override
+    public String getCidrBlock() {
+        return ec2Subnet.getCidrBlock();
+    }
+
+    @Override
+    public boolean getDefaultForAz() {
+        return ec2Subnet.getDefaultForAz();
+    }
+
+    @Override
+    public boolean getMapPublicIpOnLaunch() {
+        return ec2Subnet.getMapPublicIpOnLaunch();
+    }
+
+    @Override
+    public String getState() {
+        
+        String state = "Unknown state";
+        
+        try{
+            state = ec2().getExistSubnet(getId()).getState();
+        }catch(RuntimeException e){
+            //do nothing.
+        }
+        
+        return state;
+    }
+
+    @Override
+    public String getVpcId() {
+        return ec2Subnet.getVpcId();
     }
 
     public static class Builder {
