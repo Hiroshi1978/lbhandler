@@ -387,7 +387,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
                 List<Subnet> subnets = new ArrayList<>();
                 List<String> subnetIds = description.getSubnets();
                 for(String subnetId : subnetIds)
-                    subnets.add(new SubnetImpl.Builder().id(subnetId).build());
+                    subnets.add(new SubnetImpl.Builder().id(subnetId).get());
                 
                 List<Instance> registeredInstances = new ArrayList<>();
                 List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = description.getInstances();
@@ -516,7 +516,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         }
         
         public Builder subnet(String subnetId){
-            this.subnets.add(new SubnetImpl.Builder().id(subnetId).build());
+            this.subnets.add(new SubnetImpl.Builder().id(subnetId).get());
             return this;
         }
         

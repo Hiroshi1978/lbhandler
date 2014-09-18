@@ -20,8 +20,8 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
     
     private final com.amazonaws.services.ec2.model.Subnet ec2Subnet = new com.amazonaws.services.ec2.model.Subnet();
     
-    private SubnetImpl(Builder builder){
-        com.amazonaws.services.ec2.model.Subnet source = ec2().getExistEc2Subnet(builder.id);
+    private SubnetImpl(String id){
+        com.amazonaws.services.ec2.model.Subnet source = ec2().getExistEc2Subnet(id);
         ec2Subnet.setSubnetId(source.getSubnetId());
         ec2Subnet.setAvailabilityZone(source.getAvailabilityZone());
         ec2Subnet.setAvailableIpAddressCount(source.getAvailableIpAddressCount());
@@ -30,6 +30,26 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
         ec2Subnet.setMapPublicIpOnLaunch(source.getMapPublicIpOnLaunch());
         ec2Subnet.setTags(source.getTags());
         ec2Subnet.setVpcId(source.getVpcId());
+    }
+    
+    private SubnetImpl(String vpcId, String cidrBlock, String zone){
+        com.amazonaws.services.ec2.model.Subnet source = ec2().getNewSubnet(vpcId, cidrBlock, zone);
+        ec2Subnet.setSubnetId(source.getSubnetId());
+        ec2Subnet.setAvailabilityZone(source.getAvailabilityZone());
+        ec2Subnet.setAvailableIpAddressCount(source.getAvailableIpAddressCount());
+        ec2Subnet.setCidrBlock(source.getCidrBlock());
+        ec2Subnet.setDefaultForAz(source.getDefaultForAz());
+        ec2Subnet.setMapPublicIpOnLaunch(source.getMapPublicIpOnLaunch());
+        ec2Subnet.setTags(source.getTags());
+        ec2Subnet.setVpcId(source.getVpcId());        
+    }
+    
+    private static SubnetImpl get(Builder builder){
+        return new SubnetImpl(builder.id);
+    }
+    
+    private static SubnetImpl create(Builder builder){
+        return new SubnetImpl(builder.vpcId, builder.cidrBlock, builder.zone);
     }
     
     public com.amazonaws.services.ec2.model.Subnet asElbSubnet(){
@@ -106,16 +126,38 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
     public static class Builder {
     
         private String id;
+        private String zone;
+        private String cidrBlock;
+        private String vpcId;
         
         public Builder id(String id){
             this.id = id;
             return this;
         }
         
-        public Subnet build(){
+        public Subnet get(){
             if(existSubnets.get(id) == null)
-                existSubnets.put(id, new SubnetImpl(this));
+                existSubnets.put(id, SubnetImpl.get(this));
             return existSubnets.get(id);
+        }
+        
+        public Builder zone(String zone){
+            this.zone = zone;
+            return this;
+        }
+        public Builder cidrBlock(String cidrBlock){
+            this.cidrBlock  = cidrBlock;
+            return this;
+        }
+        public Builder vpcId(String vpcId){
+            this.vpcId  = vpcId;
+            return this;
+        }
+        
+        public Subnet create(){
+            Subnet newSubnet = SubnetImpl.create(this);
+            existSubnets.put(newSubnet.getId(), newSubnet);
+            return newSubnet;
         }
     }
 }

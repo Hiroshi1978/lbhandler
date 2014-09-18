@@ -11,12 +11,19 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
+import com.amazonaws.services.ec2.model.CreateSubnetRequest;
+import com.amazonaws.services.ec2.model.CreateSubnetResult;
+import com.amazonaws.services.ec2.model.CreateVpcRequest;
+import com.amazonaws.services.ec2.model.CreateVpcResult;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesRequest;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.DescribeSubnetsRequest;
 import com.amazonaws.services.ec2.model.DescribeSubnetsResult;
+import com.amazonaws.services.ec2.model.DescribeVpcsRequest;
+import com.amazonaws.services.ec2.model.DescribeVpcsResult;
+import static com.amazonaws.services.ec2.model.DomainType.Vpc;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Placement;
@@ -30,6 +37,7 @@ import com.amazonaws.services.ec2.model.StopInstancesResult;
 import com.amazonaws.services.ec2.model.Subnet;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.amazonaws.services.ec2.model.TerminateInstancesResult;
+import com.amazonaws.services.ec2.model.Vpc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -231,6 +239,9 @@ public class AWSEC2 implements CloudBlock{
         return describeAvailabilityZone(zoneName).getAvailabilityZones().get(0);
     }
     
+    public DescribeSubnetsResult describeSubnets(){
+        return awsHttpClient.describeSubnets();
+    }    
     public DescribeSubnetsResult describeSubnets(DescribeSubnetsRequest request){
         if(request.getSubnetIds() == null || request.getSubnetIds().isEmpty())
             throw new IllegalArgumentException("Subnet IDs not specified.");
@@ -248,5 +259,72 @@ public class AWSEC2 implements CloudBlock{
     }
     public Subnet getExistEc2Subnet(String subnetId){
         return describeSubnet(subnetId).getSubnets().get(0);
+    }
+    
+    public CreateSubnetResult createSubnet(CreateSubnetRequest request){
+
+        if(request.getVpcId() == null || request.getVpcId().isEmpty())
+            throw new IllegalArgumentException("VPC ID not specified.");
+        if(request.getCidrBlock()== null || request.getCidrBlock().isEmpty())
+            throw new IllegalArgumentException("CIDR block not specified.");
+        
+        return awsHttpClient.createSubnet(request);
+    }
+    public CreateSubnetResult createSubnet(String vpcId, String cidrBlock, String availabilityZone){
+
+        CreateSubnetRequest request = new CreateSubnetRequest();
+        request.setVpcId(vpcId);
+        request.setCidrBlock(cidrBlock);
+        request.setAvailabilityZone(availabilityZone);
+        return createSubnet(request);
+    }
+    public CreateSubnetResult createSubnet(String vpcId, String cidrBlock){
+
+        return createSubnet(vpcId, cidrBlock, null);
+    }
+    public Subnet getNewSubnet(String vpcId, String cidrBlock, String availabilityZone){
+        return createSubnet(vpcId, cidrBlock, availabilityZone).getSubnet();
+    }
+
+    public DescribeVpcsResult describeVpcs(){
+        return awsHttpClient.describeVpcs();
+    }    
+    public DescribeVpcsResult describeVpcs(DescribeVpcsRequest request){
+        if(request.getVpcIds()== null || request.getVpcIds().isEmpty())
+            throw new IllegalArgumentException("VPC IDs not specified.");
+        return awsHttpClient.describeVpcs(request);
+    }    
+    public DescribeVpcsResult describeVpcs(List<String> vpcIds){
+        DescribeVpcsRequest request = new DescribeVpcsRequest();
+        request.setVpcIds(vpcIds);
+        return describeVpcs(request);
+    }
+    public DescribeVpcsResult describeVpc(String vpcId){
+        List<String> vpcIds = new ArrayList<>();
+        vpcIds.add(vpcId);
+        return describeVpcs(vpcIds);
+    }
+    public Vpc getExistEc2Vpc(String vpcId){
+        return describeVpc(vpcId).getVpcs().get(0);
+    }
+    
+    public CreateVpcResult createVpc(CreateVpcRequest request){
+
+        if(request.getCidrBlock()== null || request.getCidrBlock().isEmpty())
+            throw new IllegalArgumentException("CIDR block not specified.");
+        if(request.getInstanceTenancy()== null || request.getInstanceTenancy().isEmpty())
+            throw new IllegalArgumentException("Instance tenancy not specified.");
+        
+        return awsHttpClient.createVpc(request);
+    }
+    public CreateVpcResult createVpc(String cidrBlock, String tenancy){
+
+        CreateVpcRequest request = new CreateVpcRequest();
+        request.setCidrBlock(cidrBlock);
+        request.setInstanceTenancy(tenancy);
+        return createVpc(request);
+    }
+    public Vpc getNewVpc(String cidrBlock, String tenancy){
+        return createVpc(cidrBlock, tenancy).getVpc();
     }
 }
