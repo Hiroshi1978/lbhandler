@@ -18,4 +18,6 @@ public interface VPC {
     public Boolean getIsDefault();
     public String getState();
     public String getId();
+    
+    public void delete();
 }

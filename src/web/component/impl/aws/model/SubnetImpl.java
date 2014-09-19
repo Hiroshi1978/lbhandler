@@ -123,6 +123,11 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
         return ec2Subnet.getVpcId();
     }
 
+    @Override
+    public void delete(){
+        ec2().deleteSubnet(getId());
+    }
+    
     public static class Builder {
     
         private String id;

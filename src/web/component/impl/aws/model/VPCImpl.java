@@ -70,7 +70,7 @@ public class VPCImpl extends AWSModelBase implements VPC{
     @Override
     public String getState() {
         
-        String state = "Unknow state";
+        String state = "Unknown state";
         
         try{
             state = ec2().getExistEc2Vpc(getId()).getState();
@@ -84,6 +84,11 @@ public class VPCImpl extends AWSModelBase implements VPC{
     @Override
     public String getId() {
         return ec2Vpc.getVpcId();
+    }
+    
+    @Override
+    public void delete(){
+        ec2().deleteVpc(getId());
     }
     
     @Override
@@ -137,6 +142,10 @@ public class VPCImpl extends AWSModelBase implements VPC{
             
             if(cidrBlock == null || cidrBlock.isEmpty())
                 throw new IllegalArgumentException("CIDR block not specified.");
+            if(tenancy == null || tenancy.isEmpty())
+                throw new IllegalArgumentException("Instnce tenancy not specified.");
+            if(!tenancy.equals("default") && !tenancy.equals("dedicated"))
+                throw new IllegalArgumentException("Instnce tenancy has to be either 'default' or 'dedicated'.");
                         
             VPC newVPC = VPCImpl.create(this);
             existVPCs.put(newVPC.getId(), newVPC);

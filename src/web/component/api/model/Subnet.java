@@ -19,4 +19,6 @@ public interface Subnet {
     public boolean getMapPublicIpOnLaunch();
     public String getState();
     public String getVpcId();
+    
+    public void delete();
 }

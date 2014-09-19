@@ -15,6 +15,8 @@ import com.amazonaws.services.ec2.model.CreateSubnetRequest;
 import com.amazonaws.services.ec2.model.CreateSubnetResult;
 import com.amazonaws.services.ec2.model.CreateVpcRequest;
 import com.amazonaws.services.ec2.model.CreateVpcResult;
+import com.amazonaws.services.ec2.model.DeleteSubnetRequest;
+import com.amazonaws.services.ec2.model.DeleteVpcRequest;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesRequest;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
@@ -285,6 +287,17 @@ public class AWSEC2 implements CloudBlock{
     public Subnet getNewSubnet(String vpcId, String cidrBlock, String availabilityZone){
         return createSubnet(vpcId, cidrBlock, availabilityZone).getSubnet();
     }
+    
+    public void deleteSubnet(DeleteSubnetRequest request){
+        
+        if(request.getSubnetId()== null || request.getSubnetId().isEmpty())
+            throw new IllegalArgumentException("Subnet ID not specified.");
+        
+        awsHttpClient.deleteSubnet(request);
+    }
+    public void deleteSubnet(String subnetId){
+        deleteSubnet(new DeleteSubnetRequest(subnetId));
+    }
 
     public DescribeVpcsResult describeVpcs(){
         return awsHttpClient.describeVpcs();
@@ -326,5 +339,16 @@ public class AWSEC2 implements CloudBlock{
     }
     public Vpc getNewVpc(String cidrBlock, String tenancy){
         return createVpc(cidrBlock, tenancy).getVpc();
+    }
+    
+    public void deleteVpc(DeleteVpcRequest request){
+        
+        if(request.getVpcId() == null || request.getVpcId().isEmpty())
+            throw new IllegalArgumentException("VPC ID not specified.");
+        
+        awsHttpClient.deleteVpc(request);
+    }
+    public void deleteVpc(String vpcId){
+        deleteVpc(new DeleteVpcRequest(vpcId));
     }
 }
