@@ -17,5 +17,5 @@ public interface VPC {
     public String getInstanceTenancy();
     public Boolean getIsDefault();
     public String getState();
-    public String getVpcId();
+    public String getId();
 }

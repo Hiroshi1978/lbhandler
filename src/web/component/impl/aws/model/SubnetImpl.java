@@ -136,6 +136,10 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
         }
         
         public Subnet get(){
+            
+            if(id == null || id.isEmpty())
+                throw new IllegalArgumentException("Subnet ID not specified.");
+                        
             if(existSubnets.get(id) == null)
                 existSubnets.put(id, SubnetImpl.get(this));
             return existSubnets.get(id);
@@ -155,6 +159,12 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
         }
         
         public Subnet create(){
+            
+            if(vpcId == null || vpcId.isEmpty())
+                throw new IllegalArgumentException("VPC ID not specified.");
+            if(cidrBlock == null || cidrBlock.isEmpty())
+                throw new IllegalArgumentException("CIDR block not specified.");
+                        
             Subnet newSubnet = SubnetImpl.create(this);
             existSubnets.put(newSubnet.getId(), newSubnet);
             return newSubnet;
