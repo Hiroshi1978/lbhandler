@@ -185,7 +185,7 @@ public class VPCImplTest {
     public void testHashCode() {
         
         System.out.println("hashCode");
-        System.out.println("equals");
+        
         VPC equalInstance = new VPCImpl.Builder().id(testInstance.getId()).get();
         VPC anotherInstance = new VPCImpl.Builder().cidr(expectedCidrBlock).tenancy(expectedTenancy).create();
         testInstances.add(anotherInstance);
