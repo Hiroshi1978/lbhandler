@@ -17,25 +17,15 @@ import web.component.api.model.VPC;
 public class VPCImpl extends AWSModelBase implements VPC{
 
     private static Map<String, VPC> existVPCs = new HashMap<>();
-    private final com.amazonaws.services.ec2.model.Vpc ec2Vpc = new com.amazonaws.services.ec2.model.Vpc();
+    private final com.amazonaws.services.ec2.model.Vpc ec2Vpc;
 
     private VPCImpl(String id){
         com.amazonaws.services.ec2.model.Vpc source = ec2().getExistEc2Vpc(id);
-        ec2Vpc.setCidrBlock(source.getCidrBlock());
-        ec2Vpc.setDhcpOptionsId(source.getDhcpOptionsId());
-        ec2Vpc.setInstanceTenancy(source.getInstanceTenancy());
-        ec2Vpc.setIsDefault(source.getIsDefault());
-        ec2Vpc.setTags(source.getTags());
-        ec2Vpc.setVpcId(source.getVpcId());
+        ec2Vpc = copyEc2Vpc(source);
     }
     private VPCImpl(String cidrBlock, String tenancy){
         com.amazonaws.services.ec2.model.Vpc source = ec2().getNewVpc(cidrBlock, tenancy);
-        ec2Vpc.setCidrBlock(source.getCidrBlock());
-        ec2Vpc.setDhcpOptionsId(source.getDhcpOptionsId());
-        ec2Vpc.setInstanceTenancy(source.getInstanceTenancy());
-        ec2Vpc.setIsDefault(source.getIsDefault());
-        ec2Vpc.setTags(source.getTags());
-        ec2Vpc.setVpcId(source.getVpcId());
+        ec2Vpc = copyEc2Vpc(source);
     }
     
     
@@ -46,6 +36,21 @@ public class VPCImpl extends AWSModelBase implements VPC{
         return new VPCImpl(builder.cidrBlock, builder.tenancy);
     }
     
+    public com.amazonaws.services.ec2.model.Vpc asEc2Vpc(){
+        return copyEc2Vpc(ec2Vpc);
+    }
+    
+    private com.amazonaws.services.ec2.model.Vpc copyEc2Vpc(com.amazonaws.services.ec2.model.Vpc original){
+        
+        com.amazonaws.services.ec2.model.Vpc copy = new com.amazonaws.services.ec2.model.Vpc();
+        copy.setCidrBlock(original.getCidrBlock());
+        copy.setDhcpOptionsId(original.getDhcpOptionsId());
+        copy.setInstanceTenancy(original.getInstanceTenancy());
+        copy.setIsDefault(original.getIsDefault());
+        copy.setTags(original.getTags());
+        copy.setVpcId(original.getVpcId());
+        return copy;
+    }
     
     @Override
     public String getCidrBlock() {

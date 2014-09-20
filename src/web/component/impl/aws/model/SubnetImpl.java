@@ -18,30 +18,16 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
 
     private static final Map<String,Subnet> existSubnets = new HashMap<>();
     
-    private final com.amazonaws.services.ec2.model.Subnet ec2Subnet = new com.amazonaws.services.ec2.model.Subnet();
+    private final com.amazonaws.services.ec2.model.Subnet ec2Subnet;
     
     private SubnetImpl(String id){
         com.amazonaws.services.ec2.model.Subnet source = ec2().getExistEc2Subnet(id);
-        ec2Subnet.setSubnetId(source.getSubnetId());
-        ec2Subnet.setAvailabilityZone(source.getAvailabilityZone());
-        ec2Subnet.setAvailableIpAddressCount(source.getAvailableIpAddressCount());
-        ec2Subnet.setCidrBlock(source.getCidrBlock());
-        ec2Subnet.setDefaultForAz(source.getDefaultForAz());
-        ec2Subnet.setMapPublicIpOnLaunch(source.getMapPublicIpOnLaunch());
-        ec2Subnet.setTags(source.getTags());
-        ec2Subnet.setVpcId(source.getVpcId());
+        ec2Subnet = copyEc2Subnet(source);
     }
     
     private SubnetImpl(String vpcId, String cidrBlock, String zone){
         com.amazonaws.services.ec2.model.Subnet source = ec2().getNewSubnet(vpcId, cidrBlock, zone);
-        ec2Subnet.setSubnetId(source.getSubnetId());
-        ec2Subnet.setAvailabilityZone(source.getAvailabilityZone());
-        ec2Subnet.setAvailableIpAddressCount(source.getAvailableIpAddressCount());
-        ec2Subnet.setCidrBlock(source.getCidrBlock());
-        ec2Subnet.setDefaultForAz(source.getDefaultForAz());
-        ec2Subnet.setMapPublicIpOnLaunch(source.getMapPublicIpOnLaunch());
-        ec2Subnet.setTags(source.getTags());
-        ec2Subnet.setVpcId(source.getVpcId());        
+        ec2Subnet = copyEc2Subnet(source);
     }
     
     private static SubnetImpl get(Builder builder){
@@ -52,8 +38,23 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
         return new SubnetImpl(builder.vpcId, builder.cidrBlock, builder.zone);
     }
     
-    public com.amazonaws.services.ec2.model.Subnet asElbSubnet(){
-        return ec2Subnet;
+    public com.amazonaws.services.ec2.model.Subnet asEc2Subnet(){
+        return copyEc2Subnet(ec2Subnet);
+    }
+    
+    private com.amazonaws.services.ec2.model.Subnet copyEc2Subnet(com.amazonaws.services.ec2.model.Subnet original){
+        
+        com.amazonaws.services.ec2.model.Subnet copy = new com.amazonaws.services.ec2.model.Subnet();
+        copy.setSubnetId(original.getSubnetId());
+        copy.setAvailabilityZone(original.getAvailabilityZone());
+        copy.setAvailableIpAddressCount(original.getAvailableIpAddressCount());
+        copy.setCidrBlock(original.getCidrBlock());
+        copy.setDefaultForAz(original.getDefaultForAz());
+        copy.setMapPublicIpOnLaunch(original.getMapPublicIpOnLaunch());
+        copy.setTags(original.getTags());
+        copy.setVpcId(original.getVpcId());
+        
+        return copy;
     }
     
     @Override

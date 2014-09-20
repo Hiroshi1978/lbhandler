@@ -22,18 +22,24 @@ public class ZoneImpl extends AWSModelBase implements Zone{
 
     private static final Map<String,Zone> existZones = new HashMap<>();
     
-    private final AvailabilityZone ec2Zone = new AvailabilityZone();
+    private final AvailabilityZone ec2Zone;
     
     private ZoneImpl(Builder builder){
         
         AvailabilityZone source = ec2().getExistEc2AvailabilityZone(builder.name);
-        ec2Zone.setMessages(source.getMessages());
-        ec2Zone.setRegionName(source.getRegionName());
-        ec2Zone.setZoneName(source.getZoneName());
+        ec2Zone = copyEc2Zone(source);
     }
     
     public AvailabilityZone asEc2Zone(){
-        return ec2Zone;
+        return copyEc2Zone(ec2Zone);
+    }
+    
+    private AvailabilityZone copyEc2Zone(AvailabilityZone original){
+        AvailabilityZone copy = new AvailabilityZone();
+        copy.setMessages(original.getMessages());
+        copy.setRegionName(original.getRegionName());
+        copy.setZoneName(original.getZoneName());
+        return copy;
     }
     
     @Override
