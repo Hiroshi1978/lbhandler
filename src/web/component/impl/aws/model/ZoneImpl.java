@@ -58,7 +58,7 @@ public class ZoneImpl extends AWSModelBase implements Zone{
     @Override
     public String getState(){
         
-        String state = "Unknown state.";
+        String state = "Unknown state";
         
         try{
             state = ec2().getExistEc2AvailabilityZone(getName()).getState();

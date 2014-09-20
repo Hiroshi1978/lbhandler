@@ -112,7 +112,7 @@ public class ZoneImplTest {
         ZoneImpl equalZone    = (ZoneImpl)new ZoneImpl.Builder().name(equalZoneName).build();
         ZoneImpl anotherZone = (ZoneImpl)new ZoneImpl.Builder().name(anotherZoneName).build();
         assertTrue(testInstance.equals(equalZone));
-        assertTrue(!testInstance.equals(anotherZone));
+        assertFalse(testInstance.equals(anotherZone));
 
     }
 

@@ -318,7 +318,16 @@ public class AWSEC2 implements CloudBlock{
         return describeVpcs(vpcIds);
     }
     public Vpc getExistEc2Vpc(String vpcId){
-        return describeVpc(vpcId).getVpcs().get(0);
+        
+        Vpc vpc = null;
+        
+        try{
+            vpc = describeVpc(vpcId).getVpcs().get(0);
+        }catch(RuntimeException e){
+            System.out.println("VPC with ID[" + vpcId + "] not exist in cloud.");
+        }
+            
+        return vpc;
     }
     
     public CreateVpcResult createVpc(CreateVpcRequest request){

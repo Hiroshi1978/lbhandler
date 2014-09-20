@@ -88,7 +88,8 @@ public class VPCImpl extends AWSModelBase implements VPC{
     
     @Override
     public void delete(){
-        ec2().deleteVpc(getId());
+        if(ec2().getExistEc2Vpc(getId()) != null)
+            ec2().deleteVpc(getId());
     }
     
     @Override
