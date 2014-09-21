@@ -126,7 +126,8 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
 
     @Override
     public void delete(){
-        ec2().deleteSubnet(getId());
+        if(ec2().getExistEc2Subnet(getId()) != null)
+            ec2().deleteSubnet(getId());
     }
     
     public static class Builder {

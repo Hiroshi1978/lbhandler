@@ -260,7 +260,15 @@ public class AWSEC2 implements CloudBlock{
         return describeSubnets(subnetIds);
     }
     public Subnet getExistEc2Subnet(String subnetId){
-        return describeSubnet(subnetId).getSubnets().get(0);
+        Subnet subnet = null;
+        
+        try{
+            subnet = describeSubnet(subnetId).getSubnets().get(0);
+        }catch(RuntimeException e){
+            System.out.println("Subnet with ID[" + subnetId + "] not exist in cloud.");
+        }
+            
+        return subnet;
     }
     
     public CreateSubnetResult createSubnet(CreateSubnetRequest request){
