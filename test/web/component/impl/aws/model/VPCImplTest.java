@@ -15,6 +15,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import web.component.api.model.VPC;
+import web.component.impl.aws.AWS;
+import web.component.impl.aws.ec2.AWSEC2;
 
 /**
  *
@@ -68,6 +70,23 @@ public class VPCImplTest {
     public void tearDown() {
     }
 
+    /**
+     * Test of asEc2Vpc method, of class VPCImpl.
+     */
+    @Test
+    public void testAsEc2Vpc() {
+        
+        System.out.println("asEc2Vpc");
+        
+        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        com.amazonaws.services.ec2.model.Vpc source = ec2.getExistEc2Vpc(testInstance.getId());
+        com.amazonaws.services.ec2.model.Vpc viewAsEc2Vpc = testInstance.asEc2Vpc();
+        
+        //two instances should be equal, but not the same.
+        assertEquals(source, viewAsEc2Vpc);
+        assertFalse(source == viewAsEc2Vpc);
+    }
+    
     /**
      * Test of getCidrBlock method, of class VPCImpl.
      */
