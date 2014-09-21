@@ -38,7 +38,7 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
         return new SubnetImpl(builder.vpcId, builder.cidrBlock, builder.zone);
     }
     
-    public com.amazonaws.services.ec2.model.Subnet asEc2Subnet(){
+    com.amazonaws.services.ec2.model.Subnet asEc2Subnet(){
         return copyEc2Subnet(ec2Subnet);
     }
     

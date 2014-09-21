@@ -30,7 +30,7 @@ public class ZoneImpl extends AWSModelBase implements Zone{
         ec2Zone = copyEc2Zone(source);
     }
     
-    public AvailabilityZone asEc2Zone(){
+    AvailabilityZone asEc2Zone(){
         return copyEc2Zone(ec2Zone);
     }
     

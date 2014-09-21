@@ -78,7 +78,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         return copyElbInstance(elbInstance);
     }
     
-    public com.amazonaws.services.ec2.model.Instance asEc2Instance(){
+    com.amazonaws.services.ec2.model.Instance asEc2Instance(){
         //return the copy of the instance the field 'ec2Instance' of this object refers.
         return copyEc2Instance(ec2Instance);
     }

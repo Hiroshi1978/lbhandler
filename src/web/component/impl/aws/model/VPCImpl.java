@@ -36,7 +36,7 @@ public class VPCImpl extends AWSModelBase implements VPC{
         return new VPCImpl(builder.cidrBlock, builder.tenancy);
     }
     
-    public com.amazonaws.services.ec2.model.Vpc asEc2Vpc(){
+    com.amazonaws.services.ec2.model.Vpc asEc2Vpc(){
         return copyEc2Vpc(ec2Vpc);
     }
     
