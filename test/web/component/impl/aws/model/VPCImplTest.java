@@ -85,6 +85,11 @@ public class VPCImplTest {
         //two instances should be equal, but not the same.
         assertEquals(source, viewAsEc2Vpc);
         assertFalse(source == viewAsEc2Vpc);
+        
+        assertEquals(expectedCidrBlock, viewAsEc2Vpc.getCidrBlock());
+        assertEquals(expectedTenancy, viewAsEc2Vpc.getInstanceTenancy());
+        assertEquals(testInstance.getId(), viewAsEc2Vpc.getVpcId());
+        assertEquals(expectedDhcpOptionsId, viewAsEc2Vpc.getDhcpOptionsId());
     }
     
     /**
