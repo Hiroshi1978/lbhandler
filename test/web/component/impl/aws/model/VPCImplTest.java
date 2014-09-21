@@ -90,6 +90,7 @@ public class VPCImplTest {
         assertEquals(expectedTenancy, viewAsEc2Vpc.getInstanceTenancy());
         assertEquals(testInstance.getId(), viewAsEc2Vpc.getVpcId());
         assertEquals(expectedDhcpOptionsId, viewAsEc2Vpc.getDhcpOptionsId());
+        assertEquals(null, viewAsEc2Vpc.getState());
     }
     
     /**

@@ -15,6 +15,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import web.component.impl.aws.AWS;
+import web.component.impl.aws.ec2.AWSEC2;
 
 /**
  *
@@ -55,11 +57,18 @@ public class ZoneImplTest {
         
         System.out.println("asEc2Zone");
         
-        AvailabilityZone ec2Zone = testInstance.asEc2Zone();
-        assertEquals(expectedRegionName,ec2Zone.getRegionName());
-        assertEquals(expectedZoneName,ec2Zone.getZoneName());
-        assertEquals(new ArrayList<>(),ec2Zone.getMessages());
-        assertEquals(null,ec2Zone.getState());
+        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        AvailabilityZone source = ec2.getExistEc2AvailabilityZone(expectedZoneName);
+        AvailabilityZone viewAsEc2Zone = testInstance.asEc2Zone();
+
+        //two instances should be equal, but not the same.
+        assertEquals(source, viewAsEc2Zone);
+        assertFalse(source == viewAsEc2Zone);
+        
+        assertEquals(expectedRegionName,viewAsEc2Zone.getRegionName());
+        assertEquals(expectedZoneName,viewAsEc2Zone.getZoneName());
+        assertEquals(new ArrayList<>(),viewAsEc2Zone.getMessages());
+        assertEquals(null,viewAsEc2Zone.getState());
 
     }
 
