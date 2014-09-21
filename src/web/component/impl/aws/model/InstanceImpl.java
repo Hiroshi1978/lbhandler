@@ -410,6 +410,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         private String imageId;
         private String type;
         private String zoneName;
+        private String subnetId;
         
         public Builder id(String id){
             this.id = id;
@@ -437,6 +438,10 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         }
         public Builder zoneName(String zoneName){
             this.zoneName = zoneName;
+            return this;
+        }
+        public Builder subnetId(String subnetId){
+            this.subnetId = subnetId;
             return this;
         }
         
