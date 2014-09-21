@@ -28,7 +28,7 @@ public class VPCImplTest {
     static final String expectedTenancy = "";
     static final String expectedState = "";
     static final String expectedDhcpOptionsId = "";
-    static VPCImpl testInstance;
+    static VPC testInstance;
     static String expectedStringExpression;
     static Set<VPC> testInstances = new HashSet<>();
     
@@ -38,7 +38,7 @@ public class VPCImplTest {
     @BeforeClass
     public static void setUpClass() {
         
-        testInstance = (VPCImpl) new VPCImpl.Builder().cidr(expectedCidrBlock).tenancy(expectedTenancy).create();
+        testInstance = new VPCImpl.Builder().cidr(expectedCidrBlock).tenancy(expectedTenancy).create();
         testInstances.add(testInstance);
         
         while(!testInstance.getState().equals("available")){
@@ -80,7 +80,7 @@ public class VPCImplTest {
         
         AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
         com.amazonaws.services.ec2.model.Vpc source = ec2.getExistEc2Vpc(testInstance.getId());
-        com.amazonaws.services.ec2.model.Vpc viewAsEc2Vpc = testInstance.asEc2Vpc();
+        com.amazonaws.services.ec2.model.Vpc viewAsEc2Vpc = ((VPCImpl)testInstance).asEc2Vpc();
         
         //two instances should be equal, but not the same.
         assertEquals(source, viewAsEc2Vpc);
@@ -180,6 +180,9 @@ public class VPCImplTest {
         } catch (InterruptedException ex) {
         }
         VPC shouldHaveBeenDeleted = new VPCImpl.Builder().id(deletedId).get();
+        
+        AWSEC2 ec2 = (AWSEC2) AWS.get(AWS.BlockName.EC2);
+        assertEquals(null, ec2.getExistEc2Vpc(deletedId));
         assertEquals("Unknown state", shouldHaveBeenDeleted.getState());
     }
 

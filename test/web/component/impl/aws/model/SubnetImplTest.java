@@ -6,6 +6,7 @@
 
 package web.component.impl.aws.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.After;
@@ -16,6 +17,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import web.component.api.model.Subnet;
 import web.component.api.model.VPC;
+import web.component.impl.aws.AWS;
+import web.component.impl.aws.ec2.AWSEC2;
 
 /**
  *
@@ -24,9 +27,12 @@ import web.component.api.model.VPC;
 public class SubnetImplTest {
 
     static final String expectedCidrBlock = "10.1.1.0/24";
-    static final String expectedTenancy = "";
     static final String expectedState = "";
     static final String expectedDhcpOptionsId = "";
+    static String expectedId;
+    static String expectedAvailabilityZone;
+    static Integer expectedAvailableIpAddressCount;
+    static Subnet testInstance;
     static VPC testVPC;
     static String expectedStringExpression;
     static Set<Subnet> testInstances = new HashSet<>();
@@ -38,7 +44,7 @@ public class SubnetImplTest {
     public static void setUpClass() {
         
         System.out.println("create test vpc.");
-        testVPC = new VPCImpl.Builder().cidr("10.1.0.0/16").tenancy(expectedTenancy).create();
+        testVPC = new VPCImpl.Builder().cidr("10.1.0.0/16").tenancy("default").create();
         
         while(!testVPC.getState().equals("available")){
             System.out.println("wait for test vpc to be ready ...");
@@ -50,7 +56,7 @@ public class SubnetImplTest {
         System.out.println("test vpc is now available.");
         
         System.out.println("create test subnets");
-        Subnet testInstance = new SubnetImpl.Builder().cidrBlock(expectedCidrBlock).vpcId(testVPC.getId()).create();
+        testInstance = new SubnetImpl.Builder().cidrBlock(expectedCidrBlock).vpcId(testVPC.getId()).create();
         while(!testInstance.getState().equals("available")){
             System.out.println("wait for test subnet to be ready ...");
             try {
@@ -58,6 +64,8 @@ public class SubnetImplTest {
             } catch (InterruptedException ex) {
             }
         }
+        expectedId = testInstance.getId();
+        expectedStringExpression = "{}";
         testInstances.add(testInstance);
         System.out.println("test vpc is now available.");
     }
@@ -85,7 +93,7 @@ public class SubnetImplTest {
     }
     
     @Before
-    public void setUp() {
+    public void setUp() {   
     }
     
     @After
@@ -98,8 +106,24 @@ public class SubnetImplTest {
     @Test
     public void testAsEc2Subnet() {
         System.out.println("asEc2Subnet");
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
+        AWSEC2 ec2 = (AWSEC2) AWS.get(AWS.BlockName.EC2);
+        com.amazonaws.services.ec2.model.Subnet source = ec2.getExistEc2Subnet(expectedId);
+        com.amazonaws.services.ec2.model.Subnet viewAsEc2Subnet = ((SubnetImpl)testInstance).asEc2Subnet();
+        
+        //two instances should be equal, but not the same.
+        assertEquals(source, viewAsEc2Subnet);
+        assertFalse(source == viewAsEc2Subnet);
+        
+        assertEquals(expectedAvailabilityZone, viewAsEc2Subnet.getAvailabilityZone());
+        assertEquals(expectedAvailableIpAddressCount, viewAsEc2Subnet.getAvailableIpAddressCount());
+        assertEquals(expectedCidrBlock, viewAsEc2Subnet.getCidrBlock());
+        assertEquals(false, viewAsEc2Subnet.getDefaultForAz());
+        assertEquals(false, viewAsEc2Subnet.getMapPublicIpOnLaunch());
+        assertEquals(null, viewAsEc2Subnet.getState());
+        assertEquals(expectedId, viewAsEc2Subnet.getSubnetId());
+        assertEquals(new ArrayList<>(), viewAsEc2Subnet.getTags());
+        assertEquals(testVPC.getId(), viewAsEc2Subnet.getVpcId());
     }
 
     /**
@@ -107,13 +131,11 @@ public class SubnetImplTest {
      */
     @Test
     public void testGetId() {
+        
         System.out.println("getId");
-        SubnetImpl instance = null;
-        String expResult = "";
-        String result = instance.getId();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
+        Subnet equalInstance = new SubnetImpl.Builder().id(expectedId).get();
+        assertEquals(expectedId, equalInstance.getId());
     }
 
     /**
@@ -121,14 +143,20 @@ public class SubnetImplTest {
      */
     @Test
     public void testEquals() {
+        
         System.out.println("equals");
-        Object toBeCompared = null;
-        SubnetImpl instance = null;
-        boolean expResult = false;
-        boolean result = instance.equals(toBeCompared);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
+        Subnet equalInstance = new SubnetImpl.Builder().id(expectedId).get();
+        Subnet anotherInstance = new SubnetImpl.Builder().vpcId(testVPC.getId()).cidrBlock("10.1.2.0/24").create();
+        while(!anotherInstance.getState().equals("available")){
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        testInstances.add(anotherInstance);
+        assertTrue(testInstance.equals(equalInstance));
+        assertFalse(testInstance.equals(anotherInstance));
     }
 
     /**
@@ -136,13 +164,20 @@ public class SubnetImplTest {
      */
     @Test
     public void testHashCode() {
+
         System.out.println("hashCode");
-        SubnetImpl instance = null;
-        int expResult = 0;
-        int result = instance.hashCode();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
+        Subnet equalInstance = new SubnetImpl.Builder().id(expectedId).get();
+        Subnet anotherInstance = new SubnetImpl.Builder().vpcId(testVPC.getId()).cidrBlock("10.1.3.0/24").create();
+        while(!anotherInstance.getState().equals("available")){
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        testInstances.add(anotherInstance);
+        assertTrue(testInstance.hashCode() == equalInstance.hashCode());
+        assertFalse(testInstance.hashCode() == anotherInstance.hashCode());
     }
 
     /**
@@ -151,12 +186,7 @@ public class SubnetImplTest {
     @Test
     public void testToString() {
         System.out.println("toString");
-        SubnetImpl instance = null;
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expectedStringExpression, testInstance.toString());
     }
 
     /**
@@ -164,13 +194,9 @@ public class SubnetImplTest {
      */
     @Test
     public void testGetZone() {
+
         System.out.println("getZone");
-        SubnetImpl instance = null;
-        String expResult = "";
-        String result = instance.getZone();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expectedAvailabilityZone, testInstance.getZone());
     }
 
     /**
@@ -178,13 +204,9 @@ public class SubnetImplTest {
      */
     @Test
     public void testGetAvailableIpAddressCount() {
+
         System.out.println("getAvailableIpAddressCount");
-        SubnetImpl instance = null;
-        Integer expResult = null;
-        Integer result = instance.getAvailableIpAddressCount();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expectedAvailableIpAddressCount, testInstance.getAvailableIpAddressCount());
     }
 
     /**
@@ -192,13 +214,9 @@ public class SubnetImplTest {
      */
     @Test
     public void testGetCidrBlock() {
+
         System.out.println("getCidrBlock");
-        SubnetImpl instance = null;
-        String expResult = "";
-        String result = instance.getCidrBlock();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expectedCidrBlock, testInstance.getCidrBlock());
     }
 
     /**
@@ -206,13 +224,9 @@ public class SubnetImplTest {
      */
     @Test
     public void testGetDefaultForAz() {
+
         System.out.println("getDefaultForAz");
-        SubnetImpl instance = null;
-        boolean expResult = false;
-        boolean result = instance.getDefaultForAz();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(false, testInstance.getDefaultForAz());
     }
 
     /**
@@ -220,13 +234,9 @@ public class SubnetImplTest {
      */
     @Test
     public void testGetMapPublicIpOnLaunch() {
+        
         System.out.println("getMapPublicIpOnLaunch");
-        SubnetImpl instance = null;
-        boolean expResult = false;
-        boolean result = instance.getMapPublicIpOnLaunch();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(false, testInstance.getMapPublicIpOnLaunch());
     }
 
     /**
@@ -234,13 +244,10 @@ public class SubnetImplTest {
      */
     @Test
     public void testGetState() {
+
         System.out.println("getState");
-        SubnetImpl instance = null;
-        String expResult = "";
-        String result = instance.getState();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expectedState, testInstance.getState());
+
     }
 
     /**
@@ -248,13 +255,10 @@ public class SubnetImplTest {
      */
     @Test
     public void testGetVpcId() {
+        
         System.out.println("getVpcId");
-        SubnetImpl instance = null;
-        String expResult = "";
-        String result = instance.getVpcId();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(testVPC.getId(), testInstance.getVpcId());
+
     }
 
     /**
@@ -262,11 +266,31 @@ public class SubnetImplTest {
      */
     @Test
     public void testDelete() {
+        
         System.out.println("delete");
-        SubnetImpl instance = null;
-        instance.delete();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
+        Subnet toBeDeleted = new SubnetImpl.Builder().vpcId(testVPC.getId()).cidrBlock("10.1.4.0/24").create();
+        
+        while(!toBeDeleted.getState().equals("available")){
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        testInstances.add(toBeDeleted);
+        String deletedId = toBeDeleted.getId();
+        toBeDeleted.delete();
+        
+        //wait for deletion to be completed.
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+        }
+        Subnet shouldHaveBeenDeleted = new SubnetImpl.Builder().id(deletedId).get();
+        
+        AWSEC2 ec2 = (AWSEC2) AWS.get(AWS.BlockName.EC2);
+        assertEquals(null, ec2.getExistEc2Subnet(deletedId));
+        assertEquals("Unknown state", shouldHaveBeenDeleted.getState());
     }
     
 }

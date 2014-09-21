@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import web.component.api.model.Zone;
 import web.component.impl.aws.AWS;
 import web.component.impl.aws.ec2.AWSEC2;
 
@@ -27,7 +28,7 @@ public class ZoneImplTest {
     static final String expectedRegionName = "";
     static final String expectedZoneName = "";
     static final String expectedState = "";
-    static final ZoneImpl testInstance = (ZoneImpl)new ZoneImpl.Builder().name(expectedZoneName).build();
+    static final Zone testInstance = new ZoneImpl.Builder().name(expectedZoneName).build();
     static final String expectedStringExpression = "{ZoneName: " + testInstance.getName() + ", RegionName: " + testInstance.getRegionName() + "}";
 
     public ZoneImplTest() {
@@ -59,7 +60,7 @@ public class ZoneImplTest {
         
         AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
         AvailabilityZone source = ec2.getExistEc2AvailabilityZone(expectedZoneName);
-        AvailabilityZone viewAsEc2Zone = testInstance.asEc2Zone();
+        AvailabilityZone viewAsEc2Zone = ((ZoneImpl)testInstance).asEc2Zone();
 
         //two instances should be equal, but not the same.
         assertEquals(source, viewAsEc2Zone);
