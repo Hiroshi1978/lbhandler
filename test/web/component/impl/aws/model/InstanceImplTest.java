@@ -77,6 +77,8 @@ public class InstanceImplTest {
     public void testAsElbInstance() {
         System.out.println("asElbInstance");
         
+        AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+        com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.getExistElbInstance(testInstance.getId());
         for(Instance testInstance : testInstances){
             com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance1 = ((InstanceImpl)testInstance).asElbInstance();
             assertTrue(elbInstance1.getInstanceId() != null && !elbInstance1.getInstanceId().isEmpty());
@@ -90,16 +92,19 @@ public class InstanceImplTest {
     public void testAsEc2Instance() {
         System.out.println("asEc2Instance");
         
-        for(Instance testInstance : testInstances){
-            com.amazonaws.services.ec2.model.Instance ec2Instance = ((InstanceImpl)testInstance).asEc2Instance();
-            com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance = ((InstanceImpl)testInstance).asElbInstance();
-            assertTrue(ec2Instance.getInstanceId() != null && !ec2Instance.getInstanceId().isEmpty());
-            assertEquals(ec2Instance.getInstanceId(),elbInstance.getInstanceId());
-            assertEquals(testImageId,ec2Instance.getImageId());
-            assertEquals(testInstanceType,ec2Instance.getInstanceType());
-            assertEquals(testInstanceType,ec2Instance.getInstanceLifecycle());
-            assertEquals(testPlacement,ec2Instance.getPlacement().toString());
-        }
+        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        com.amazonaws.services.ec2.model.Instance source = ec2.getExistEc2Instance(testInstanceId);
+        com.amazonaws.services.ec2.model.Instance viewAsEc2Instance = ((InstanceImpl)testInstance).asEc2Instance();
+
+        //two instances are equal but not the same.
+        assertTrue(viewAsEc2Instance.equals(source));
+        assertFalse(viewAsEc2Instance == source);
+        
+        assertEquals(testInstanceId,viewAsEc2Instance.getInstanceId());
+        assertEquals(testImageId,viewAsEc2Instance.getImageId());
+        assertEquals(testInstanceType,viewAsEc2Instance.getInstanceType());
+        assertEquals(testInstanceLifeCycle,viewAsEc2Instance.getInstanceLifecycle());
+        assertEquals(testPlacement,viewAsEc2Instance.getPlacement().toString());
     }
 
     /**
