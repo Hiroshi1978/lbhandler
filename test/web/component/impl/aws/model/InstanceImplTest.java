@@ -9,6 +9,8 @@ package web.component.impl.aws.model;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -17,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
+import web.component.impl.aws.AWS;
 import web.component.impl.aws.ec2.AWSEC2;
 import web.component.impl.aws.elb.AWSELB;
 
@@ -34,7 +37,12 @@ public class InstanceImplTest {
     private static final String testPlacement = "";
     private static final String testZoneName = "";
     private static String testInstanceId;
-    private static LoadBalancer testLb;
+    //initialized with testInstace as backend server.
+    private static LoadBalancer testLb1;
+    //initialized without any backend server.
+    private static LoadBalancer testLb2;
+    private static final List<LoadBalancer> testLbs = new ArrayList<>();
+    private static String testStringExpression;
     
     public InstanceImplTest() {
     }
@@ -46,22 +54,27 @@ public class InstanceImplTest {
         testInstanceId = testInstance.getId();
         testInstances.add(testInstance);
         
-        testLb = new LoadBalancerImpl.Builder("testLb").defaultHttpListener().zone(testZoneName).build();
-        while(!testLb.isStarted()){
-            try{
-                Thread.sleep(10000);
-            }catch(IOException e){
-                throw new RuntimeException("failed to create test load balancer.");
+        testLb1 = new LoadBalancerImpl.Builder("testLb1").defaultHttpListener().zone(testZoneName).build();
+        testLbs.add(testLb1);
+        testLb2 = new LoadBalancerImpl.Builder("testLb2").defaultHttpListener().zone(testZoneName).build();
+        testLbs.add(testLb2);
+        
+        for(LoadBalancer testLb : testLbs){
+            while(!testLb.isStarted()){
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ex) {
+                }
             }
         }
-        testLb.registerInstance(testInstance);
+        testLb1.registerInstance(testInstance);
     }
     
     @AfterClass
     public static void tearDownClass() {
         
-        testLb.deregisterInstance(testInstance);
-        testLb.delete();
+        for(LoadBalancer testLb : testLbs)
+            testLb.delete();
         
         //stop and terminate the test instances.
         for(Instance toDelete : testInstances){
@@ -70,7 +83,7 @@ public class InstanceImplTest {
             while(!toDelete.isStopped()){
                 try{
                     Thread.sleep(3000);
-                }catch(IOException e){
+                }catch(InterruptedException e){
                 }
             }
             System.out.println("terminate test instance [" + toDelete + "]");
@@ -97,11 +110,11 @@ public class InstanceImplTest {
         System.out.println("asElbInstance");
         
         AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
-        com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getInstances().get(0);
+        com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.describeLoadBalancers(testLb1.getName()).getLoadBalancerDescriptions().get(0).getInstances().get(0);
         com.amazonaws.services.elasticloadbalancing.model.Instance viewAsElbInstance = ((InstanceImpl)testInstance).asElbInstance();
 
         //two instances are equal but not the same.
-        assertTrue(source.equals(viewAwsElbInstance));
+        assertTrue(source.equals(viewAsElbInstance));
         assertFalse(source == viewAsElbInstance);
         
         assertEquals(source.getInstanceId(), viewAsElbInstance.getInstanceId());
@@ -180,8 +193,10 @@ public class InstanceImplTest {
      */
     @Test
     public void testRegisterWith() {
+        
         System.out.println("registerWith");
-        fail("The test case is a prototype.");
+        testInstance.registerWith(testLb2);
+        assertEquals(testInstance, testLb2.getBackendInstances().get(0));
     }
 
     /**
@@ -189,8 +204,10 @@ public class InstanceImplTest {
      */
     @Test
     public void testDeregisterFrom() {
+
         System.out.println("deregisterFrom");
-        fail("The test case is a prototype.");
+        testInstance.deregisterFrom(testLb2);
+        assertEquals(0, testLb2.getBackendInstances().size());
     }
 
     /**
@@ -198,8 +215,16 @@ public class InstanceImplTest {
      */
     @Test
     public void testEquals() {
+        
         System.out.println("equals");
-        fail("The test case is a prototype.");
+        Instance equalInstance = new InstanceImpl.Builder().id(testInstanceId).get();
+        Instance anotherInstance = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
+        testInstances.add(anotherInstance);
+        
+        assertTrue(testInstance.equals(testInstance));
+        assertTrue(testInstance.equals(equalInstance));
+        assertFalse(testInstance.equals(anotherInstance));
+        assertFalse(testInstance.equals(null));
     }
 
     /**
@@ -234,8 +259,9 @@ public class InstanceImplTest {
      */
     @Test
     public void testToString() {
+        
         System.out.println("toString");
-        fail("The test case is a prototype.");
+        assertEquals(testStringExpression, testInstance.toString());
     }
 
     /**
