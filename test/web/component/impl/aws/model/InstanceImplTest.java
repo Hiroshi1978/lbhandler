@@ -17,6 +17,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
+import web.component.impl.aws.ec2.AWSEC2;
+import web.component.impl.aws.elb.AWSELB;
 
 /**
  *
@@ -95,11 +97,12 @@ public class InstanceImplTest {
         System.out.println("asElbInstance");
         
         AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
-        com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.getExistElbInstance(testInstance.getId());
-        for(Instance testInstance : testInstances){
-            com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance1 = ((InstanceImpl)testInstance).asElbInstance();
-            assertTrue(elbInstance1.getInstanceId() != null && !elbInstance1.getInstanceId().isEmpty());
-        }
+        com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getInstances().get(0);
+        com.amazonaws.services.elasticloadbalancing.model.Instance viewAsElbInstance = ((InstanceImpl)testInstance).asElbInstance();
+
+        //two instances are equal but not the same.
+        assertTrue(source.equals(viewAwsElbInstance));
+        assertFalse(source == viewAsElbInstance);
     }
 
     /**
