@@ -6,6 +6,7 @@
 
 package web.component.impl.aws.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -22,6 +23,7 @@ import web.component.api.model.Instance;
  */
 public class InstanceImplTest {
     
+    private static Instance testInstance;
     private static final List<Instance> testInstances = new ArrayList<>();
     private static final String testImageId = "";
     private static final String testInstanceType = "";
@@ -35,22 +37,26 @@ public class InstanceImplTest {
     @BeforeClass
     public static void setUpClass() {
         //build instance from create method to obtain reference to the object of the newly created instance.
-        Instance testInstance1 = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).create();
-        testInstanceId = testInstance1.getId();
-        
-        //build instance from get method to obtain reference to the object of the same instance.
-        Instance testInstance2 = new InstanceImpl.Builder().id(testInstanceId).get();
-
-        testInstances.add(testInstance1);
-        testInstances.add(testInstance2);
+        testInstance = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).create();
+        testInstanceId = testInstance.getId();
+        testInstances.add(testInstance);
     }
     
     @AfterClass
     public static void tearDownClass() {
-        //stop and terminate the test instance.
-        Instance testInstance = testInstances.get(0);
-        testInstance.stop();
-        testInstance.terminate();
+        //stop and terminate the test instances.
+        for(Instance toDelete : testInstances){
+            System.out.println("stop test instance [" + toDelete + "]");
+            toDelete.stop();
+            while(!toDelete.isStopped()){
+                try{
+                    Thread.sleep(3000);
+                }catch(IOException e){
+                }
+            }
+            System.out.println("terminate test instance [" + toDelete + "]");
+            toDelete.terminate();
+        }
     }
     
     @Before
