@@ -103,6 +103,8 @@ public class InstanceImplTest {
         //two instances are equal but not the same.
         assertTrue(source.equals(viewAwsElbInstance));
         assertFalse(source == viewAsElbInstance);
+        
+        assertEquals(source.getInstanceId(), viewAsElbInstance.getInstanceId());
     }
 
     /**
