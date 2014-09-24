@@ -171,7 +171,8 @@ public class InstanceImplTest {
     @Test
     public void testGetId() {
         System.out.println("getId");
-        assertEquals(testInstanceId, testInstances.get(1).getId());
+        Instance equalInstance = new InstanceImpl.Builder().id(testInstanceId).get();
+        assertEquals(testInstanceId, equalInstance.getId());
     }
 
     /**
