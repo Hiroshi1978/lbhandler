@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import web.component.api.model.Instance;
+import web.component.api.model.LoadBalancer;
 
 /**
  *
@@ -29,7 +30,9 @@ public class InstanceImplTest {
     private static final String testInstanceType = "";
     private static final String testInstanceLifeCycle = "";
     private static final String testPlacement = "";
+    private static final String testZoneName = "";
     private static String testInstanceId;
+    private static LoadBalancer testLb;
     
     public InstanceImplTest() {
     }
@@ -40,10 +43,24 @@ public class InstanceImplTest {
         testInstance = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).create();
         testInstanceId = testInstance.getId();
         testInstances.add(testInstance);
+        
+        testLb = new LoadBalancerImpl.Builder("testLb").defaultHttpListener().zone(testZoneName).build();
+        while(!testLb.isStarted()){
+            try{
+                Thread.sleep(10000);
+            }catch(IOException e){
+                throw new RuntimeException("failed to create test load balancer.");
+            }
+        }
+        testLb.registerInstance(testInstance);
     }
     
     @AfterClass
     public static void tearDownClass() {
+        
+        testLb.deregisterInstance(testInstance);
+        testLb.delete();
+        
         //stop and terminate the test instances.
         for(Instance toDelete : testInstances){
             System.out.println("stop test instance [" + toDelete + "]");
