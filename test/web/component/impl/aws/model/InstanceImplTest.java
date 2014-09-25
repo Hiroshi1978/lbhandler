@@ -229,8 +229,14 @@ public class InstanceImplTest {
      */
     @Test
     public void testHashCode() {
+        
         System.out.println("hashCode");
-        fail("The test case is a prototype.");
+        Instance equalInstance = new InstanceImpl.Builder().id(testInstanceId).get();
+        Instance anotherInstance = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
+        
+        assertTrue(testInstance.hashCode() == testInstance.hashCode());
+        assertTrue(testInstance.hashCode() == equalInstance.hashCode());
+        assertFalse(testInstance.hashCode() == anotherInstance.hashCode());
     }
 
     /**
@@ -266,8 +272,41 @@ public class InstanceImplTest {
      */
     @Test
     public void testStart() {
+        
         System.out.println("start");
-        fail("The test case is a prototype.");
+        
+        //assert it start normally when it is stopped.
+        testInstance.stop();
+        while(!testInstance.isStopped()){
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        testInstance.start();
+        int counter = 0;
+        while(!testInstance.isStarted()){
+            if(++counter >= 10){
+                fail();
+                break;
+            }
+                
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        
+        //assert it is running if start method called when it is running.
+        while(!testInstance.isStarted()){
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        
+        testInstance.start();
+        assertTrue(testInstance.isStarted());
     }
 
     /**
@@ -275,8 +314,42 @@ public class InstanceImplTest {
      */
     @Test
     public void testStop() {
+        
         System.out.println("stop");
-        fail("The test case is a prototype.");
+        //assert it stop if stop method called when it is running.
+        while(!testInstance.isStarted()){
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        
+        testInstance.stop();
+        
+        int counter = 0;
+        while(!testInstance.isStopped()){
+            
+            if(++counter >= 10){
+                fail();
+                break;
+            }
+            
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+
+        //assert it is stopped if stop method called when it is stopped.
+        while(!testInstance.isStopped()){
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        
+        testInstance.stop();
+        assertTrue(testInstance.isStopped());
     }
 
     /**
@@ -295,7 +368,41 @@ public class InstanceImplTest {
      */
     @Test
     public void testTerminate() {
+        
         System.out.println("terminate");
-        fail("The test case is a prototype.");
+        Instance toTerminate1 = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
+        Instance toTerminate2 = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
+        Instance toTerminate3 = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
+        
+        //assert it can be terminated soon after its creation.
+        toTerminate1.terminate();
+        
+        while(!toTerminate2.isStarted() || !toTerminate3.isStarted()){
+            try{
+                Thread.sleep(3000);
+            }catch(InterruptedException e){
+            }
+        }
+        
+        toTerminate2.start();
+        toTerminate3.stop();
+        
+        while(!toTerminate2.isStarted() || !toTerminate3.isStopped()){
+            try{
+                Thread.sleep(3000);
+            }catch(InterruptedException e){
+            }
+        }
+        
+        //assert it can be terminated when it is running.
+        toTerminate2.terminate();
+        //assert it can be terminated when it is stopped.
+        toTerminate3.terminate();
+        //assert it can be terminated when it is already teminated.
+        toTerminate1.terminate();
+
+        assertEquals("Unknown state", toTerminate1.getStateName());
+        assertEquals("Unknown state", toTerminate2.getStateName());
+        assertEquals("Unknown state", toTerminate3.getStateName());
     }
 }
