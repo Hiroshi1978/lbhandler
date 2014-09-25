@@ -316,7 +316,7 @@ public class InstanceImplTest {
         while(!testInstance.isStopped()){
             testInstance.stop();
             if(++counter >= 30){
-                fail();
+                fail("time out occurred before test instance was stopped.");
                 break;
             }
             
@@ -330,7 +330,7 @@ public class InstanceImplTest {
         counter = 0;
         while(!testInstance.isStarted()){
             if(++counter >= 10){
-                fail();
+                fail("time out occurred before test instance was started.");
                 break;
             }
                 
@@ -346,7 +346,7 @@ public class InstanceImplTest {
         while(!testInstance.isStarted()){
             testInstance.start();
             if(++counter >= 10){
-                fail();
+                fail("time out occurred before test instance was started.");
                 break;
             }
             try {
@@ -374,7 +374,7 @@ public class InstanceImplTest {
         while(!testInstance.isStarted()){
             testInstance.start();
             if(++counter >= 10){
-                fail();
+                fail("time out occurred before test instance was started.");
                 break;
             }
             
@@ -389,7 +389,7 @@ public class InstanceImplTest {
         counter = 0;
         while(!testInstance.isStopped()){
             if(++counter >= 10){
-                fail();
+                fail("time out occurred before test instance was stopped.");
                 break;
             }
             
@@ -405,7 +405,7 @@ public class InstanceImplTest {
         while(!testInstance.isStopped()){
             testInstance.stop();
             if(++counter >= 10){
-                fail();
+                fail("time out occurred before test instance was stopped.");
                 break;
             }
             
@@ -450,7 +450,7 @@ public class InstanceImplTest {
         while(!testInstance2.isStarted()){
             testInstance2.start();
             if(++counter >= 10){
-                fail();
+                fail("time out occurred before test instance was started.");
                 break;
             }
             try{
@@ -464,7 +464,7 @@ public class InstanceImplTest {
         while(!testInstance3.isStopped()){
             testInstance3.stop();
             if(++counter >= 10){
-                fail();
+                fail("time out occurred before test instance was stopped.");
                 break;
             }
             try{
@@ -478,7 +478,7 @@ public class InstanceImplTest {
         while(!testInstance1.isTerminated()){
             testInstance1.terminate();
             if(++counter >= 10){
-                fail();
+                fail("time out occurred before test instance was terminated.");
                 break;
             }
             try{
