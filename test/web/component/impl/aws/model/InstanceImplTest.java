@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -20,6 +22,7 @@ import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
 import web.component.impl.aws.AWS;
 import web.component.impl.aws.ec2.AWSEC2;
+import web.component.impl.aws.elb.AWSELB;
 
 /**
  *
@@ -36,8 +39,13 @@ public class InstanceImplTest {
     private static  Instance instanceToTestTerminate2;
     private static  Instance instanceToTestTerminate3;
     
-    private static final Map<String,LoadBalancer> testLbs = new HashMap<>();
-
+    private static final Map<String, LoadBalancer> testLbs = new HashMap<>();
+    private static final List<String> testLbNames = new ArrayList<>();
+    static{
+        testLbNames.add("test-lb-name-1");
+        testLbNames.add("test-lb-name-2");
+    }
+    
     private static final String testImageId = "";
     private static final String testInstanceType = "";
     private static final String testInstanceLifeCycle = null;
@@ -50,7 +58,17 @@ public class InstanceImplTest {
     
     @BeforeClass
     public static void setUpClass() {
-        //prepare 3 test instances
+
+    	/*
+    	Instance newInstance = new InstanceImpl.Builder().id("").get();
+        testInstances.put(newInstance.getId(), newInstance);
+        testInstanceIds.add(newInstance.getId());
+        newInstance = new InstanceImpl.Builder().id("").get();
+        testInstances.put(newInstance.getId(), newInstance);
+        testInstanceIds.add(newInstance.getId());
+        */
+
+    	//prepare 3 test instances
         for(int i=0; i<2;i++){
             Instance newInstance = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
             //build instance from create method to obtain reference to the object of the newly created instance.
@@ -58,7 +76,6 @@ public class InstanceImplTest {
             testInstances.put(newInstance.getId(), newInstance);
             System.out.println("test instance created [" + newInstance + "]");
         }
-        
         instanceToTestStart      = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
         instanceToTestStop       = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
         instanceToTestTerminate1 = new InstanceImpl.Builder().imageId(testImageId).type(testInstanceType).zoneName(testZoneName).create();
@@ -70,11 +87,40 @@ public class InstanceImplTest {
         System.out.println("test instance created [" + instanceToTestTerminate1 + "]");
         System.out.println("test instance created [" + instanceToTestTerminate2 + "]");
         System.out.println("test instance created [" + instanceToTestTerminate3 + "]");
+        
+        //use exist load balancers for test.
+        for(String testLbName : testLbNames){
+            LoadBalancer testLb = LoadBalancerImpl.getExistLoadBalancerByName(testLbName);
+            testLbs.put(testLbName, testLb);
+            System.out.println("add test load balancer [" + testLb.toString() + "]");
+        }
+    	
+        /*
+        //create new load balancers for test.
+        for(String testLbName : testLbNames){
+            LoadBalancer testLb = new LoadBalancerImpl.Builder(testLbName).defaultHttpListener().zone(testZoneName).build();
+            testLbs.put(testLbName, testLb);
+            System.out.println("add test load balancer [" + testLb.toString() + "]");
+        }
+        
+        for(LoadBalancer testLb : testLbs.values()){
+            while(!testLb.isStarted()){
+                System.out.println("wait for test load balancer [" + testLb.getName() + "] to bre available ...");
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ex) {
+                }
+            }
+            System.out.println("test load balancer [" + testLb.getName() + "] is now available");
+        }
+        */
     }
     
     @AfterClass
     public static void tearDownClass() {
-        
+    	
+    	//enable these codes if you need.
+        /*
         //stop test instances.
         for(Instance toDelete : testInstances.values()){
             System.out.println("stop test instance [" + toDelete + "]");
@@ -104,6 +150,8 @@ public class InstanceImplTest {
         System.out.println("terminate test instance [" + instanceToTestTerminate1 + "]");
         System.out.println("terminate test instance [" + instanceToTestTerminate2 + "]");
         System.out.println("terminate test instance [" + instanceToTestTerminate3 + "]");
+        
+        */
     }
     
     @Before
@@ -122,11 +170,24 @@ public class InstanceImplTest {
      */
     @Test
     public void testAsElbInstance() {
-        /*
+        
         System.out.println("asElbInstance");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        
+        //test instance has to be registered to test load balancer for executing this test.
+        testLb.registerInstance(testInstance);
+        while(testLb.getBackendInstances().size() != 1 || !testLb.getBackendInstances().get(0).equals(testInstance)){
+            testLb.deregisterInstances(testLb.getBackendInstances());
+            testLb.registerInstance(testInstance);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
         
         AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
-        com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.describeLoadBalancers(testLb1.getName()).getLoadBalancerDescriptions().get(0).getInstances().get(0);
+        com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getInstances().get(0);
         com.amazonaws.services.elasticloadbalancing.model.Instance viewAsElbInstance = ((InstanceImpl)testInstance).asElbInstance();
 
         //two instances are equal but not the same.
@@ -134,7 +195,6 @@ public class InstanceImplTest {
         assertFalse(source == viewAsElbInstance);
         
         assertEquals(source.getInstanceId(), viewAsElbInstance.getInstanceId());
-        */
     }
 
     /**
@@ -214,11 +274,23 @@ public class InstanceImplTest {
      */
     @Test
     public void testRegisterWith() {
-        /*
+        
         System.out.println("registerWith");
-        testInstance.registerWith(testLb2);
-        assertEquals(testInstance, testLb2.getBackendInstances().get(0));
-        */
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        
+        //make sure test load balancer has no backends.
+        while(!testLb.getBackendInstances().isEmpty()){
+            testLb.deregisterInstances(testLb.getBackendInstances());
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        
+        //try register.
+        testInstance.registerWith(testLb);
+        assertEquals(testInstance, testLb.getBackendInstances().get(0));
     }
 
     /**
@@ -226,11 +298,26 @@ public class InstanceImplTest {
      */
     @Test
     public void testDeregisterFrom() {
-        /*
+        
         System.out.println("deregisterFrom");
-        testInstance.deregisterFrom(testLb2);
-        assertEquals(0, testLb2.getBackendInstances().size());
-        */
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        
+        //make sure test load balancer has test instance as  backend.
+        while(testLb.getBackendInstances().size() != 1 || !testLb.getBackendInstances().get(0).equals(testInstance)){
+            //deregister all backends.
+            testLb.deregisterInstances(testLb.getBackendInstances());
+            //then register test instance.
+            testLb.registerInstance(testInstance);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        
+        //try deregister.
+        testInstance.deregisterFrom(testLb);
+        assertEquals(0, testLb.getBackendInstances().size());
     }
 
     /**
