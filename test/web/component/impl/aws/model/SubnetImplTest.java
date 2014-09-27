@@ -56,7 +56,7 @@ public class SubnetImplTest {
         System.out.println("test vpc is now available.");
         
         System.out.println("create test subnets");
-        testInstance = new SubnetImpl.Builder().cidrBlock(expectedCidrBlock).vpcId(testVPC.getId()).create();
+        testInstance = new SubnetImpl.Builder().cidr(expectedCidrBlock).vpc(testVPC.getId()).create();
         while(!testInstance.getState().equals("available")){
             System.out.println("wait for test subnet to be ready ...");
             try {
@@ -147,7 +147,7 @@ public class SubnetImplTest {
         System.out.println("equals");
         
         Subnet equalInstance = new SubnetImpl.Builder().id(expectedId).get();
-        Subnet anotherInstance = new SubnetImpl.Builder().vpcId(testVPC.getId()).cidrBlock("10.1.2.0/24").create();
+        Subnet anotherInstance = new SubnetImpl.Builder().vpc(testVPC.getId()).cidr("10.1.2.0/24").create();
         while(!anotherInstance.getState().equals("available")){
             try {
                 Thread.sleep(3000);
@@ -168,7 +168,7 @@ public class SubnetImplTest {
         System.out.println("hashCode");
 
         Subnet equalInstance = new SubnetImpl.Builder().id(expectedId).get();
-        Subnet anotherInstance = new SubnetImpl.Builder().vpcId(testVPC.getId()).cidrBlock("10.1.3.0/24").create();
+        Subnet anotherInstance = new SubnetImpl.Builder().vpc(testVPC.getId()).cidr("10.1.3.0/24").create();
         while(!anotherInstance.getState().equals("available")){
             try {
                 Thread.sleep(3000);
@@ -269,7 +269,7 @@ public class SubnetImplTest {
         
         System.out.println("delete");
 
-        Subnet toBeDeleted = new SubnetImpl.Builder().vpcId(testVPC.getId()).cidrBlock("10.1.4.0/24").create();
+        Subnet toBeDeleted = new SubnetImpl.Builder().vpc(testVPC.getId()).cidr("10.1.4.0/24").create();
         
         while(!toBeDeleted.getState().equals("available")){
             try {

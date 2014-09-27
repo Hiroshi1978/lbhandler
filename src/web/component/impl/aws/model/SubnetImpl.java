@@ -156,11 +156,11 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
             this.zone = zone;
             return this;
         }
-        public Builder cidrBlock(String cidrBlock){
+        public Builder cidr(String cidrBlock){
             this.cidrBlock  = cidrBlock;
             return this;
         }
-        public Builder vpcId(String vpcId){
+        public Builder vpc(String vpcId){
             this.vpcId  = vpcId;
             return this;
         }
