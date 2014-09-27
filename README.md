@@ -23,11 +23,11 @@ We aim to offer libraries that makes it possible to handle resources of some web
 ### Configure VPC and subnets.
 
 ```java
-    VPC vpc = new VPCImpl.Builder().cidr("10.1.0.0/16").tenancy("default").create();
+    VPC vpc = new VPCImpl.Builder().cidr("1.1.0.0/16").tenancy("default").create();
     
     List<Subnet> subnets = new ArrayList<>();
-    Subnet s1 = new SubnetImpl.Builder().cidr("10.1.1.0/24").vpcId(vpc.getId()).zone("az1").create();
-    Subnet s2 = new SubnetImpl.Builder().cidr("10.1.2.0/24").vpcId(vpc.getId()).zone("az2").create();
+    Subnet s1 = new SubnetImpl.Builder().cidr("1.1.1.0/24").vpc(vpc.getId()).zone("az1").create();
+    Subnet s2 = new SubnetImpl.Builder().cidr("1.1.2.0/24").vpc(vpc.getId()).zone("az2").create();
     subnets.add(s1);
     subnets.add(s2);
 ```
