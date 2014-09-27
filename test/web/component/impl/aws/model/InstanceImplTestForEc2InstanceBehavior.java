@@ -64,7 +64,7 @@ public class InstanceImplTestForEc2InstanceBehavior {
             testInstanceIds.add(newInstance.getId());
             testInstances.put(newInstance.getId(), newInstance);
             System.out.println("test instance created [" + newInstance + "]");
-        }        
+        }
     }
     
     static private void getExistTestInstances(){
@@ -168,17 +168,6 @@ public class InstanceImplTestForEc2InstanceBehavior {
         assertTrue(testInstance.hashCode() == testInstance.hashCode());
         assertTrue(testInstance.hashCode() == equalInstance.hashCode());
         assertFalse(testInstance.hashCode() == anotherInstance.hashCode());
-    }
-
-    /**
-     * Test of getState method, of class InstanceImpl.
-     */
-    @Test
-    public void testGetState() {
-        /*
-        System.out.println("getState");
-        fail("The test case is a prototype.");
-        */
     }
 
     /**
@@ -396,5 +385,85 @@ public class InstanceImplTestForEc2InstanceBehavior {
         assertTrue("testInstance1 state : " + testInstance1.getStateName(), testInstance1.isTerminated() || testInstance1.getStateName().equals("shutting-down") || testInstance1.getStateName().equals("Unknown state"));
         assertTrue("testInstance2 state : " + testInstance2.getStateName(), testInstance2.isTerminated() || testInstance2.getStateName().equals("shutting-down") || testInstance2.getStateName().equals("Unknown state"));
         assertTrue("testInstance3 state : " + testInstance3.getStateName(), testInstance3.isTerminated() || testInstance3.getStateName().equals("shutting-down") || testInstance3.getStateName().equals("Unknown state"));
+    }
+    
+    @Test
+    public void testGetImageId(){
+    
+        System.out.println("getImageId");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        assertEquals(testImageId, testInstance.getImageId());
+        
+    }
+
+    @Test
+    public void testGetInstanceType(){
+    
+        System.out.println("getInstanceType");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        assertEquals(testInstanceType, testInstance.getInstanceType());
+        
+    }
+
+    @Test
+    public void testGetLifeCycle(){
+    
+        System.out.println("getLifeCycle");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        assertEquals(testInstanceLifeCycle, testInstance.getLifeCycle());
+        
+    }
+
+    @Test
+    public void testGetPublicIpAddress(){
+    
+        System.out.println("getPublicIpAddress");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        assertEquals(((InstanceImpl)testInstance).asEc2Instance().getPublicIpAddress(), testInstance.getPublicIpAddress());
+        
+    }
+    
+    @Test
+    public void testGetZoneName(){
+    
+        System.out.println("getZoneName");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        assertEquals(testZoneName, testInstance.getZoneName());
+        
+    }
+    
+    @Test
+    public void testGetStateName(){
+    
+        System.out.println("getStateName");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        
+        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        String expectedStateName = ec2.getInstanceState(testInstance.getId()).getName();
+        assertEquals(expectedStateName, testInstance.getStateName());
+        
+    }
+    
+    @Test
+    public void testGetStateCode(){
+    
+        System.out.println("getStateCode");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        
+        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        int expectedStateCode = ec2.getInstanceState(testInstance.getId()).getCode();
+        assertEquals(expectedStateCode, (int)testInstance.getStateCode());
+        
+    }
+
+    @Test
+    public void testGetStateTransitionReason() {
+
+        System.out.println("getStateTransitionReason");
+        Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        
+        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        String expectedStateTransitionReason = ec2.getInstanceStateTransitionReason(testInstance.getId());
+        assertEquals(expectedStateTransitionReason, testInstance.getStateTransitionReason());        
     }
 }
