@@ -23,11 +23,11 @@ We aim to offer libraries that makes it possible to handle resources of some web
 ### Configure VPC and subnets.
 
 ```java
-    VPC vpc = new VPCImpl.Builder().cidr("1.1.0.0/16").tenancy("default").create();
+    VPC v = new VPCImpl.Builder().cidr("1.1.0.0/16").tenancy("default").create();
     
     List<Subnet> subnets = new ArrayList<>();
-    Subnet s1 = new SubnetImpl.Builder().cidr("1.1.1.0/24").vpc(vpc.getId()).zone("az1").create();
-    Subnet s2 = new SubnetImpl.Builder().cidr("1.1.2.0/24").vpc(vpc.getId()).zone("az2").create();
+    Subnet s1 = new SubnetImpl.Builder().cidr("1.1.1.0/24").vpc(v.getId()).zone("z1").create();
+    Subnet s2 = new SubnetImpl.Builder().cidr("1.1.2.0/24").vpc(v.getId()).zone("z2").create();
     subnets.add(s1);
     subnets.add(s2);
 ```
@@ -54,14 +54,14 @@ The output is :
     id           : subnet-xxxxxxxx
     state        : available
     vpc id       : vpc-xxxxxxxx
-    zone         : az1
+    zone         : z1
     ------------------------------
     available ip : 251
     cidr block   : 10.1.2.0/24
     id           : subnet-yyyyyyyy
     state        : available
     vpc id       : vpc-yyyyyyyy
-    zone         : az2
+    zone         : z2
     ------------------------------
 
 
