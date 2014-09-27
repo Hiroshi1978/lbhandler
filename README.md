@@ -6,7 +6,7 @@ We aim to offer libraries that makes it possible to handle resources of some web
 
 ## Usage
 
- * [Confiugre VPC and subnets ...](#configure-vpc-and-subnets)
+ * [Configure VPC and subnets ...](#configure-vpc-and-subnets)
  * [Launch your web server ...](#launch-web-servers)
  * [Create new load balancer ...](#how-to-create-new-load-balancer-)
  * [Get information about load balancer ...](#how-to-get-information-about-the-created-load-balancer-)
