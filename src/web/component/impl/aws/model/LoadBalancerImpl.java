@@ -404,6 +404,16 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         return loadBalancer;
     }
 
+    public static List<LoadBalancer> getExistLoadBalancers(){
+
+        List<LoadBalancer> existLoadBalancers = new ArrayList<>();
+        List<LoadBalancerDescription> descriptions = getAllLoadBalancerDescriptions().getLoadBalancerDescriptions();
+        for(LoadBalancerDescription description : descriptions)
+            existLoadBalancers.add(LoadBalancerImpl.getExistLoadBalancerByName(description.getLoadBalancerName()));
+
+        return existLoadBalancers;
+    }
+    
     @Override
     public String getName() {
         return this.name;

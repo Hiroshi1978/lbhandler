@@ -6,11 +6,13 @@
 
 package web.component.impl.aws.model;
 
+import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import web.component.api.model.Instance;
 import web.component.api.model.BackendState;
+import web.component.api.model.Instance;
 import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
 import web.component.impl.aws.AWS;
@@ -135,12 +137,13 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public LoadBalancer getLoadBalancer() {
-        throw new UnsupportedOperationException("Not yet supported.");
+        List<LoadBalancer> loadBalancers = getLoadBalancers();
+        return loadBalancers.isEmpty() ? null : loadBalancers.get(0);
     }
 
     @Override
     public List<LoadBalancer> getLoadBalancers(){
-        throw new UnsupportedOperationException("Not yet supported.");
+        return LoadBalancerImpl.getExistLoadBalancers();
     }
     
     @Override
