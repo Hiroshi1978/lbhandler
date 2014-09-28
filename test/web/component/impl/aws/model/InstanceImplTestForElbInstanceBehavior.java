@@ -73,8 +73,7 @@ public class InstanceImplTestForElbInstanceBehavior {
     
     static private void getExistTestInstances(){
 
-        String[] existInstanceIds = {"test-lb-1",
-                                     "test-lb-2"};
+        String[] existInstanceIds = {"specify","IDs","of","your","test","instances","here"};
         testInstanceIds = Arrays.asList(existInstanceIds);
         
         for(String testInstanceId : testInstanceIds){
@@ -86,8 +85,7 @@ public class InstanceImplTestForElbInstanceBehavior {
     
     static private void createTestLbs(){
         
-        String[] newLbNames = {"test-lb-1",
-                               "test-lb-2"};
+        String[] newLbNames = {"test-lb-1","test-lb-2"};
         testLbNames = Arrays.asList(newLbNames);
         
         for(String testLbName : testLbNames){
@@ -110,7 +108,7 @@ public class InstanceImplTestForElbInstanceBehavior {
     
     static void getExistTestLbs(){
 
-        String[] newLbNames = {"specify","your","test","lb","names","here."};
+        String[] newLbNames = {"test-lb-1","test-lb-2"};
         testLbNames = Arrays.asList(newLbNames);
         
         //use exist load balancers for test.
@@ -184,14 +182,36 @@ public class InstanceImplTestForElbInstanceBehavior {
         
         System.out.println("getLoadBalancer");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        LoadBalancer testLb1 = testLbs.get(testLbNames.get(0));
+        LoadBalancer testLb2 = testLbs.get(testLbNames.get(1));
         
-        boolean thrown = false;
-        try{
-            testInstance.getLoadBalancer();
-        }catch(UnsupportedOperationException e){
-            thrown = true;
+        //make sure test load balancer1 has test instance as backend.
+        while(!testLb1.getBackendInstances().contains(testInstance)){
+
+            testLb1.registerInstance(testInstance);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
         }
-        assertTrue(thrown);
+        
+        //make sure test load balancer2 does not have test instance as backend.
+        while(testLb2.getBackendInstances().contains(testInstance)){
+
+            testLb2.deregisterInstance(testInstance);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        
+        //try test method.
+        LoadBalancer actualLb = testInstance.getLoadBalancer();
+        
+        //restore the state before test.
+        testLb1.deregisterInstance(testInstance);
+        
+        assertEquals(testLb1, actualLb);
     }
 
     /**
@@ -202,14 +222,36 @@ public class InstanceImplTestForElbInstanceBehavior {
         
         System.out.println("getLoadBalancers");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
+        LoadBalancer testLb1 = testLbs.get(testLbNames.get(0));
+        LoadBalancer testLb2 = testLbs.get(testLbNames.get(1));
         
-        boolean thrown = false;
-        try{
-            testInstance.getLoadBalancers();
-        }catch(UnsupportedOperationException e){
-            thrown = true;
+        //make sure test load balancer1 has test instance as backend.
+        while(!testLb1.getBackendInstances().contains(testInstance)){
+
+            testLb1.registerInstance(testInstance);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
         }
-        assertTrue(thrown);
+        
+        //make sure test load balancer2 does not have test instance as backend.
+        while(!testLb2.getBackendInstances().contains(testInstance)){
+
+            testLb2.registerInstance(testInstance);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+        
+        List<LoadBalancer> actualLbs = testInstance.getLoadBalancers();
+        
+        //restore the state before test.
+        testLb1.deregisterInstance(testInstance);
+        testLb2.deregisterInstance(testInstance);
+        
+        assertTrue(actualLbs.contains(testLb1) && actualLbs.contains(testLb2));
     }
 
     /**
@@ -233,7 +275,12 @@ public class InstanceImplTestForElbInstanceBehavior {
         
         //try register.
         testInstance.registerWith(testLb);
-        assertEquals(testInstance, testLb.getBackendInstances().get(0));
+        Instance actualInstance = testLb.getBackendInstances().get(0);
+        
+        //restore the state before test.
+        testLb.deregisterInstance(testInstance);
+        
+        assertEquals(testInstance, actualInstance);
     }
 
     /**
@@ -247,10 +294,7 @@ public class InstanceImplTestForElbInstanceBehavior {
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         
         //make sure test load balancer has test instance as  backend.
-        while(testLb.getBackendInstances().size() != 1 || !testLb.getBackendInstances().get(0).equals(testInstance)){
-            //deregister all backends.
-            testLb.deregisterInstances(testLb.getBackendInstances());
-            //then register test instance.
+        while(!testLb.getBackendInstances().contains(testInstance)){
             testLb.registerInstance(testInstance);
             try {
                 Thread.sleep(3000);
@@ -260,6 +304,7 @@ public class InstanceImplTestForElbInstanceBehavior {
         
         //try deregister.
         testInstance.deregisterFrom(testLb);
-        assertEquals(0, testLb.getBackendInstances().size());
+        
+        assertTrue(testLb.getBackendInstances().isEmpty());
     }
 }
