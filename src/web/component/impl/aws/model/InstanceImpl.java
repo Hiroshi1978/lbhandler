@@ -6,8 +6,6 @@
 
 package web.component.impl.aws.model;
 
-import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
