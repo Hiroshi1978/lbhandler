@@ -6,10 +6,10 @@
 
 package web.component.impl.aws.model; 
 
-import java.util.ArrayList; 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List; 
+import java.util.HashMap; 
+import java.util.List;
 import java.util.Map;
 import org.junit.After; 
 import org.junit.AfterClass; 
@@ -26,6 +26,8 @@ import web.component.api.model.LoadBalancerListener;
  */ 
 public class LoadBalancerListenerImplTest { 
 
+    private static LoadBalancerListener testInstance;
+    
     private static final Map<String, LoadBalancer> testLbs = new HashMap<>();
     private static List<String> testLbNames;
     
@@ -36,11 +38,22 @@ public class LoadBalancerListenerImplTest {
     private static final int testServicePort = 80; 
     private static final int testInstancePort = 80; 
     
+    private static final String testCertificateId = null;
+    
     public LoadBalancerListenerImplTest() { 
     } 
     
     @BeforeClass 
     public static void setUpClass() { 
+        
+        //test instance without any load balancer attached.
+        testInstance = new LoadBalancerListenerImpl.Builder()
+                .instancePort(testInstancePort)
+                .instanceProtocol(testInstanceProtocol)
+                .servicePort(testServicePort)
+                .serviceProtocol(testServiceProtocol)
+                .certificateId(testCertificateId)
+                .build();
         
         getExistTestLbs();
         //createTestLbs();
@@ -80,7 +93,7 @@ public class LoadBalancerListenerImplTest {
     
     static void getExistTestLbs(){
 
-        String[] newLbNames = {"test-lb-1","test-lb-2"};
+        String[] newLbNames = {"test-lb"};
         testLbNames = Arrays.asList(newLbNames);
         
         //use exist load balancers for test.
@@ -107,8 +120,6 @@ public class LoadBalancerListenerImplTest {
     public void testSetInstancePort() {
         
         System.out.println("setInstancePort"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
         
         int instancePort = 0; 
         
@@ -126,8 +137,6 @@ public class LoadBalancerListenerImplTest {
     @Test 
     public void testSetServicePort() { 
         System.out.println("setServicePort");
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
         
         int servciePort = 0; 
         
@@ -146,8 +155,6 @@ public class LoadBalancerListenerImplTest {
     public void testSetInstanceProtocol() { 
 
         System.out.println("setInstanceProtocol"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
         
         String instanceProtocol = "HTTP"; 
         
@@ -166,9 +173,7 @@ public class LoadBalancerListenerImplTest {
     public void testSetServiceProtocol() {
         
         System.out.println("setServiceProtocol"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
-
+        
         String serviceProtocol = "HTTP"; 
         
         try{ 
@@ -186,9 +191,7 @@ public class LoadBalancerListenerImplTest {
     public void testSetServerCertificate() { 
 
         System.out.println("setServerCertificate"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
-
+        
         String certId = "test-cert-id";
         
         try{
@@ -206,9 +209,7 @@ public class LoadBalancerListenerImplTest {
     @Test 
     public void testGetInstancePort() { 
         System.out.println("getInstancePort"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
-
+        
         int port = testInstance.getInstancePort(); 
         assertEquals(testInstancePort, port); 
     } 
@@ -219,9 +220,7 @@ public class LoadBalancerListenerImplTest {
     @Test 
     public void testGetServicePort() { 
         System.out.println("getServicePort"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
-
+        
         int port = testInstance.getServicePort(); 
         assertEquals(testServicePort, port); 
     } 
@@ -233,9 +232,7 @@ public class LoadBalancerListenerImplTest {
     public void testGetInstanceProtocol() { 
         
         System.out.println("getInstanceProtocol"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
-
+        
         String protocol = testInstance.getInstanceProtocol(); 
         assertTrue(testInstanceProtocol.equalsIgnoreCase(protocol));
     } 
@@ -247,9 +244,7 @@ public class LoadBalancerListenerImplTest {
     public void testGetServiceProtocol() { 
         
         System.out.println("getServiceProtocol"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
-
+        
         String protocol = testInstance.getServiceProtocol(); 
         assertTrue(testServiceProtocol.equalsIgnoreCase(protocol));
     } 
@@ -262,7 +257,7 @@ public class LoadBalancerListenerImplTest {
     public void testGetServerCertificate() { 
         
         System.out.println("getServerCertificate");
-        fail();
+        assertEquals("", testInstance.getServerCertificate());
     } 
 
     /** 
@@ -272,7 +267,23 @@ public class LoadBalancerListenerImplTest {
     public void testAddTo() { 
         
         System.out.println("addTo"); 
-        fail();
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        LoadBalancerListener testListener = new LoadBalancerListenerImpl.Builder()
+                .instancePort(testInstancePort)
+                .servicePort(8088)
+                .instanceProtocol(testInstanceProtocol)
+                .serviceProtocol(testServiceProtocol)
+                .build();
+        
+        testListener.addTo(testLb);
+        
+        //get snapshot of the attached listeners.
+        List<LoadBalancerListener> results = new ArrayList<>(testLb.getListeners());
+        
+        //restore the state before test.
+        testLb.deleteListener(testListener);
+        
+        assertTrue(results.contains(testListener));
     } 
 
     /** 
@@ -282,7 +293,28 @@ public class LoadBalancerListenerImplTest {
     public void testDeleteFrom() { 
         
         System.out.println("deleteFrom"); 
-        fail();
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        LoadBalancerListener testListener = new LoadBalancerListenerImpl.Builder()
+                .instancePort(testInstancePort)
+                .servicePort(8088)
+                .instanceProtocol(testInstanceProtocol)
+                .serviceProtocol(testServiceProtocol)
+                .build();
+        testLb.createListener(testListener);
+        if(!testLb.getListeners().contains(testListener))
+            fail("could not create test listener to test load balancer.");
+        
+        //try delete.
+        testListener.deleteFrom(testLb);
+        
+        //get snapshot of the attached listeners.
+        List<LoadBalancerListener> results = new ArrayList<>(testLb.getListeners());
+        
+        //restore the state before test if needed.
+        if(testLb.getListeners().contains(testListener))
+            testLb.deleteListener(testListener);
+        
+        assertTrue(!results.contains(testListener));
     } 
 
     /** 
@@ -292,8 +324,7 @@ public class LoadBalancerListenerImplTest {
     public void testEquals() { 
         
         System.out.println("equals");
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
+        
         LoadBalancerListener equalInstance = new LoadBalancerListenerImpl.Builder()
                 .instancePort(testInstancePort)
                 .instanceProtocol(testInstanceProtocol)
@@ -346,8 +377,7 @@ public class LoadBalancerListenerImplTest {
     public void testHashCode() { 
         
         System.out.println("hashCode"); 
-        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        LoadBalancerListener testInstance = (LoadBalancerListenerImpl)testLb.getListeners().get(0); 
+        
         LoadBalancerListener equalInstance = new LoadBalancerListenerImpl.Builder()
                 .instancePort(testInstancePort)
                 .instanceProtocol(testInstanceProtocol)
@@ -371,5 +401,4 @@ public class LoadBalancerListenerImplTest {
         assertTrue(testInstance.hashCode() == equalInstanceWithLowerCase.hashCode());
         assertTrue(testInstance.hashCode() != instanceWithDifferentInstancePort.hashCode());
     } 
-    
 } 
