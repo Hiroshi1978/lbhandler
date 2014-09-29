@@ -21,7 +21,6 @@ public interface LoadBalancerListener {
     public String getServiceProtocol();
     public void setServerCertificate(String serverCertificateId);
     public String getServerCertificate();
-    public LoadBalancer getLoadBalancer();
     
    /*
     * Add this load balancer listener to specified load balancer.

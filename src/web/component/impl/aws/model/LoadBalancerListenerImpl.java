@@ -17,19 +17,39 @@ import web.component.api.model.LoadBalancerListener;
  */
 public class LoadBalancerListenerImpl extends AWSModelBase implements LoadBalancerListener{
 
-    private final Listener elbListener = new Listener();
+    private final Listener elbListener;
     
-    private LoadBalancerListenerImpl(Builder builder){
+    private LoadBalancerListenerImpl(Listener source){
+        elbListener = source;
+    }
+    
+    private static LoadBalancerListener create(Builder builder){
+
+        Listener newListener = new Listener();
+        newListener.setInstancePort(builder.instancePort);
+        newListener.setInstanceProtocol(builder.instanceProtocol);
+        newListener.setLoadBalancerPort(builder.servicePort);
+        newListener.setProtocol(builder.serviceProtocol);
+        newListener.setSSLCertificateId(builder.certificateId);
         
-        elbListener.setInstancePort(builder.instancePort);
-        elbListener.setInstanceProtocol(builder.instanceProtocol);
-        elbListener.setLoadBalancerPort(builder.servicePort);
-        elbListener.setProtocol(builder.serviceProtocol);
-        elbListener.setSSLCertificateId(builder.certificateId);
+        return new LoadBalancerListenerImpl(newListener);
     }
     
     Listener asElbListener(){
-        return elbListener;
+        return copyElbListener(elbListener);
+    }
+    
+    private Listener copyElbListener(Listener source){
+        
+        Listener copy = new Listener();
+        
+        copy.setInstancePort(source.getInstancePort());
+        copy.setInstanceProtocol(source.getInstanceProtocol());
+        copy.setLoadBalancerPort(source.getLoadBalancerPort());
+        copy.setProtocol(source.getProtocol());
+        copy.setSSLCertificateId(source.getSSLCertificateId());
+        
+        return copy;
     }
     
     @Override
@@ -82,19 +102,6 @@ public class LoadBalancerListenerImpl extends AWSModelBase implements LoadBalanc
         String certificateId = elbListener.getSSLCertificateId();
         return certificateId == null ? "" : certificateId;
     }
-    
-    @Override
-    public LoadBalancer getLoadBalancer() {
-        throw new UnsupportedOperationException("Not yet supported.");
-    }
-
-   /*
-    * This method should be called only from the instances of LoadBalancerImpl class in this package.
-    * Should not called by this class itself.
-    */
-    void setLoadBalancer(LoadBalancer newLb) {
-        throw new UnsupportedOperationException("Not yet supported.");
-    }
 
     @Override
     public void addTo(LoadBalancer addedTo){
@@ -116,7 +123,8 @@ public class LoadBalancerListenerImpl extends AWSModelBase implements LoadBalanc
             return ( getInstancePort().equals(asImpl.getInstancePort()) && 
                      getInstanceProtocol().equalsIgnoreCase(asImpl.getInstanceProtocol()) &&
                      getServicePort().equals(asImpl.getServicePort()) &&
-                     getServiceProtocol().equalsIgnoreCase(asImpl.getServiceProtocol()));
+                     getServiceProtocol().equalsIgnoreCase(asImpl.getServiceProtocol()) &&
+                     (getServerCertificate() == null ? (asImpl.getServerCertificate() == null) : getServerCertificate().equals(asImpl.getServerCertificate())));
         }
             
         return false;
@@ -173,7 +181,7 @@ public class LoadBalancerListenerImpl extends AWSModelBase implements LoadBalanc
         }
         
         public LoadBalancerListener build(){
-            return new LoadBalancerListenerImpl(this);
+            return LoadBalancerListenerImpl.create(this);
         }
     }
 }
