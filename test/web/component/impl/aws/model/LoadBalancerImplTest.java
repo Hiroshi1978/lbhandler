@@ -79,7 +79,7 @@ public class LoadBalancerImplTest {
     
     static void getExistTestLbs(){
 
-        String[] newLbNames = {"kobayashi-lb"};
+        String[] newLbNames = {""};
         testLbNames = Arrays.asList(newLbNames);
         
         //use exist load balancers for test.
