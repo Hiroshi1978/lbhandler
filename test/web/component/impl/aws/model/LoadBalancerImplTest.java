@@ -6,7 +6,6 @@
 
 package web.component.impl.aws.model;
 
-import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersResult;
 import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import web.component.api.model.BackendState;
 import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
@@ -81,7 +79,7 @@ public class LoadBalancerImplTest {
     
     static void getExistTestLbs(){
 
-        String[] newLbNames = {""};
+        String[] newLbNames = {"kobayashi-lb"};
         testLbNames = Arrays.asList(newLbNames);
         
         //use exist load balancers for test.
@@ -635,20 +633,30 @@ public class LoadBalancerImplTest {
      * Test of getBackendInstances method, of class LoadBalancerImpl.
      */
     @Test
-    public void testGetBackendInstances_0args() {
+    public void testGetBackendInstances() {
         
         System.out.println("getBackendInstances");
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getBackendInstances method, of class LoadBalancerImpl.
-     */
-    @Test
-    public void testGetBackendInstances_boolean() {
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        Instance testInstance1 = testBackendInstances.get(testBackendInstanceIds.get(0));
+        Instance testInstance2 = testBackendInstances.get(testBackendInstanceIds.get(1));
+        List<Instance> testInstances = new ArrayList<>();
+        testInstances.add(testInstance1);
+        testInstances.add(testInstance2);
         
-        System.out.println("getBackendInstances");
-        fail("The test case is a prototype.");
+        //deregister all the registered instances.
+        testLb.deregisterInstances(testLb.getBackendInstances());
+        if(!testLb.getBackendInstances().isEmpty())
+            fail("test load balancer  shold not have any registered backend instance.");
+        
+        testLb.registerInstances(testInstances);
+        
+        List<Instance> results = new ArrayList<>(testLb.getBackendInstances());
+        
+        //restore the state before.
+        testLb.deregisterInstances(testInstances);
+        
+        //results should contain only test instances.
+        assertEquals(testInstances, results);
     }
 
     /**

@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import web.component.api.model.BackendState;
 import web.component.api.model.Instance;
-import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
 import web.component.api.model.Subnet;
@@ -31,10 +30,6 @@ import web.component.impl.aws.elb.AWSELB;
 public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
 
     private final String name;
-    private final List<LoadBalancerListener> listeners = new ArrayList<>();
-    private final List<Zone> zones = new ArrayList<>();
-    private final List<Subnet> subnets = new ArrayList<>();
-    private final List<Instance> instances = new ArrayList<>();
     
     private volatile boolean started;
     private volatile boolean destroyed;
@@ -51,7 +46,6 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
                 throw new IllegalArgumentException("Invalid listeners specified.");
             }
         }
-        this.listeners.addAll(builder.listeners);
         
         List<AvailabilityZone> availabilityZones = new ArrayList<>();
         if(builder.zones != null){
@@ -63,8 +57,6 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
                 }
             }
         }
-        if(builder.zones != null)
-            this.zones.addAll(builder.zones);
         
         List<String> subnetIds = new ArrayList<>();
         if(builder.subnets != null){
@@ -76,12 +68,10 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
                 }
             }
         }
-        if(builder.subnets != null)
-            this.subnets.addAll(builder.subnets);
         
-        if(this.zones != null && !this.zones.isEmpty()){
+        if(!availabilityZones.isEmpty()){
             elb().createLoadBalancerWithAvailabilityZones(name, elbListeners, availabilityZones);
-        }else if(this.subnets != null && !this.subnets.isEmpty()){
+        }else if(!subnetIds.isEmpty()){
             elb().createLoadBalancerWithSubnets(name, elbListeners, subnetIds);
         }else{
             throw new IllegalArgumentException("Either zones or subnets must be specified.");
@@ -112,21 +102,6 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         
         //set load balancer name.
         this.name = name;
-
-        //set listeners.
-        this.listeners.addAll(listeners);
-           
-
-        //set zones.
-        this.zones.addAll(zones);
-
-        //set subnets.
-        if(subnets != null && !subnets.isEmpty())
-            this.subnets.addAll(subnets);
-
-        //set backendinstances.
-        if(backendInstances != null && !backendInstances.isEmpty())
-            this.instances.addAll(backendInstances);
     }
     
     /**
@@ -159,22 +134,15 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return;
 
-        List<LoadBalancerListener> listenersToAdd  = new ArrayList();
         List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener newListener : newListeners){
-            if(newListener instanceof LoadBalancerListenerImpl){
-                if(!listeners.contains(newListener)){
-                    listenersToAdd.add(newListener);
-                    elbListeners.add(((LoadBalancerListenerImpl)newListener).asElbListener());
-                }
-                            }else{
+            if(newListener instanceof LoadBalancerListenerImpl)
+                elbListeners.add(((LoadBalancerListenerImpl)newListener).asElbListener());
+            else
                 throw new IllegalArgumentException("Invalid listeners specified.");
-            }
         }
         if(!elbListeners.isEmpty())
             elb().createLoadBalancerListeners(name,elbListeners);
-        if(!listenersToAdd.isEmpty())
-            this.listeners.addAll(listenersToAdd);
     }
 
     @Override
@@ -186,19 +154,13 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         List<LoadBalancerListener> listenersToRemove  = new ArrayList();
         List<Listener> elbListeners = new ArrayList<>();
         for(LoadBalancerListener listenerToDelete : listenersToDelete){
-            if(listenerToDelete instanceof LoadBalancerListenerImpl){
-                if(listeners.contains(listenerToDelete)){
-                    listenersToRemove.add(listenerToDelete);
-                    elbListeners.add(((LoadBalancerListenerImpl)listenerToDelete).asElbListener());
-                }
-            }else{
+            if(listenerToDelete instanceof LoadBalancerListenerImpl)
+                elbListeners.add(((LoadBalancerListenerImpl)listenerToDelete).asElbListener());
+            else
                 throw new IllegalArgumentException("Invalid listeners specified.");
-            }
         }
         if(!elbListeners.isEmpty())
             elb().deleteLoadBalancerListeners(name,elbListeners);
-        if(!listenersToRemove.isEmpty())
-            this.listeners.removeAll(listenersToRemove);
     }
 
     @Override
@@ -229,22 +191,15 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return;
 
-        List<Instance> backendInstancesToAdd = new ArrayList<>();
         List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = new ArrayList<>();
         for(Instance newInstance : newInstances){
-            if(newInstance instanceof InstanceImpl){
-                if(!instances.contains(newInstance)){
-                    backendInstancesToAdd.add(newInstance);
-                    elbInstances.add(((InstanceImpl)newInstance).asElbInstance());
-                }
-            }else{
+            if(newInstance instanceof InstanceImpl)
+                elbInstances.add(((InstanceImpl)newInstance).asElbInstance());
+            else
                 throw new IllegalArgumentException("Invalid instances specified.");
-            }
         }
         if(!elbInstances.isEmpty())
             elb().registerInstancesWithLoadBalancer(name, elbInstances);
-        if(!backendInstancesToAdd.isEmpty())
-            this.instances.addAll(backendInstancesToAdd);
     }
 
     @Override
@@ -253,22 +208,15 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return;
         
-        List<Instance> backendInstancesToRemove = new ArrayList<>();
         List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = new ArrayList<>();
         for(Instance instanceToDelete : instancesToDelete){
-            if(instanceToDelete instanceof InstanceImpl){
-                if(instances.contains(instanceToDelete)){
-                    backendInstancesToRemove.add(instanceToDelete);
-                    elbInstances.add(((InstanceImpl)instanceToDelete).asElbInstance());
-                }
-            }else{
+            if(instanceToDelete instanceof InstanceImpl)
+                elbInstances.add(((InstanceImpl)instanceToDelete).asElbInstance());
+            else
                 throw new IllegalArgumentException("Invalid instances specified.");
-            }
         }
         if(!elbInstances.isEmpty())
             elb().deregisterInstancesFromLoadBalancer(name, elbInstances);
-        if(!backendInstancesToRemove.isEmpty())
-            this.instances.removeAll(backendInstancesToRemove);
     }
 
     @Override
@@ -299,7 +247,15 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return;
         
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<String> zoneNames = new ArrayList<>();
+        for(Zone zone : zones)
+            if(zone instanceof ZoneImpl)
+                zoneNames.add(zone.getName());
+            else
+                throw new IllegalArgumentException("Invalid Zone specified.");
+        
+        if(!zoneNames.isEmpty())
+            elb().enableAvailabilityZonesForLoadBalancer(name, zoneNames);
     }
 
     @Override
@@ -308,7 +264,15 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return;
         
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<String> zoneNames = new ArrayList<>();
+        for(Zone zone : zones)
+            if(zone instanceof ZoneImpl)
+                zoneNames.add(zone.getName());
+            else
+                throw new IllegalArgumentException("Invalid Zone specified.");
+        
+        if(!zoneNames.isEmpty())
+            elb().disableAvailabilityZonesForLoadBalancer(name, zoneNames);
     }
 
     @Override
@@ -340,10 +304,6 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
             return;
         
         elb().deleteLoadBalancer(name);
-        listeners.clear();
-        instances.clear();
-        zones.clear();
-        subnets.clear();
         destroyed = true;
     }
 
@@ -421,17 +381,41 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
 
     @Override
     public List<LoadBalancerListener> getListeners() {
-        return this.listeners;
+        
+        if(isDestroyed())
+            return null;
+        
+        List<ListenerDescription> listenerDescriptions = elb().getLoadBalancerDescription(name).getListenerDescriptions();
+        List<LoadBalancerListener> listeners = new ArrayList<>();
+        for(ListenerDescription desc : listenerDescriptions)
+            listeners.add(new LoadBalancerListenerImpl.Builder().description(desc).build());
+        return listeners;
     }
 
     @Override
     public List<Zone> getZones() {
-        return this.zones;
+        
+        if(isDestroyed())
+            return null;
+        
+        List<String> zoneNames = elb().getLoadBalancerDescription(name).getAvailabilityZones();
+        List<Zone> zones = new ArrayList<>();
+        for(String zoneName : zoneNames)
+            zones.add(new ZoneImpl.Builder().name(zoneName).build());
+        return zones;
     }
 
     @Override
     public List<Subnet> getSubnets() {
-        return this.subnets;
+        
+        if(isDestroyed())
+            return null;
+        
+        List<String> subnetIds = elb().getLoadBalancerDescription(name).getSubnets();
+        List<Subnet> subnets = new ArrayList<>();
+        for(String subnetId : subnetIds)
+            subnets.add(new SubnetImpl.Builder().id(subnetId).get());
+        return subnets;
     }
 
     @Override
@@ -439,25 +423,12 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         
         if(isDestroyed())
             return null;
-
-        return instances.isEmpty() ? this.getBackendInstances(true) : instances;
-    }
-
-    public List<Instance> getBackendInstances(boolean reload) {
         
-        if(isDestroyed())
-            return null;
-        
-        if(reload){
-            List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = elb().getLoadBalancerDescription(name).getInstances();
-            List<Instance> latestInstances = new ArrayList<>();
-            for(com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance : elbInstances)
-                latestInstances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).get());
-            instances.clear();
-            instances.addAll(latestInstances);
-        }
+        List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = elb().getLoadBalancerDescription(name).getInstances();
+        List<Instance> instances = new ArrayList<>();
+        for(com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance : elbInstances)
+            instances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).get());
         return instances;
-        
     }
 
     public static class Builder{
