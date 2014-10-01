@@ -563,6 +563,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         return states;
     }
 
+    @Override
     public BackendState getInstanceState(String backendInstanceId){
 
         if(isDestroyed())
@@ -573,6 +574,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         return this.getInstanceStatesByInstanceId(backendInstanceIds).get(0);
     }
     
+    @Override
     public BackendState getInstanceState(Instance backendInstance){
 
         if(isDestroyed())

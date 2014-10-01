@@ -59,6 +59,7 @@ public interface LoadBalancer {
     public List<BackendState> getInstanceStates();
     public List<BackendState> getInstanceStates(List<Instance> backendInstances);
     public BackendState getInstanceState(Instance backendInstance);
+    public BackendState getInstanceState(String backendInstanceId);
     
     /**
      * Check if this load balancer is destroyed.
