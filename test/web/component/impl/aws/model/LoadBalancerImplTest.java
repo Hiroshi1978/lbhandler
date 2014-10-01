@@ -7,6 +7,7 @@
 package web.component.impl.aws.model;
 
 import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
+import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class LoadBalancerImplTest {
     
     static void getExistTestLbs(){
 
-        String[] newLbNames = {""};
+        String[] newLbNames = {"specify","your","test","lb","names","here","."};
         testLbNames = Arrays.asList(newLbNames);
         
         //use exist load balancers for test.
@@ -133,7 +134,8 @@ public class LoadBalancerImplTest {
     public void testIsStarted() {
         
         System.out.println("isStarted");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        assertEquals(true, testLb.isStarted());
     }
 
     /**
@@ -528,7 +530,20 @@ public class LoadBalancerImplTest {
     public void testDelete() {
         
         System.out.println("delete");
-        fail("The test case is a prototype.");
+        LoadBalancer toDelete = testLbs.get(testLbNames.get(1));
+        
+        if(toDelete.isDestroyed())
+            fail("test load balancer should not be destroyed.");
+        
+        toDelete.delete();
+        
+        //wait for deletion to be completed.
+        try{
+            Thread.sleep(50000);
+        }catch(InterruptedException e){
+        }
+        
+        assertTrue(toDelete.isDestroyed());
     }
 
     /**
@@ -538,7 +553,8 @@ public class LoadBalancerImplTest {
     public void testIsDestroyed() {
         
         System.out.println("isDestroyed");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        assertEquals(false, testLb.isDestroyed());
     }
 
     /**
@@ -548,7 +564,9 @@ public class LoadBalancerImplTest {
     public void testGetExistLoadBalancerByName() {
         
         System.out.println("getExistLoadBalancerByName");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        LoadBalancer existLb = LoadBalancerImpl.getExistLoadBalancerByName(testLbNames.get(0));
+        assertEquals(testLb, existLb);
     }
 
     /**
@@ -558,7 +576,22 @@ public class LoadBalancerImplTest {
     public void testGetExistLoadBalancers() {
         
         System.out.println("getExistLoadBalancers");
-        fail("The test case is a prototype.");
+        
+        List<LoadBalancer> results = new ArrayList<>(LoadBalancerImpl.getExistLoadBalancers());
+        
+        boolean allContained = true;
+        for(LoadBalancer result : results){
+            if(!testLbs.values().contains(result)){
+                allContained = false;
+                break;
+            }
+                
+        }
+        
+        //all elements of result list should be contained in test load balancer list.
+        assertTrue(allContained);
+        //size of result list and test load balancer list should be the same.
+        assertEquals(testLbs.size(), results.size());
     }
 
     /**
@@ -568,7 +601,8 @@ public class LoadBalancerImplTest {
     public void testGetName() {
         
         System.out.println("getName");
-       fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        assertEquals(testLbNames.get(0), testLb.getName());
     }
 
     /**
@@ -710,23 +744,19 @@ public class LoadBalancerImplTest {
     }
 
     /**
-     * Test of getAllLoadBalancerDescriptions method, of class LoadBalancerImpl.
-     */
-    @Test
-    public void testGetAllLoadBalancerDescriptions() {
-        
-        System.out.println("getAllLoadBalancerDescriptions");
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of equals method, of class LoadBalancerImpl.
      */
     @Test
     public void testEquals() {
         
         System.out.println("equals");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        LoadBalancer equalLb = LoadBalancerImpl.getExistLoadBalancerByName(testLb.getName());
+        LoadBalancer anotherLb = testLbs.get(testLbNames.get(2));
+        
+        assertTrue(testLb.equals(testLb));
+        assertTrue(testLb.equals(equalLb));
+        assertFalse(testLb.equals(anotherLb));
     }
 
     /**
@@ -736,7 +766,13 @@ public class LoadBalancerImplTest {
     public void testHashCode() {
         
         System.out.println("hashCode");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        LoadBalancer equalLb = LoadBalancerImpl.getExistLoadBalancerByName(testLb.getName());
+        LoadBalancer anotherLb = testLbs.get(testLbNames.get(2));
+        
+        assertTrue(testLb.hashCode() == testLb.hashCode());
+        assertTrue(testLb.hashCode() == equalLb.hashCode());
+        assertTrue(testLb.hashCode() != anotherLb.hashCode());
     }
 
     /**
@@ -746,7 +782,12 @@ public class LoadBalancerImplTest {
     public void testToString() {
         
         System.out.println("toString");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        
+        AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+        String expectedStringExpression = elb.getLoadBalancerDescription(testLb.getName()).toString();
+
+        assertEquals(expectedStringExpression, testLb.toString());
     }
     
 }

@@ -583,7 +583,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         return this.getInstanceStates(backendInstances).get(0);
     }
 
-    public static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
+    private static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
 
         AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
         DescribeLoadBalancersResult result = elb.describeLoadBalancers();
