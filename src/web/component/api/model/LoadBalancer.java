@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * @author Hiroshi
  */
-public interface LoadBalancer {
+public interface LoadBalancer extends Comparable<LoadBalancer>{
     
     /**
      * Check if this load balancer is started, which means it is ready to serve.

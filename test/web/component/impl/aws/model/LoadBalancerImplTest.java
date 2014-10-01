@@ -10,6 +10,7 @@ import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -577,21 +578,15 @@ public class LoadBalancerImplTest {
         
         System.out.println("getExistLoadBalancers");
         
-        List<LoadBalancer> results = new ArrayList<>(LoadBalancerImpl.getExistLoadBalancers());
+        List<LoadBalancer> actualList = new ArrayList<>(LoadBalancerImpl.getExistLoadBalancers());
+        List<LoadBalancer> expectedList = new ArrayList<>(testLbs.values());
+
+        Collections.sort(actualList);
+        Collections.sort(expectedList);
         
-        boolean allContained = true;
-        for(LoadBalancer result : results){
-            if(!testLbs.values().contains(result)){
-                allContained = false;
-                break;
-            }
-                
-        }
-        
-        //all elements of result list should be contained in test load balancer list.
-        assertTrue(allContained);
-        //size of result list and test load balancer list should be the same.
-        assertEquals(testLbs.size(), results.size());
+        for(int i = 0; i < actualList.size(); i++)
+            if(!expectedList.get(i).equals(actualList.get(i)))
+                fail("unexpected load balancer found: " + actualList.get(i));
     }
 
     /**
@@ -788,6 +783,41 @@ public class LoadBalancerImplTest {
         String expectedStringExpression = elb.getLoadBalancerDescription(testLb.getName()).toString();
 
         assertEquals(expectedStringExpression, testLb.toString());
+    }
+
+    /**
+     * Test of compareTo method, of class LoadBalancerImpl.
+     */
+    @Test
+    public void testCompareTo() {
+        
+        System.out.println("compareTo");
+        LoadBalancer testLb1 = new LoadBalancerImpl.Builder("aa").defaultHttpListener().zone(testZoneName).build();
+        LoadBalancer testLb2 = new LoadBalancerImpl.Builder("bb").defaultHttpListener().zone(testZoneName).build();
+        LoadBalancer testLb3 = new LoadBalancerImpl.Builder("cc").defaultHttpListener().zone(testZoneName).build();
+        
+        
+        try{
+            testLb1.compareTo(null);
+        }catch(Exception e){
+            assertTrue(e instanceof NullPointerException);
+        }
+        
+        assertTrue(testLb1.compareTo(testLb1) == 0);
+        assertTrue(testLb1.compareTo(testLb2) < 0);
+        assertTrue(testLb1.compareTo(testLb3) < 0);
+        
+        assertTrue(testLb2.compareTo(testLb1) > 0);
+        assertTrue(testLb2.compareTo(testLb2) == 0);
+        assertTrue(testLb2.compareTo(testLb3) < 0);
+        
+        assertTrue(testLb3.compareTo(testLb1) > 0);
+        assertTrue(testLb3.compareTo(testLb2) > 0);
+        assertTrue(testLb3.compareTo(testLb3) == 0);
+        
+        testLb1.delete();
+        testLb2.delete();
+        testLb3.delete();
     }
     
 }

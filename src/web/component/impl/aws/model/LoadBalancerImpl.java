@@ -431,6 +431,18 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         return instances;
     }
 
+   /*
+    * 
+    */
+    @Override
+    public int compareTo(LoadBalancer o) {
+        
+        if(o == null)
+            throw new NullPointerException();
+        
+        return this.getName().compareTo(o.getName());
+    }
+
     public static class Builder{
         
         private final String name;
