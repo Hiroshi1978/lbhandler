@@ -725,7 +725,16 @@ public class LoadBalancerImplTest {
     public void testGetInstanceState_String() {
         
         System.out.println("getInstanceState");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        Instance testInstance = testBackendInstances.get(testBackendInstanceIds.get(0));
+        
+        BackendState expected = testInstance.getBackendStateOf(testLb);
+        BackendState actual = testLb.getInstanceState(testInstance.getId());
+        
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getInstanceId(), actual.getInstanceId());
+        assertEquals(expected.getReasonCode(), actual.getReasonCode());
+        assertEquals(expected.getState(), actual.getState());
     }
 
     /**
@@ -735,7 +744,16 @@ public class LoadBalancerImplTest {
     public void testGetInstanceState_Instance() {
         
         System.out.println("getInstanceState");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        Instance testInstance = testBackendInstances.get(testBackendInstanceIds.get(0));
+        
+        BackendState expected = testInstance.getBackendStateOf(testLb);
+        BackendState actual = testLb.getInstanceState(testInstance);
+        
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getInstanceId(), actual.getInstanceId());
+        assertEquals(expected.getReasonCode(), actual.getReasonCode());
+        assertEquals(expected.getState(), actual.getState());
     }
 
     /**
