@@ -10,7 +10,7 @@ package web.component.api.model;
  *
  * @author Hiroshi
  */
-public interface VPC {
+public interface VPC extends Comparable<VPC>{
     
     public String getCidrBlock();
     public String getDhcpOptionsId();

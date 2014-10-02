@@ -114,6 +114,15 @@ public class VPCImpl extends AWSModelBase implements VPC{
     public String toString(){
         return ec2Vpc.toString();
     }
+
+    @Override
+    public int compareTo(VPC o) {
+        
+        if(o == null)
+            throw new NullPointerException();
+        
+        return this.getId().compareTo(o.getId());
+    }
     
     public static class Builder {
         

@@ -94,6 +94,15 @@ public class ZoneImpl extends AWSModelBase implements Zone{
     public String toString(){
         return "{ZoneName: " + getName() + ", RegionName: " + getRegionName() + "}";
     }
+
+    @Override
+    public int compareTo(Zone o) {
+        
+        if(o == null)
+            throw new NullPointerException();
+        
+        return this.getName().compareTo(o.getName());
+    }
     
     public static class Builder {
         

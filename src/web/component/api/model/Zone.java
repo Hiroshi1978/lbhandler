@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Hiroshi
  */
-public interface Zone {
+public interface Zone extends Comparable<Zone>{
     public List<String> getMessages();
     public String getName();
     public String getRegionName();

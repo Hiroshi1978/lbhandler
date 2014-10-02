@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Hiroshi
  */
-public interface Instance {
+public interface Instance extends Comparable<Instance>{
     
     /**
      * Returns instance of load balancer with which this backend instance is registered.

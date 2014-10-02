@@ -293,4 +293,35 @@ public class SubnetImplTest {
         assertEquals("Unknown state", shouldHaveBeenDeleted.getState());
     }
     
+    /**
+     * Test of compareTo method, of class SubnetImpl.
+     */
+    @Test
+    public void testCompareTo() {
+        
+        System.out.println("compareTo");
+        VPC testVpc = new VPCImpl.Builder().cidr("10.1.0.0/16").create();
+        List<String> testSubnetIds = new ArrayList<>();
+        
+        for(int i=0; i<3; i++)
+            testSubnetIds.add(new SubnetImpl.Builder().cidr("10.1." + (i+1) + ".0/24").vpc(testVpc.getId()).create().getId());
+        
+        Collections.sort(testSubnetIds);
+
+        Subnet testSubnet1 = new SubnetImpl.Builder().id(testSubnetIds.get(0)).get();
+        Subnet testSubnet2 = new SubnetImpl.Builder().id(testSubnetIds.get(1)).get();
+        Subnet testSubnet3 = new SubnetImpl.Builder().id(testSubnetIds.get(2)).get();
+        
+        assertTrue(testSubnet1.compareTo(testSubnet1) == 0);
+        assertTrue(testSubnet1.compareTo(testSubnet2) < 0);
+        assertTrue(testSubnet1.compareTo(testSubnet3) < 0);
+        assertTrue(testSubnet2.compareTo(testSubnet1) > 0);
+        assertTrue(testSubnet2.compareTo(testSubnet2) == 0);
+        assertTrue(testSubnet2.compareTo(testSubnet3) < 0);
+        assertTrue(testSubnet3.compareTo(testSubnet1) > 0);
+        assertTrue(testSubnet3.compareTo(testSubnet2) > 0);
+        assertTrue(testSubnet3.compareTo(testSubnet3) == 0); 
+        
+        testVpc.delete();
+    }
 }

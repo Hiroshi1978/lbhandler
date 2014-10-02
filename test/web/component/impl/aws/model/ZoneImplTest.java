@@ -149,4 +149,31 @@ public class ZoneImplTest {
         assertEquals(expectedStringExpression, testInstance.toString());
     }
     
+
+    /**
+     * Test of compareTo method, of class ZoneImpl.
+     */
+    @Test
+    public void testCompareTo() {
+        
+        System.out.println("compareTo");
+        //prepare three zone names for test.
+        String[] testZoneNameArray = new String[]{"","",""};
+        List<String> testZoneNames = Arrays.asList(testZoneNameArray);
+        Collections.sort(testZoneNames);
+
+        Zone zone1 = new ZoneImpl.Builder().name(testZoneNames.get(0)).build();
+        Zone zone2 = new ZoneImpl.Builder().name(testZoneNames.get(1)).build();
+        Zone zone3 = new ZoneImpl.Builder().name(testZoneNames.get(2)).build();
+        
+        assertTrue(zone1.compareTo(zone1) == 0);
+        assertTrue(zone1.compareTo(zone2) < 0);
+        assertTrue(zone1.compareTo(zone3) < 0);
+        assertTrue(zone2.compareTo(zone1) > 0);
+        assertTrue(zone2.compareTo(zone2) == 0);
+        assertTrue(zone2.compareTo(zone3) < 0);
+        assertTrue(zone3.compareTo(zone1) > 0);
+        assertTrue(zone3.compareTo(zone2) > 0);
+        assertTrue(zone3.compareTo(zone3) == 0);
+    }
 }

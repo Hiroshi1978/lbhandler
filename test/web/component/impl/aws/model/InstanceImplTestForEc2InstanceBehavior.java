@@ -466,4 +466,30 @@ public class InstanceImplTestForEc2InstanceBehavior {
         String expectedStateTransitionReason = ec2.getInstanceStateTransitionReason(testInstance.getId());
         assertEquals(expectedStateTransitionReason, testInstance.getStateTransitionReason());        
     }
+
+    @Test
+    public void testCompareTo(){
+        
+        System.out.println("compareTo");
+        List<String> sortedTestInstanceIds = new ArrayList<>(testInstanceIds);
+        Collections.sort(sortedTestInstanceIds);
+        //this test requires three test instances.
+        Instance testInstance1 = new InstanceImpl.Builder().id(sortedTestInstanceIds.get(0)).get();
+        Instance testInstance2 = new InstanceImpl.Builder().id(sortedTestInstanceIds.get(1)).get();
+        Instance testInstance3 = new InstanceImpl.Builder().id(sortedTestInstanceIds.get(2)).get();
+        
+        assertTrue(testInstance1.compareTo(testInstance1) == 0);
+        assertTrue(testInstance1.compareTo(testInstance2) < 0);
+        assertTrue(testInstance1.compareTo(testInstance3) < 0);
+        assertTrue(testInstance2.compareTo(testInstance1) > 0);
+        assertTrue(testInstance2.compareTo(testInstance2) == 0);
+        assertTrue(testInstance2.compareTo(testInstance3) < 0);
+        assertTrue(testInstance3.compareTo(testInstance1) > 0);
+        assertTrue(testInstance3.compareTo(testInstance2) > 0);
+        assertTrue(testInstance3.compareTo(testInstance3) == 0);
+    	
+    	testInstance1.delete();
+    	testInstance2.delete();
+    	testInstance3.delete();
+    }
 }

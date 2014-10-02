@@ -304,6 +304,15 @@ public class InstanceImpl extends AWSModelBase implements Instance{
             throw new IllegalArgumentException("Load balancer not specified.");
         return BackendStateImpl.create(this, lb);
     }
+
+    @Override
+    public int compareTo(Instance o) {
+        
+        if(o == null)
+            throw new NullPointerException();
+        
+        return this.getId().compareTo(o.getId());
+    }
     
    /*
     * The instance of this class expresses snapshot of the state of the specified Instance (VM).

@@ -238,4 +238,36 @@ public class VPCImplTest {
         assertEquals(expectedStringExpression, testInstance.toString());
     }
     
+    /**
+     * Test of compareTo method, of class VPCImpl.
+     */
+    @Test
+    public void testCompareTo() {
+        
+        System.out.println("compareTo");
+        List<String> testVpcIds = new ArrayList<>();
+        
+        for(int i=0; i<3; i++)
+            testVpcIds.add(new VPCImpl.Builder().cidr(expectedCidrBlock).create().getId());
+        
+        Collections.sort(testVpcIds);
+
+        VPC testVpc1 = new VPCImpl.Builder().id(testVpcIds.get(0)).get();
+        VPC testVpc2 = new VPCImpl.Builder().id(testVpcIds.get(1)).get();
+        VPC testVpc3 = new VPCImpl.Builder().id(testVpcIds.get(2)).get();
+        
+        assertTrue(testVpc1.compareTo(testVpc1) == 0);
+        assertTrue(testVpc1.compareTo(testVpc2) < 0);
+        assertTrue(testVpc1.compareTo(testVpc3) < 0);
+        assertTrue(testVpc2.compareTo(testVpc1) > 0);
+        assertTrue(testVpc2.compareTo(testVpc2) == 0);
+        assertTrue(testVpc2.compareTo(testVpc3) < 0);
+        assertTrue(testVpc3.compareTo(testVpc1) > 0);
+        assertTrue(testVpc3.compareTo(testVpc2) > 0);
+        assertTrue(testVpc3.compareTo(testVpc3) == 0);
+        
+        testVpc1.delete();
+        testVpc2.delete();
+        testVpc3.delete();
+    }
 }

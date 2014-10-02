@@ -10,7 +10,7 @@ package web.component.api.model;
  *
  * @author Hiroshi
  */
-public interface Subnet {
+public interface Subnet extends Comparable<Subnet>{
     public String getId();
     public String getZone();
     public Integer getAvailableIpAddressCount();
