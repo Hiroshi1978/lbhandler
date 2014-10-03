@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import web.component.impl.Cloud;
 import web.component.impl.CloudBlock;
+import web.component.impl.aws.autoscaling.AWSAutoScaling;
 import web.component.impl.aws.ec2.AWSEC2;
 import web.component.impl.aws.elb.AWSELB;
 
@@ -36,6 +37,8 @@ public class AWS implements Cloud{
                 cb = AWSEC2.get();
             if(BlockName.ELB.equals(name))
                 cb = AWSELB.get();
+            if(BlockName.AutoScaling.equals(name))
+                cb = AWSAutoScaling.get();
             
             INSTANCE.components.put(name, cb);
         }
@@ -43,6 +46,6 @@ public class AWS implements Cloud{
     }
     
     public static enum BlockName{
-        EC2,ELB;
+        EC2,ELB,AutoScaling;
     }
 }
