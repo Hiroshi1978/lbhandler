@@ -23,13 +23,23 @@ public class AWS implements Cloud{
     
     private final Map<BlockName, CloudBlock> components = new HashMap<>();
 
-    private AWS(){
-        components.put(BlockName.EC2, AWSEC2.get());
-        components.put(BlockName.ELB, AWSELB.get());        
+    private AWS(){     
     }
     
     public static final CloudBlock get(BlockName name){
-        return INSTANCE.components.get(name);
+        
+        CloudBlock cb = INSTANCE.components.get(name);
+        
+        if(cb == null){
+        
+            if(BlockName.EC2.equals(name))
+                cb = AWSEC2.get();
+            if(BlockName.ELB.equals(name))
+                cb = AWSELB.get();
+            
+            INSTANCE.components.put(name, cb);
+        }
+        return cb;
     }
     
     public static enum BlockName{
