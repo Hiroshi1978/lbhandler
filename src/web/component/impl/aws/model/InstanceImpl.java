@@ -55,7 +55,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     */
     private static Instance create(Builder builder){
         
-        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
         com.amazonaws.services.ec2.model.Instance newEc2Instance = ec2.createInstance(builder.imageId, builder.type, builder.zoneName);
         Instance newInstance = new InstanceImpl(newEc2Instance);
         existInstances.put(newInstance.getId(), newInstance);
@@ -325,7 +325,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     
         private InstanceStateImpl(Instance instance){
             
-            AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+            AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
             com.amazonaws.services.ec2.model.InstanceState source = ec2.getInstanceState(instance.getId());
             ec2InstanceState.setCode(source.getCode());
             ec2InstanceState.setName(source.getName());
@@ -362,7 +362,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
             if(instance == null || lb == null)
                 throw new IllegalArgumentException("Both instance and load balancer must be specified.");
                 
-            AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+            AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
             com.amazonaws.services.elasticloadbalancing.model.InstanceState source = 
                 elb.describeInstanceHealth(lb.getName(), ((InstanceImpl)instance).asElbInstance()).getInstanceStates().get(0);
             elbInstanceState.setDescription(source.getDescription());

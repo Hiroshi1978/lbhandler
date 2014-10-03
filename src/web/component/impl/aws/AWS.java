@@ -27,9 +27,14 @@ public class AWS implements Cloud{
     private AWS(){     
     }
     
-    public static final CloudBlock get(BlockName name){
+    //interface to access cloud.
+    public static AWS access(){
+        return INSTANCE;
+    }
+    
+    public final CloudBlock get(BlockName name){
         
-        CloudBlock cb = INSTANCE.components.get(name);
+        CloudBlock cb = components.get(name);
         
         if(cb == null){
         
@@ -40,7 +45,7 @@ public class AWS implements Cloud{
             if(BlockName.AutoScaling.equals(name))
                 cb = AWSAutoScaling.get();
             
-            INSTANCE.components.put(name, cb);
+            components.put(name, cb);
         }
         return cb;
     }
