@@ -7,7 +7,9 @@
 package web.component.impl.aws.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -107,7 +109,7 @@ public class SubnetImplTest {
     public void testAsEc2Subnet() {
         System.out.println("asEc2Subnet");
         
-        AWSEC2 ec2 = (AWSEC2) AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2) AWS.access().get(AWS.BlockName.EC2);
         com.amazonaws.services.ec2.model.Subnet source = ec2.getExistEc2Subnet(expectedId);
         com.amazonaws.services.ec2.model.Subnet viewAsEc2Subnet = ((SubnetImpl)testInstance).asEc2Subnet();
         
@@ -288,11 +290,11 @@ public class SubnetImplTest {
         }
         Subnet shouldHaveBeenDeleted = new SubnetImpl.Builder().id(deletedId).get();
         
-        AWSEC2 ec2 = (AWSEC2) AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2) AWS.access().get(AWS.BlockName.EC2);
         assertEquals(null, ec2.getExistEc2Subnet(deletedId));
         assertEquals("Unknown state", shouldHaveBeenDeleted.getState());
     }
-    
+
     /**
      * Test of compareTo method, of class SubnetImpl.
      */
@@ -324,4 +326,5 @@ public class SubnetImplTest {
         
         testVpc.delete();
     }
+    
 }

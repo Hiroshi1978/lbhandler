@@ -6,7 +6,10 @@
 
 package web.component.impl.aws.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -78,7 +81,7 @@ public class VPCImplTest {
         
         System.out.println("asEc2Vpc");
         
-        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
         com.amazonaws.services.ec2.model.Vpc source = ec2.getExistEc2Vpc(testInstance.getId());
         com.amazonaws.services.ec2.model.Vpc viewAsEc2Vpc = ((VPCImpl)testInstance).asEc2Vpc();
         
@@ -181,7 +184,7 @@ public class VPCImplTest {
         }
         VPC shouldHaveBeenDeleted = new VPCImpl.Builder().id(deletedId).get();
         
-        AWSEC2 ec2 = (AWSEC2) AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2) AWS.access().get(AWS.BlockName.EC2);
         assertEquals(null, ec2.getExistEc2Vpc(deletedId));
         assertEquals("Unknown state", shouldHaveBeenDeleted.getState());
     }
@@ -237,7 +240,7 @@ public class VPCImplTest {
         System.out.println("toString");
         assertEquals(expectedStringExpression, testInstance.toString());
     }
-    
+
     /**
      * Test of compareTo method, of class VPCImpl.
      */
@@ -270,4 +273,5 @@ public class VPCImplTest {
         testVpc2.delete();
         testVpc3.delete();
     }
+    
 }

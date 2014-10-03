@@ -8,6 +8,8 @@ package web.component.impl.aws.model;
 
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -58,7 +60,7 @@ public class ZoneImplTest {
         
         System.out.println("asEc2Zone");
         
-        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
         AvailabilityZone source = ec2.getExistEc2AvailabilityZone(expectedZoneName);
         AvailabilityZone viewAsEc2Zone = ((ZoneImpl)testInstance).asEc2Zone();
 
@@ -148,7 +150,6 @@ public class ZoneImplTest {
         System.out.println("toString");
         assertEquals(expectedStringExpression, testInstance.toString());
     }
-    
 
     /**
      * Test of compareTo method, of class ZoneImpl.
@@ -176,4 +177,5 @@ public class ZoneImplTest {
         assertTrue(zone3.compareTo(zone2) > 0);
         assertTrue(zone3.compareTo(zone3) == 0);
     }
+    
 }

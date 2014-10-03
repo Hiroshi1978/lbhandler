@@ -45,9 +45,9 @@ public class InstanceImplTestForElbInstanceBehavior {
     public static void setUpClass() {
         
         //if you use instances already launched in cloud.
-        //getExistTestInstances();
+        getExistTestInstances();
         //if you newly create instances for test.
-        createTestInstances();
+        //createTestInstances();
             
         //if you use load balancers already launched in cloud.
         //getExistTestLbs();
@@ -73,7 +73,7 @@ public class InstanceImplTestForElbInstanceBehavior {
     
     static private void getExistTestInstances(){
 
-        String[] existInstanceIds = {"specify","IDs","of","your","test","instances","here"};
+        String[] existInstanceIds = {"",""};
         testInstanceIds = Arrays.asList(existInstanceIds);
         
         for(String testInstanceId : testInstanceIds){
@@ -163,7 +163,7 @@ public class InstanceImplTestForElbInstanceBehavior {
             }
         }
         
-        AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
         com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getInstances().get(0);
         com.amazonaws.services.elasticloadbalancing.model.Instance viewAsElbInstance = ((InstanceImpl)testInstance).asElbInstance();
 

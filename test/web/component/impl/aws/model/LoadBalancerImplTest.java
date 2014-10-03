@@ -611,7 +611,7 @@ public class LoadBalancerImplTest {
         System.out.println("getListeners");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         
-        AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
         List<ListenerDescription> descs = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getListenerDescriptions();
         List<LoadBalancerListener> expectedList = new ArrayList<>();
         for(ListenerDescription desc : descs)
@@ -630,7 +630,7 @@ public class LoadBalancerImplTest {
         
         System.out.println("getZones");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
         List<String> expectedZoneNames = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getAvailabilityZones();
         
         List<Zone> expectedZones = new ArrayList<>();
@@ -649,7 +649,7 @@ public class LoadBalancerImplTest {
         System.out.println("getSubnets");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         
-        AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
         List<String> expectedSubnetIds = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getSubnets();
         
         List<Subnet> expectedSubnets = new ArrayList<>();
@@ -875,7 +875,7 @@ public class LoadBalancerImplTest {
         System.out.println("toString");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         
-        AWSELB elb = (AWSELB)AWS.get(AWS.BlockName.ELB);
+        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
         String expectedStringExpression = elb.getLoadBalancerDescription(testLb.getName()).toString();
 
         assertEquals(expectedStringExpression, testLb.toString());

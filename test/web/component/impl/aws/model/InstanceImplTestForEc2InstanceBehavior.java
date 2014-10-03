@@ -8,6 +8,7 @@ package web.component.impl.aws.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +111,7 @@ public class InstanceImplTestForEc2InstanceBehavior {
         System.out.println("asEc2Instance");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
         
-        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
         com.amazonaws.services.ec2.model.Instance source = ec2.getExistEc2Instance(testInstanceIds.get(0));
         com.amazonaws.services.ec2.model.Instance viewAsEc2Instance = ((InstanceImpl)testInstance).asEc2Instance();
 
@@ -438,7 +439,7 @@ public class InstanceImplTestForEc2InstanceBehavior {
         System.out.println("getStateName");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
         
-        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
         String expectedStateName = ec2.getInstanceState(testInstance.getId()).getName();
         assertEquals(expectedStateName, testInstance.getStateName());
         
@@ -450,7 +451,7 @@ public class InstanceImplTestForEc2InstanceBehavior {
         System.out.println("getStateCode");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
         
-        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
         int expectedStateCode = ec2.getInstanceState(testInstance.getId()).getCode();
         assertEquals(expectedStateCode, (int)testInstance.getStateCode());
         
@@ -462,11 +463,11 @@ public class InstanceImplTestForEc2InstanceBehavior {
         System.out.println("getStateTransitionReason");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
         
-        AWSEC2 ec2 = (AWSEC2)AWS.get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
         String expectedStateTransitionReason = ec2.getInstanceStateTransitionReason(testInstance.getId());
         assertEquals(expectedStateTransitionReason, testInstance.getStateTransitionReason());        
     }
-
+    
     @Test
     public void testCompareTo(){
         
@@ -487,9 +488,5 @@ public class InstanceImplTestForEc2InstanceBehavior {
         assertTrue(testInstance3.compareTo(testInstance1) > 0);
         assertTrue(testInstance3.compareTo(testInstance2) > 0);
         assertTrue(testInstance3.compareTo(testInstance3) == 0);
-    	
-    	testInstance1.delete();
-    	testInstance2.delete();
-    	testInstance3.delete();
     }
 }
