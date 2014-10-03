@@ -17,7 +17,7 @@ import web.component.impl.aws.elb.AWSELB;
  */
 public abstract class AWSModelBase {
  
-    protected AWS aws = AWS.access();
+    protected final AWS aws = AWS.access();
     
    /* 
     * Returns AWS EC2 service interface.
