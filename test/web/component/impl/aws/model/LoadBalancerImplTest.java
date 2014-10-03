@@ -7,7 +7,6 @@
 package web.component.impl.aws.model;
 
 import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
-import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +19,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import web.component.api.model.BackendState;
 import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
@@ -49,8 +49,8 @@ public class LoadBalancerImplTest {
     @BeforeClass
     public static void setUpClass() {
         
-        getExistTestLbs();
-        //createTestLbs();
+        //getExistTestLbs();
+        createTestLbs();
         
         getExistTestBackendInstances();
         //createTestBackendInstances();
@@ -81,7 +81,7 @@ public class LoadBalancerImplTest {
     
     static void getExistTestLbs(){
 
-        String[] newLbNames = {"specify","your","test","lb","names","here","."};
+        String[] newLbNames = {"test-lb-1"};
         testLbNames = Arrays.asList(newLbNames);
         
         //use exist load balancers for test.
@@ -118,6 +118,8 @@ public class LoadBalancerImplTest {
     
     @AfterClass
     public static void tearDownClass() {
+        for(String testLbName : testLbNames)
+            testLbs.get(testLbName).delete();
     }
     
     @Before
@@ -583,7 +585,7 @@ public class LoadBalancerImplTest {
 
         Collections.sort(actualList);
         Collections.sort(expectedList);
-        
+
         for(int i = 0; i < actualList.size(); i++)
             if(!expectedList.get(i).equals(actualList.get(i)))
                 fail("unexpected load balancer found: " + actualList.get(i));
@@ -695,7 +697,32 @@ public class LoadBalancerImplTest {
     public void testGetInstanceStates_0args() {
         
         System.out.println("getInstanceStates");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        List<Instance> toRegister = new ArrayList<>(testBackendInstances.values());
+        testLb.registerInstances(toRegister);
+        
+        List<BackendState> expectedList = new ArrayList<>();
+        List<Instance> registeredInstances = testLb.getBackendInstances();
+        for(Instance registeredInstance : registeredInstances)
+            expectedList.add(registeredInstance.getBackendStateOf(testLb));
+        
+        List<BackendState> actualList = testLb.getInstanceStates();
+        
+        Collections.sort(expectedList);
+        Collections.sort(actualList);
+        
+        //restore the state before test.
+        testLb.deregisterInstances(toRegister);
+        
+        for(int i=0;i<expectedList.size();i++){
+           BackendState expected = expectedList.get(i);
+           BackendState actual   = actualList.get(i);
+           if(!expected.getDescription().equals(actual.getDescription()) ||
+              !expected.getInstanceId().equals(actual.getInstanceId()) ||
+              !expected.getReasonCode().equals(actual.getReasonCode()) ||
+              !expected.getState().equals(actual.getState()))
+               fail("unexpected state found: " + actual);
+        }
     }
 
     /**
@@ -705,7 +732,32 @@ public class LoadBalancerImplTest {
     public void testGetInstanceStates_List() {
         
         System.out.println("getInstanceStates");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        List<Instance> toRegister = new ArrayList<>(testBackendInstances.values());
+        testLb.registerInstances(toRegister);
+        
+        List<BackendState> expectedList = new ArrayList<>();
+        List<Instance> registeredInstances = testLb.getBackendInstances();
+        for(Instance registeredInstance : registeredInstances)
+            expectedList.add(registeredInstance.getBackendStateOf(testLb));
+        
+        List<BackendState> actualList = testLb.getInstanceStates(toRegister);
+        
+        Collections.sort(expectedList);
+        Collections.sort(actualList);
+        
+        //restore the state before test.
+        testLb.deregisterInstances(toRegister);
+        
+        for(int i=0;i<expectedList.size();i++){
+           BackendState expected = expectedList.get(i);
+           BackendState actual   = actualList.get(i);
+           if(!expected.getDescription().equals(actual.getDescription()) ||
+              !expected.getInstanceId().equals(actual.getInstanceId()) ||
+              !expected.getReasonCode().equals(actual.getReasonCode()) ||
+              !expected.getState().equals(actual.getState()))
+               fail("unexpected state found: " + actual);
+        }
     }
 
     /**
@@ -715,7 +767,33 @@ public class LoadBalancerImplTest {
     public void testGetInstanceStatesByInstanceId() {
         
         System.out.println("getInstanceStatesByInstanceId");
-        fail("The test case is a prototype.");
+        LoadBalancer testLb = testLbs.get(testLbNames.get(0));
+        List<Instance> toRegister = new ArrayList<>(testBackendInstances.values());
+        testLb.registerInstances(toRegister);
+        
+        List<BackendState> expectedList = new ArrayList<>();
+        List<Instance> registeredInstances = testLb.getBackendInstances();
+        for(Instance registeredInstance : registeredInstances)
+            expectedList.add(registeredInstance.getBackendStateOf(testLb));
+        
+        List<BackendState> actualList = testLb.getInstanceStatesByInstanceId(testBackendInstanceIds);
+        
+        Collections.sort(expectedList);
+        Collections.sort(actualList);
+        
+        //restore the state before test.
+        testLb.deregisterInstances(toRegister);
+        
+        for(int i=0;i<expectedList.size();i++){
+           BackendState expected = expectedList.get(i);
+           BackendState actual   = actualList.get(i);
+           if(!expected.getDescription().equals(actual.getDescription()) ||
+              !expected.getInstanceId().equals(actual.getInstanceId()) ||
+              !expected.getReasonCode().equals(actual.getReasonCode()) ||
+              !expected.getState().equals(actual.getState()))
+               fail("unexpected state found: " + actual + "\n" +
+                    "expected state was:     " + expected);
+        }
     }
 
     /**
@@ -765,7 +843,7 @@ public class LoadBalancerImplTest {
         System.out.println("equals");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         LoadBalancer equalLb = LoadBalancerImpl.getExistLoadBalancerByName(testLb.getName());
-        LoadBalancer anotherLb = testLbs.get(testLbNames.get(2));
+        LoadBalancer anotherLb = testLbs.get(testLbNames.get(1));
         
         assertTrue(testLb.equals(testLb));
         assertTrue(testLb.equals(equalLb));
@@ -781,7 +859,7 @@ public class LoadBalancerImplTest {
         System.out.println("hashCode");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         LoadBalancer equalLb = LoadBalancerImpl.getExistLoadBalancerByName(testLb.getName());
-        LoadBalancer anotherLb = testLbs.get(testLbNames.get(2));
+        LoadBalancer anotherLb = testLbs.get(testLbNames.get(1));
         
         assertTrue(testLb.hashCode() == testLb.hashCode());
         assertTrue(testLb.hashCode() == equalLb.hashCode());

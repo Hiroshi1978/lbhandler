@@ -558,6 +558,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         return states;
     }
     
+    @Override
     public List<BackendState> getInstanceStatesByInstanceId(List<String> instanceIds){
 
         if(isDestroyed())

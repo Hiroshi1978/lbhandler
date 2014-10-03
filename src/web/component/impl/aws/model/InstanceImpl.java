@@ -412,6 +412,13 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         public String toString(){
             return elbInstanceState.toString();
         }
+
+        @Override
+        public int compareTo(BackendState o) {
+            if(o == null)
+                throw new NullPointerException();
+            return this.getInstanceId().compareTo(o.getInstanceId());
+        }
     }
     
     public static class Builder {
