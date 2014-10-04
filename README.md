@@ -211,29 +211,30 @@ To inspect the source codes, visit [GitHub AWS SDK for Java](https://github.com/
 To use AWS ELB implementation, you have to create two files and prepare some configuration parameters for http client which communicates with AWS ELB following these steps.
 
 ###### Step 1. 
-Create text file with name 'credentials.txt' in the parent directory of the directory where AWSElasticLoadBalancing.class exists (web/component/impl/aws).
+Create text file with name 'aws_config.txt' in the parent directory of the directory where AWS.class exists (web/component/impl/aws).
 
 ###### Step 2. 
-Edit it following the sample below, and save it.
+Edit it following the sample below, and save it.In most cases the value to the key 'signer.Type' is 'AWS4SignerType'. The value to the key 'endpoint' and 'servicename' must be set to each service's specific value. 
 
 ```
+    #credentials
     aws.key=YOURAWSACCESSKEY
     aws.secret=YOURAWSSECRETKEYCORRESPONDINGTOTHEACCESSKEY
-```
 
-###### Step 3. 
-Create text files with name 'httpclient_config.txt' in the directory where AWSELB class exists (web/component/impl/aws/elb), and alo in the directory where AWSEC2 class exists (web/component/impl/aws/ec2).
+    #endpoint
+    autoscaling.endpoint=protocol://endpoint.of.each.service/path
+    ec2.endpoint=protocol://endpoint.of.each.service/path
+    elb.endpoint=protocol://endpoint.of.each.service/path
 
-###### Step 4. 
-Edit them following the sample below, and save it. In most cases the value to the key 'signer.Type' is 'AWS4SignerType'. The value to the key 'endpoint' and 'servicename' must be set to each service's specific value. 
+    #servicename
+    autoscaling.servicename=properServiceName
+    ec2.servicename=properServiceName
+    elb.servicename=properServiceName
 
-```
-    endpoint=protocol://endpoint.of.each.service/path
-    servicename=properServiceName
+    #other parameters
     region=properRegionName
     signer.type=AWS4SignerType
 ```
-
 
 ### Want to learn more?
 
