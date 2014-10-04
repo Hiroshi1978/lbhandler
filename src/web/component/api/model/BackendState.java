@@ -10,7 +10,7 @@ package web.component.api.model;
  *
  * @author Hiroshi
  */
-public interface BackendState {
+public interface BackendState extends Comparable<BackendState>{
     
     //interface as elb instance.
 

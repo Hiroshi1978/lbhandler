@@ -58,6 +58,7 @@ public interface LoadBalancer extends Comparable<LoadBalancer>{
     
     public List<BackendState> getInstanceStates();
     public List<BackendState> getInstanceStates(List<Instance> backendInstances);
+    public List<BackendState> getInstanceStatesByInstanceId(List<String> backendInstanceIds);
     public BackendState getInstanceState(Instance backendInstance);
     public BackendState getInstanceState(String backendInstanceId);
     
