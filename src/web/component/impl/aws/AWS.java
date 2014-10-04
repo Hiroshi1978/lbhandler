@@ -6,13 +6,14 @@
 
 package web.component.impl.aws;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import web.component.impl.Cloud;
 import web.component.impl.CloudBlock;
-import web.component.impl.aws.autoscaling.AWSAutoScaling;
-import web.component.impl.aws.ec2.AWSEC2;
-import web.component.impl.aws.elb.AWSELB;
 
 /**
  *
@@ -21,10 +22,19 @@ import web.component.impl.aws.elb.AWSELB;
 public class AWS implements Cloud{
     
     private static final AWS INSTANCE = new AWS();
+
+    private final Properties AWS_CONFIG = new Properties();
     
     private final Map<BlockName, CloudBlock> components = new HashMap<>();
 
     private AWS(){     
+
+        try {
+            AWS_CONFIG.load(AWS.class.getResourceAsStream("./aws_config.txt"));
+        } catch (IOException ex) {
+            System.out.println("configuration file not found.");
+            throw new RuntimeException(ex);
+        }
     }
     
     //interface to access cloud.
@@ -48,6 +58,19 @@ public class AWS implements Cloud{
             components.put(name, cb);
         }
         return cb;
+    }
+    
+    Properties conf(){
+        
+        return (Properties)AWS_CONFIG.clone();
+    }
+    
+    AWSCredentials credentials(){
+        
+        String awsKey = AWS_CONFIG.getProperty("aws.key");
+        String secretKey = AWS_CONFIG.getProperty("aws.secret");
+        
+        return new BasicAWSCredentials(awsKey,secretKey);
     }
     
     public static enum BlockName{

@@ -26,7 +26,7 @@ import web.component.api.model.LoadBalancerListener;
 import web.component.api.model.Subnet;
 import web.component.api.model.Zone;
 import web.component.impl.aws.AWS;
-import web.component.impl.aws.elb.AWSELB;
+import web.component.impl.aws.AWSELB;
 
 /**
  *

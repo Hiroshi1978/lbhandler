@@ -20,7 +20,7 @@ import org.junit.Test;
 import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
 import web.component.impl.aws.AWS;
-import web.component.impl.aws.elb.AWSELB;
+import web.component.impl.aws.AWSELB;
 
 /**
  *

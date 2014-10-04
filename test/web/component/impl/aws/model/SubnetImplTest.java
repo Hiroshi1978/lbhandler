@@ -20,7 +20,7 @@ import org.junit.Test;
 import web.component.api.model.Subnet;
 import web.component.api.model.VPC;
 import web.component.impl.aws.AWS;
-import web.component.impl.aws.ec2.AWSEC2;
+import web.component.impl.aws.AWSEC2;
 
 /**
  *

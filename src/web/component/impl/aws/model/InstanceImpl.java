@@ -14,8 +14,8 @@ import web.component.api.model.Instance;
 import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
 import web.component.impl.aws.AWS;
-import web.component.impl.aws.ec2.AWSEC2;
-import web.component.impl.aws.elb.AWSELB;
+import web.component.impl.aws.AWSEC2;
+import web.component.impl.aws.AWSELB;
 
 /**
  *
