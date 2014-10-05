@@ -15,6 +15,7 @@ import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription
 import java.util.ArrayList;
 import java.util.List;
 import web.component.api.model.BackendState;
+import web.component.api.model.HealthCheck;
 import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
@@ -603,6 +604,35 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
         DescribeLoadBalancersResult result = elb.describeLoadBalancers();
         return result;
+    }
+
+    @Override
+    public void configureHealthCheck(HealthCheck healthCheck){
+        
+        if(!(healthCheck instanceof HealthCheckImpl))
+            throw new IllegalArgumentException("invalid health check specified.");
+        
+        elb().configureHealthCheck(name, ((HealthCheckImpl)healthCheck).asElbHealthCheck());
+    }
+    public void setHealthyThreshold(int healthyThreshold){
+        HealthCheck hc = new HealthCheckImpl.Builder().healthyThreshold(healthyThreshold).build();
+        configureHealthCheck(hc);
+    }
+    public void setHealthCheckInterval(int interval){
+        HealthCheck hc = new HealthCheckImpl.Builder().interval(interval).build();
+        configureHealthCheck(hc);
+    }
+    public void setHealthCheckTarget(String target){
+        HealthCheck hc = new HealthCheckImpl.Builder().target(target).build();
+        configureHealthCheck(hc);
+    }
+    public void setHealthCheckTimeout(int timeout){
+        HealthCheck hc = new HealthCheckImpl.Builder().timeout(timeout).build();
+        configureHealthCheck(hc);
+    }
+    public void setUnhealthyThreshold(int unhealthyThreshold){
+        HealthCheck hc = new HealthCheckImpl.Builder().unhealthyThreshold(unhealthyThreshold).build();
+        configureHealthCheck(hc);
     }
     
     @Override

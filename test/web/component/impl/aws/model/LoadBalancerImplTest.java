@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import web.component.api.model.BackendState;
+import web.component.api.model.HealthCheck;
 import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
@@ -914,6 +915,84 @@ public class LoadBalancerImplTest {
         testLb1.delete();
         testLb2.delete();
         testLb3.delete();
+    }
+
+    /**
+     * Test of configureHealthCheck method, of class LoadBalancerImpl.
+     */
+    @Test
+    public void testConfigureHealthCheck() {
+        System.out.println("configureHealthCheck");
+        HealthCheck healthCheck = null;
+        LoadBalancerImpl instance = null;
+        instance.configureHealthCheck(healthCheck);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of setHealthyThreshold method, of class LoadBalancerImpl.
+     */
+    @Test
+    public void testSetHealthyThreshold() {
+        System.out.println("setHealthyThreshold");
+        int healthyThreshold = 0;
+        LoadBalancerImpl instance = null;
+        instance.setHealthyThreshold(healthyThreshold);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of setHealthCheckInterval method, of class LoadBalancerImpl.
+     */
+    @Test
+    public void testSetHealthCheckInterval() {
+        System.out.println("setHealthCheckInterval");
+        int interval = 0;
+        LoadBalancerImpl instance = null;
+        instance.setHealthCheckInterval(interval);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of setHealthCheckTarget method, of class LoadBalancerImpl.
+     */
+    @Test
+    public void testSetHealthCheckTarget() {
+        System.out.println("setHealthCheckTarget");
+        String target = "";
+        LoadBalancerImpl instance = null;
+        instance.setHealthCheckTarget(target);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of setHealthCheckTimeout method, of class LoadBalancerImpl.
+     */
+    @Test
+    public void testSetHealthCheckTimeout() {
+        System.out.println("setHealthCheckTimeout");
+        int timeout = 0;
+        LoadBalancerImpl instance = null;
+        instance.setHealthCheckTimeout(timeout);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of setUnhealthyThreshold method, of class LoadBalancerImpl.
+     */
+    @Test
+    public void testSetUnhealthyThreshold() {
+        System.out.println("setUnhealthyThreshold");
+        int unhealthyThreshold = 0;
+        LoadBalancerImpl instance = null;
+        instance.setUnhealthyThreshold(unhealthyThreshold);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
     
 }

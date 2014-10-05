@@ -54,6 +54,7 @@ public interface LoadBalancer extends Comparable<LoadBalancer>{
     public void enableZone(Zone zone);
     public void disableZones(List<Zone> zones);
     public void disableZone(Zone zone);
+    public void configureHealthCheck(HealthCheck healthCheck);
     public void delete();
     
     public List<BackendState> getInstanceStates();
@@ -74,4 +75,5 @@ public interface LoadBalancer extends Comparable<LoadBalancer>{
     public List<Zone> getZones();
     public List<Subnet> getSubnets(); 
     public List<Instance> getBackendInstances();
+    
 }
