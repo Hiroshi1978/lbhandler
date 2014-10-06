@@ -32,4 +32,11 @@ public interface AutoScalingGroup extends Comparable<AutoScalingGroup>{
     public String getStatus();
     public List<String> getTerminationPolicies();
     public String getVPCZoneIdentifier();
+    
+    public void attachInstances(List<Instance> instances);
+    public void detachInstances(List<Instance> instances);
+    
+    public void setDesiredCapacity(int desiredCapacity);
+    
+    public void updateZones(List<Zone> zones);
 }

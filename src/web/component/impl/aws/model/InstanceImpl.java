@@ -26,7 +26,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     private static final Map<String,Instance> existInstances = new HashMap<>();
     private final com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance;
     private final com.amazonaws.services.ec2.model.Instance ec2Instance;
-
+    
    /*
     * Build new instance of this class that communicates with the VM identified by the specified instance ID in cloud.
     */
@@ -82,7 +82,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         //return the copy of the instance the field 'ec2Instance' of this object refers.
         return copyEc2Instance(ec2Instance);
     }
-    
+ 
     private com.amazonaws.services.elasticloadbalancing.model.Instance copyElbInstance(com.amazonaws.services.elasticloadbalancing.model.Instance original){
         
         com.amazonaws.services.elasticloadbalancing.model.Instance copy = new com.amazonaws.services.elasticloadbalancing.model.Instance();

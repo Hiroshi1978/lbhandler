@@ -6,10 +6,12 @@
 
 package web.component.impl.aws.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import web.component.api.model.AutoScalingGroup;
 import web.component.api.model.Instance;
+import web.component.api.model.Zone;
 import web.component.impl.aws.AWS;
 import web.component.impl.aws.AWSAutoScaling;
 
@@ -19,23 +21,28 @@ import web.component.impl.aws.AWSAutoScaling;
  */
 public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGroup{
 
-    private final com.amazonaws.services.autoscaling.model.AutoScalingGroup awsASGroup;
+    private final String name;
     
-    private AutoScalingGroupImpl(com.amazonaws.services.autoscaling.model.AutoScalingGroup source){
-        awsASGroup = copyAwsASGroup(source);
+    private AutoScalingGroupImpl(String name){
+        this.name = name;
     }
     
     private static AutoScalingGroup create(Builder builder){
         
         AWSAutoScaling as = (AWSAutoScaling)AWS.access().get(AWS.BlockName.AutoScaling);
         as.createAutoScalingGroup(builder.name, builder.maxSize, builder.minSize);
-        return new AutoScalingGroupImpl(as.getExistAutoScalingGroupByName(builder.name));
+        return new AutoScalingGroupImpl(builder.name);
     }
     
     private static AutoScalingGroup get(Builder builder){
         
         AWSAutoScaling as = (AWSAutoScaling)AWS.access().get(AWS.BlockName.AutoScaling);
-        return new AutoScalingGroupImpl(as.getExistAutoScalingGroupByName(builder.name));
+        try{
+            as.getExistAutoScalingGroupByName(builder.name);
+        }catch(Exception e){
+            throw new RuntimeException("auto scaling group with the specified name [" + builder.name + "] not found.",e);
+        }
+        return new AutoScalingGroupImpl(builder.name);
     }
     
     private com.amazonaws.services.autoscaling.model.AutoScalingGroup copyAwsASGroup(com.amazonaws.services.autoscaling.model.AutoScalingGroup source){
@@ -65,89 +72,99 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
     
     @Override
     public String getAutoScalingGroupARN() {
-        return awsASGroup.getAutoScalingGroupARN();
+        return as().getExistAutoScalingGroupByName(name).getAutoScalingGroupARN();
     }
 
     @Override
     public String getName() {
-        return awsASGroup.getAutoScalingGroupName();
+        return name;
     }
 
     @Override
     public List<String> getZones() {
-        return awsASGroup.getAvailabilityZones();
+        return as().getExistAutoScalingGroupByName(name).getAvailabilityZones();
     }
 
     @Override
     public Date getCreatedTime() {
-        return awsASGroup.getCreatedTime();
+        return as().getExistAutoScalingGroupByName(name).getCreatedTime();
     }
 
     @Override
     public int getDefaultCoolDown() {
-        return awsASGroup.getDefaultCooldown();
+        return as().getExistAutoScalingGroupByName(name).getDefaultCooldown();
     }
 
     @Override
     public int getDesiredCapacity() {
-        return awsASGroup.getDesiredCapacity();
+        return as().getExistAutoScalingGroupByName(name).getDesiredCapacity();
     }
 
     @Override
     public int getHealthCheckGracePeriod() {
-        return awsASGroup.getHealthCheckGracePeriod();
+        return as().getExistAutoScalingGroupByName(name).getHealthCheckGracePeriod();
     }
 
     @Override
     public String getHealthCheckType() {
-        return awsASGroup.getHealthCheckType();
+        return as().getExistAutoScalingGroupByName(name).getHealthCheckType();
     }
 
     @Override
     public List<Instance> getInstances() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        List<Instance> instances = new ArrayList<>();
+        for(String id : as().getAttachedInstanceIds(name))
+            instances.add(new InstanceImpl.Builder().id(id).get());
+        
+        return instances;
     }
 
     @Override
     public String getLaunchConfigurationName() {
-        return awsASGroup.getLaunchConfigurationName();
+        return as().getExistAutoScalingGroupByName(name).getLaunchConfigurationName();
     }
 
     @Override
     public List<String> getLoadBalancerNames() {
-        return awsASGroup.getLoadBalancerNames();
+        return as().getExistAutoScalingGroupByName(name).getLoadBalancerNames();
     }
 
     @Override
     public int getMaxSize() {
-        return awsASGroup.getMaxSize();
+        return as().getExistAutoScalingGroupByName(name).getMaxSize();
     }
 
     @Override
     public int getMinSize() {
-        return awsASGroup.getMinSize();
+        return as().getExistAutoScalingGroupByName(name).getMinSize();
     }
 
     @Override
     public String getPlacementGroup() {
-        return awsASGroup.getPlacementGroup();
+        return as().getExistAutoScalingGroupByName(name).getPlacementGroup();
     }
 
     @Override
     public String getStatus() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return as().getExistAutoScalingGroupByName(name).getStatus();
     }
 
     @Override
     public List<String> getTerminationPolicies() {
-        return awsASGroup.getTerminationPolicies();
+        return as().getExistAutoScalingGroupByName(name).getTerminationPolicies();
     }
 
     @Override
     public String getVPCZoneIdentifier() {
-        return awsASGroup.getVPCZoneIdentifier();
+        return as().getExistAutoScalingGroupByName(name).getVPCZoneIdentifier();
     }
 
+    @Override
+    public void setDesiredCapacity(int desiredCapacity) {
+        as().setDesiredCapacity(getName(), desiredCapacity);
+    }
+    
     @Override
     public int compareTo(AutoScalingGroup o) {
         
@@ -155,6 +172,47 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
             throw new NullPointerException();
         
         return this.getName().compareTo(o.getName());
+    }
+
+    @Override
+    public void attachInstances(List<Instance> instances) {
+        
+        if(instances == null || instances.isEmpty())
+            throw new IllegalArgumentException("Instances not specified.");
+        
+        List<String> instanceIds = new ArrayList<>();
+        for(Instance instance : instances)
+            instanceIds.add(instance.getId());
+        
+        as().attachInstances(name, instanceIds);
+    }
+    public void attachInstance(Instance instance) {
+        as().attachInstance(name, instance.getId());
+    }
+    
+    @Override
+    public void detachInstances(List<Instance> instances) {
+        
+        if(instances == null || instances.isEmpty())
+            throw new IllegalArgumentException("Instances not specified.");
+        
+        List<String> instanceIds = new ArrayList<>();
+        for(Instance instance : instances)
+            instanceIds.add(instance.getId());
+        
+        as().detachInstances(name, instanceIds);
+    }
+    public void detachInstance(Instance instance) {
+        as().detachInstance(name, instance.getId());
+    }
+    
+    public void updateZones(List<Zone> zones){
+        
+        List<String> zoneNames = new ArrayList<>();
+        for(Zone z : zones)
+            zoneNames.add(z.getName());
+        
+        as().updateAutoScalingGroupAvailabilityZones(name, zoneNames);
     }
     
     static class Builder {
