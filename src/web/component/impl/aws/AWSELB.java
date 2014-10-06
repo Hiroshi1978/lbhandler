@@ -12,6 +12,8 @@ import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancing;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient;
 import com.amazonaws.services.elasticloadbalancing.model.AttachLoadBalancerToSubnetsRequest;
 import com.amazonaws.services.elasticloadbalancing.model.AttachLoadBalancerToSubnetsResult;
+import com.amazonaws.services.elasticloadbalancing.model.ConfigureHealthCheckRequest;
+import com.amazonaws.services.elasticloadbalancing.model.ConfigureHealthCheckResult;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerListenersRequest;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerResult;
@@ -29,6 +31,7 @@ import com.amazonaws.services.elasticloadbalancing.model.DisableAvailabilityZone
 import com.amazonaws.services.elasticloadbalancing.model.DisableAvailabilityZonesForLoadBalancerResult;
 import com.amazonaws.services.elasticloadbalancing.model.EnableAvailabilityZonesForLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.EnableAvailabilityZonesForLoadBalancerResult;
+import com.amazonaws.services.elasticloadbalancing.model.HealthCheck;
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.Listener;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
@@ -505,4 +508,22 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.describeInstanceHealth(request);
     }
 
+    public ConfigureHealthCheckResult configureHealthCheck(ConfigureHealthCheckRequest request){
+
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(request.getHealthCheck() == null)
+            throw new IllegalArgumentException("Health check parameters not specified.");
+
+        return awsHttpClient.configureHealthCheck(request);
+    }
+    
+    public ConfigureHealthCheckResult configureHealthCheck(String loadBalancerName, HealthCheck hc){
+        
+        ConfigureHealthCheckRequest request = new ConfigureHealthCheckRequest();
+        request.setLoadBalancerName(loadBalancerName);
+        request.setHealthCheck(hc);
+        
+        return configureHealthCheck(request);
+    }
 }

@@ -75,7 +75,7 @@ public class HealthCheckImpl extends AWSModelBase implements HealthCheck{
 
     @Override
     public void setHealthyThreshold(int healthyThreshold) {
-        elbHealthCheck.setUnhealthyThreshold(healthyThreshold);
+        elbHealthCheck.setHealthyThreshold(healthyThreshold);
     }
 
     @Override

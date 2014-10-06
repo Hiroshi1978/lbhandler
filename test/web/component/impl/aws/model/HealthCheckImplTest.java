@@ -6,13 +6,13 @@
 
 package web.component.impl.aws.model;
 
-import com.amazonaws.services.elasticloadbalancing.model.HealthCheck;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import web.component.api.model.HealthCheck;
 
 /**
  *
@@ -44,13 +44,30 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testAsElbHealthCheck() {
+        
         System.out.println("asElbHealthCheck");
-        HealthCheckImpl instance = null;
-        HealthCheck expResult = null;
-        HealthCheck result = instance.asElbHealthCheck();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        com.amazonaws.services.elasticloadbalancing.model.HealthCheck elbHealthCheck
+                = ((HealthCheckImpl)hc).asElbHealthCheck();
+        
+        assertEquals(hc.getHealthyThreshold(),(int)elbHealthCheck.getHealthyThreshold());
+        assertEquals(hc.getInterval(),(int)elbHealthCheck.getInterval());
+        assertEquals(hc.getTarget(),elbHealthCheck.getTarget());
+        assertEquals(hc.getTimeout(),(int)elbHealthCheck.getTimeout());
+        assertEquals(hc.getUnhealthyThreshold(),(int)elbHealthCheck.getUnhealthyThreshold());
+        
+        com.amazonaws.services.elasticloadbalancing.model.HealthCheck elbHealthCheck2
+                = ((HealthCheckImpl)hc).asElbHealthCheck();
+        
+        assertEquals(elbHealthCheck2,elbHealthCheck);
+        assertFalse(elbHealthCheck2 == elbHealthCheck);
     }
 
     /**
@@ -58,13 +75,18 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testGetHealthyThreshold() {
+        
         System.out.println("getHealthyThreshold");
-        HealthCheckImpl instance = null;
-        int expResult = 0;
-        int result = instance.getHealthyThreshold();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        int testHealthThresHold = 10;
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(testHealthThresHold)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        assertEquals(testHealthThresHold, hc.getHealthyThreshold());
     }
 
     /**
@@ -72,27 +94,37 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testGetInterval() {
+        
         System.out.println("getInterval");
-        HealthCheckImpl instance = null;
-        int expResult = 0;
-        int result = instance.getInterval();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        int testInterval = 30;
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(testInterval)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        assertEquals(testInterval, hc.getInterval());
     }
-
+    
     /**
      * Test of getTarget method, of class HealthCheckImpl.
      */
     @Test
     public void testGetTarget() {
+
         System.out.println("getTarget");
-        HealthCheckImpl instance = null;
-        String expResult = "";
-        String result = instance.getTarget();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String testTarget = "http:80/index.html";
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target(testTarget)
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        assertEquals(testTarget, hc.getTarget());
     }
 
     /**
@@ -100,13 +132,18 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testGetTimeout() {
+        
         System.out.println("getTimeout");
-        HealthCheckImpl instance = null;
-        int expResult = 0;
-        int result = instance.getTimeout();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        int testTimeout = 30;
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(testTimeout)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        assertEquals(testTimeout, hc.getTimeout());
     }
 
     /**
@@ -114,13 +151,18 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testGetUnhealthyThreshold() {
+        
         System.out.println("getUnhealthyThreshold");
-        HealthCheckImpl instance = null;
-        int expResult = 0;
-        int result = instance.getUnhealthyThreshold();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        int testUNhealthyThreshold = 2;
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(testUNhealthyThreshold)
+                            .build();
+        
+        assertEquals(testUNhealthyThreshold, hc.getUnhealthyThreshold());
     }
 
     /**
@@ -128,12 +170,19 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testSetHealthyThreshold() {
+        
         System.out.println("setHealthyThreshold");
-        int healthyThreshold = 0;
-        HealthCheckImpl instance = null;
-        instance.setHealthyThreshold(healthyThreshold);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        int testHealthyThreshold = 8;
+        hc.setHealthyThreshold(testHealthyThreshold);
+        assertEquals(testHealthyThreshold, hc.getHealthyThreshold());
     }
 
     /**
@@ -141,12 +190,19 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testSetInterval() {
+        
         System.out.println("setInterval");
-        int interval = 0;
-        HealthCheckImpl instance = null;
-        instance.setInterval(interval);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        int testInterval = 40;
+        hc.setInterval(testInterval);
+        assertEquals(testInterval, hc.getInterval());
     }
 
     /**
@@ -154,12 +210,19 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testSetTarget() {
+        
         System.out.println("setTarget");
-        String target = "";
-        HealthCheckImpl instance = null;
-        instance.setTarget(target);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        String testTarget = "https:8088/index2.html";
+        hc.setTarget(testTarget);
+        assertEquals(testTarget, hc.getTarget());
     }
 
     /**
@@ -167,12 +230,19 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testSetTimeout() {
+        
         System.out.println("setTimeout");
-        int timeout = 0;
-        HealthCheckImpl instance = null;
-        instance.setTimeout(timeout);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        int testTimeout = 40;
+        hc.setTimeout(testTimeout);
+        assertEquals(testTimeout, hc.getTimeout());
     }
 
     /**
@@ -180,12 +250,19 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testSetUnhealthyThreshold() {
+        
         System.out.println("setUnhealthyThreshold");
-        int unhealthyThreshold = 0;
-        HealthCheckImpl instance = null;
-        instance.setUnhealthyThreshold(unhealthyThreshold);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        int testUnhealthyThreshold = 4;
+        hc.setUnhealthyThreshold(testUnhealthyThreshold);
+        assertEquals(testUnhealthyThreshold, hc.getUnhealthyThreshold());
     }
 
     /**
@@ -193,13 +270,20 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testToString() {
+        
         System.out.println("toString");
-        HealthCheckImpl instance = null;
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        
+        com.amazonaws.services.elasticloadbalancing.model.HealthCheck elbHealthCheck =
+                ((HealthCheckImpl)hc).asElbHealthCheck();
+        
+        assertEquals(elbHealthCheck.toString(), hc.toString());
     }
 
     /**
@@ -207,14 +291,39 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testEquals() {
+        
         System.out.println("equals");
-        Object o = null;
-        HealthCheckImpl instance = null;
-        boolean expResult = false;
-        boolean result = instance.equals(o);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc1 = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        HealthCheck hc2 = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        HealthCheck hc3 = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(1)
+                            .build();
+        
+        assertTrue(hc1.equals(hc1));
+        assertTrue(hc1.equals(hc2));
+        assertFalse(hc1.equals(hc3));
+        assertTrue(hc2.equals(hc1));
+        assertTrue(hc2.equals(hc2));
+        assertFalse(hc2.equals(hc3));
+        assertFalse(hc3.equals(hc1));
+        assertFalse(hc3.equals(hc2));
+        assertTrue(hc3.equals(hc3));
     }
 
     /**
@@ -222,13 +331,39 @@ public class HealthCheckImplTest {
      */
     @Test
     public void testHashCode() {
+        
         System.out.println("hashCode");
-        HealthCheckImpl instance = null;
-        int expResult = 0;
-        int result = instance.hashCode();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HealthCheck hc1 = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        HealthCheck hc2 = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(2)
+                            .build();
+        HealthCheck hc3 = new HealthCheckImpl.Builder()
+                            .healthyThreshold(10)
+                            .interval(30)
+                            .target("http:80/index.html")
+                            .timeout(30)
+                            .unhealthyThreshold(1)
+                            .build();
+
+        assertTrue(hc1.hashCode() == hc1.hashCode());
+        assertTrue(hc1.hashCode() == hc2.hashCode());
+        assertTrue(hc1.hashCode() != hc3.hashCode());
+        assertTrue(hc2.hashCode() == hc1.hashCode());
+        assertTrue(hc2.hashCode() == hc2.hashCode());
+        assertTrue(hc2.hashCode() != hc3.hashCode());
+        assertTrue(hc3.hashCode() != hc1.hashCode());
+        assertTrue(hc3.hashCode() != hc2.hashCode());
+        assertTrue(hc3.hashCode() == hc3.hashCode());
     }
     
 }
