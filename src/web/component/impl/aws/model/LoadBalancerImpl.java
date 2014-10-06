@@ -612,7 +612,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(!(healthCheck instanceof HealthCheckImpl))
             throw new IllegalArgumentException("invalid health check specified.");
         
-        elb().configureHealthCheck(name, ((HealthCheckImpl)healthCheck).asElbHealthCheck()).getHealthCheck();
+        elb().configureHealthCheck(name, ((HealthCheckImpl)healthCheck).asElbHealthCheck());
     }
     
     public void setHealthyThreshold(int healthyThreshold){
