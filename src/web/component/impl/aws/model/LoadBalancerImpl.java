@@ -607,35 +607,17 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
     }
 
     @Override
-    public void configureHealthCheck(HealthCheck healthCheck){
+    public HealthCheck configureHealthCheck(HealthCheck healthCheck){
         
         if(!(healthCheck instanceof HealthCheckImpl))
             throw new IllegalArgumentException("invalid health check specified.");
         
-        elb().configureHealthCheck(name, ((HealthCheckImpl)healthCheck).asElbHealthCheck());
+        com.amazonaws.services.elasticloadbalancing.model.HealthCheck elbHealthCheck = 
+            elb().configureHealthCheck(name, ((HealthCheckImpl)healthCheck).asElbHealthCheck()).getHealthCheck();
+        
+        return new HealthCheckImpl.Builder().build(elbHealthCheck);
     }
-    
-    public void setHealthyThreshold(int healthyThreshold){
-        HealthCheck hc = new HealthCheckImpl.Builder().healthyThreshold(healthyThreshold).build();
-        configureHealthCheck(hc);
-    }
-    public void setHealthCheckInterval(int interval){
-        HealthCheck hc = new HealthCheckImpl.Builder().interval(interval).build();
-        configureHealthCheck(hc);
-    }
-    public void setHealthCheckTarget(String target){
-        HealthCheck hc = new HealthCheckImpl.Builder().target(target).build();
-        configureHealthCheck(hc);
-    }
-    public void setHealthCheckTimeout(int timeout){
-        HealthCheck hc = new HealthCheckImpl.Builder().timeout(timeout).build();
-        configureHealthCheck(hc);
-    }
-    public void setUnhealthyThreshold(int unhealthyThreshold){
-        HealthCheck hc = new HealthCheckImpl.Builder().unhealthyThreshold(unhealthyThreshold).build();
-        configureHealthCheck(hc);
-    }
-    
+        
     @Override
     public boolean equals(Object toBeCompared){
         if(toBeCompared instanceof LoadBalancerImpl)

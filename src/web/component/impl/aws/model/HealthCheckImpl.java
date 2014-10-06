@@ -156,5 +156,12 @@ public class HealthCheckImpl extends AWSModelBase implements HealthCheck{
             
             return HealthCheckImpl.create(this);
         }
+        
+        //build instance from aws elb HealthCheck object.
+        //this method is supposed to be called only by LoadBalancerImpl class,
+        //in the context of calling configureHealthCheck method.
+        HealthCheck build(com.amazonaws.services.elasticloadbalancing.model.HealthCheck elbHealthCheck){
+            return new HealthCheckImpl(elbHealthCheck);
+        }
     }
 }
