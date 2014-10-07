@@ -37,6 +37,16 @@ public interface AutoScalingGroup extends Comparable<AutoScalingGroup>{
     public void detachInstances(List<Instance> instances);
     
     public void setDesiredCapacity(int desiredCapacity);
+    public void setZones(List<Zone> zones);
+    public void setDefaultCoolDown(int defaultCoolDown);
+    public void setHealthCheckGracePeriod(int healthCheckGracePeriod);
+    public void setHealthCheckType(String healthCheckType);
+    public void setLaunchConfigurationName(String launchConfigurationName);
+    public void setMaxSize(int maxSize);
+    public void setMinSize(int minSize);
+    public void setPlacementGroup(String placementGroup);
+    public void setVPCZoneIdentifier(String vpcZoneIdentifier);
+    public void setTerminationPolicies(List<String> terminationPolicies);
     
-    public void updateZones(List<Zone> zones);
+    public void delete();
 }

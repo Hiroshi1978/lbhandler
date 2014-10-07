@@ -16,13 +16,17 @@ import com.amazonaws.services.autoscaling.model.DeleteAutoScalingGroupRequest;
 import com.amazonaws.services.autoscaling.model.DeleteLaunchConfigurationRequest;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingGroupsRequest;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingGroupsResult;
+import com.amazonaws.services.autoscaling.model.DescribeLaunchConfigurationsRequest;
+import com.amazonaws.services.autoscaling.model.DescribeLaunchConfigurationsResult;
 import com.amazonaws.services.autoscaling.model.DetachInstancesRequest;
 import com.amazonaws.services.autoscaling.model.Instance;
+import com.amazonaws.services.autoscaling.model.LaunchConfiguration;
 import com.amazonaws.services.autoscaling.model.SetDesiredCapacityRequest;
+import com.amazonaws.services.autoscaling.model.TerminateInstanceInAutoScalingGroupRequest;
+import com.amazonaws.services.autoscaling.model.TerminateInstanceInAutoScalingGroupResult;
 import com.amazonaws.services.autoscaling.model.UpdateAutoScalingGroupRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import web.component.impl.CloudBlock;
 
@@ -154,12 +158,16 @@ public class AWSAutoScaling implements CloudBlock{
         awsHttpClient.createAutoScalingGroup(request);
     }
 
-    public void createAutoScalingGroup(String autoScalingGroupName, int maxSize, int minSize){
+    public void createAutoScalingGroup(String autoScalingGroupName, int maxSize, int minSize, String instanceId, String launchConfigurationName){
      
         CreateAutoScalingGroupRequest request = new CreateAutoScalingGroupRequest();
         request.setAutoScalingGroupName(autoScalingGroupName);
         request.setMaxSize(maxSize);
         request.setMinSize(minSize);
+        if(instanceId != null && !instanceId.isEmpty())
+            request.setInstanceId(instanceId);
+        if(launchConfigurationName != null && !launchConfigurationName.isEmpty())
+            request.setLaunchConfigurationName(launchConfigurationName);
         
         createAutoScalingGroup(request);
     }
@@ -210,7 +218,48 @@ public class AWSAutoScaling implements CloudBlock{
     }
 
     public AutoScalingGroup getExistAutoScalingGroupByName(String autoScalingGroupName){
-        return describeAutoScalingGroup(autoScalingGroupName).getAutoScalingGroups().get(0);
+        
+        List<AutoScalingGroup> existASGroups = describeAutoScalingGroup(autoScalingGroupName).getAutoScalingGroups();
+        AutoScalingGroup existOne = null;
+        if(existASGroups != null && !existASGroups.isEmpty())
+            existOne = existASGroups.get(0);
+        
+        return existOne;
+    }
+    
+    public DescribeLaunchConfigurationsResult describeLaunchConfigurations(){
+        
+        return awsHttpClient.describeLaunchConfigurations();
+    }
+    public DescribeLaunchConfigurationsResult describeLaunchConfigurations(DescribeLaunchConfigurationsRequest request){
+        
+        if(request.getLaunchConfigurationNames() == null || request.getLaunchConfigurationNames().isEmpty())
+            throw new IllegalArgumentException("Launch configuration names not specified.");
+        
+        return awsHttpClient.describeLaunchConfigurations(request);
+    }
+    public DescribeLaunchConfigurationsResult describeLaunchConfigurations(List<String> launchConfigurationNames){
+        
+        DescribeLaunchConfigurationsRequest request = new DescribeLaunchConfigurationsRequest();
+        request.setLaunchConfigurationNames(launchConfigurationNames);
+        
+        return describeLaunchConfigurations(request);
+    }
+    public DescribeLaunchConfigurationsResult describeLaunchConfiguration(String launchConfigurationName){
+        
+        List<String> launchConfigurationNames = new ArrayList<>();
+        launchConfigurationNames.add(launchConfigurationName);
+        
+        return describeLaunchConfigurations(launchConfigurationNames);
+    }
+    public LaunchConfiguration getExistLaunchConfiguration(String launchConfigurationName){
+        
+        List<LaunchConfiguration> lcs = describeLaunchConfiguration(launchConfigurationName).getLaunchConfigurations();
+        LaunchConfiguration existOne = null;
+        if(lcs != null && !lcs.isEmpty())
+            existOne = lcs.get(0);
+        
+        return existOne;
     }
     
     public List<String> getAttachedInstanceIds(String autoScalingGroupName){
@@ -347,5 +396,31 @@ public class AWSAutoScaling implements CloudBlock{
         request.setAutoScalingGroupName(autoScalingGroupName);
         request.setTerminationPolicies(terminationPolicies);
         updateAutoScalingGroup(request);
+    }
+    
+    public TerminateInstanceInAutoScalingGroupResult terminateInstanceInAutoScalingGroup(TerminateInstanceInAutoScalingGroupRequest request){
+        
+        if(request.getInstanceId() == null || request.getInstanceId().isEmpty())
+            throw new IllegalArgumentException("Instance ID not specified.");
+        if(request.getShouldDecrementDesiredCapacity() == null)
+            throw new IllegalArgumentException("Whether decrease desired capacity or not is not specified.");
+
+        return awsHttpClient.terminateInstanceInAutoScalingGroup(request);
+    }
+    public TerminateInstanceInAutoScalingGroupResult terminateInstanceInAutoScalingGroup(String instanceId){
+        
+        TerminateInstanceInAutoScalingGroupRequest request = new TerminateInstanceInAutoScalingGroupRequest();
+        request.setInstanceId(instanceId);
+        request.setShouldDecrementDesiredCapacity(false);
+
+        return terminateInstanceInAutoScalingGroup(request);
+    }
+    public TerminateInstanceInAutoScalingGroupResult terminateInstanceInAutoScalingGroupDecreasingDesiredCapacity(String instanceId){
+        
+        TerminateInstanceInAutoScalingGroupRequest request = new TerminateInstanceInAutoScalingGroupRequest();
+        request.setInstanceId(instanceId);
+        request.setShouldDecrementDesiredCapacity(true);
+
+        return terminateInstanceInAutoScalingGroup(request);
     }
 }

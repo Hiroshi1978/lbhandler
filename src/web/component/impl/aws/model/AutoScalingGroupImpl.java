@@ -30,18 +30,24 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
     private static AutoScalingGroup create(Builder builder){
         
         AWSAutoScaling as = (AWSAutoScaling)AWS.access().get(AWS.BlockName.AutoScaling);
-        as.createAutoScalingGroup(builder.name, builder.maxSize, builder.minSize);
+        
+        as.createAutoScalingGroup(
+                builder.name, 
+                builder.maxSize, 
+                builder.minSize, 
+                builder.instanceId, 
+                builder.launchConfigurationName
+            );
         return new AutoScalingGroupImpl(builder.name);
     }
     
     private static AutoScalingGroup get(Builder builder){
         
         AWSAutoScaling as = (AWSAutoScaling)AWS.access().get(AWS.BlockName.AutoScaling);
-        try{
-            as.getExistAutoScalingGroupByName(builder.name);
-        }catch(Exception e){
-            throw new RuntimeException("auto scaling group with the specified name [" + builder.name + "] not found.",e);
-        }
+
+        if(as.getExistAutoScalingGroupByName(builder.name) == null)
+            throw new RuntimeException("auto scaling group with the specified name [" + builder.name + "] not found.");
+        
         return new AutoScalingGroupImpl(builder.name);
     }
     
@@ -206,7 +212,8 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
         as().detachInstance(name, instance.getId());
     }
     
-    public void updateZones(List<Zone> zones){
+    @Override
+    public void setZones(List<Zone> zones){
         
         List<String> zoneNames = new ArrayList<>();
         for(Zone z : zones)
@@ -214,12 +221,66 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
         
         as().updateAutoScalingGroupAvailabilityZones(name, zoneNames);
     }
+
+    @Override
+    public void setDefaultCoolDown(int defaultCoolDown) {
+        as().updateAutoScalingGroupDefaultCoolDown(name, defaultCoolDown);
+    }
+
+    @Override
+    public void setHealthCheckGracePeriod(int healthCheckGracePeriod) {
+        as().updateAutoScalingGroupHealthCheckGracePeriod(name, healthCheckGracePeriod);
+    }
+
+    @Override
+    public void setHealthCheckType(String healthCheckType) {
+        as().updateAutoScalingGroupHealthCheckType(name, healthCheckType);
+    }
+
+    @Override
+    public void setLaunchConfigurationName(String launchConfigurationName) {
+        as().updateAutoScalingGroupLaunchConfigurationName(name, launchConfigurationName);
+    }
+
+    @Override
+    public void setMaxSize(int maxSize) {
+        as().updateAutoScalingGroupMaxSize(name, maxSize);
+    }
+
+    @Override
+    public void setMinSize(int minSize) {
+        as().updateAutoScalingGroupMinSize(name, minSize);
+    }
+
+    @Override
+    public void setPlacementGroup(String placementGroup) {
+        as().updateAutoScalingGroupPlacementGroup(name, placementGroup);
+    }
+
+    @Override
+    public void setVPCZoneIdentifier(String vpcZoneIdentifier) {
+        as().updateAutoScalingGroupVPCZoneIdentifier(name, vpcZoneIdentifier);
+    }
+
+    @Override
+    public void setTerminationPolicies(List<String> terminationPolicies) {
+        as().updateAutoScalingGroupTerminationPolicies(name, terminationPolicies);
+    }
+    
+    @Override
+    public void delete(){
+        
+        if(as().getExistAutoScalingGroupByName(name) != null)
+            as().deleteAutoScalingGroup(name);
+    }
     
     static class Builder {
 
         private String name;
         private int maxSize;
         private int minSize;
+        private String instanceId;
+        private String launchConfigurationName;
         
         public Builder name(String name){
             this.name = name;
@@ -233,6 +294,14 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
             this.minSize = min;
             return this;
         }
+        public Builder instanceId(String instanceId){
+            this.instanceId = instanceId;
+            return this;
+        }
+        public Builder launchConfiguration(String lc){
+            this.launchConfigurationName = lc;
+            return this;
+        }
         
         public AutoScalingGroup create(){
             
@@ -240,6 +309,9 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
                 throw new IllegalArgumentException("Auto scaling group name and max size and min size are required.");
             if(maxSize < minSize)
                 throw new IllegalArgumentException("Max size must be equal to or larger than min size.");
+            if((instanceId == null || instanceId.isEmpty()) &&
+                    (launchConfigurationName == null || launchConfigurationName.isEmpty()))
+                throw new IllegalArgumentException("Either instancd ID or launch configuration name must be specified.");
             
             return AutoScalingGroupImpl.create(this);
         }
