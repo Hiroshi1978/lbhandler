@@ -111,7 +111,7 @@ public class InstanceImplTestForEc2InstanceBehavior {
         System.out.println("asEc2Instance");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
         
-        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = AWS.access().ec2();
         com.amazonaws.services.ec2.model.Instance source = ec2.getExistEc2Instance(testInstanceIds.get(0));
         com.amazonaws.services.ec2.model.Instance viewAsEc2Instance = ((InstanceImpl)testInstance).asEc2Instance();
 
@@ -439,7 +439,7 @@ public class InstanceImplTestForEc2InstanceBehavior {
         System.out.println("getStateName");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
         
-        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = AWS.access().ec2();
         String expectedStateName = ec2.getInstanceState(testInstance.getId()).getName();
         assertEquals(expectedStateName, testInstance.getStateName());
         
@@ -451,7 +451,7 @@ public class InstanceImplTestForEc2InstanceBehavior {
         System.out.println("getStateCode");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
         
-        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = AWS.access().ec2();
         int expectedStateCode = ec2.getInstanceState(testInstance.getId()).getCode();
         assertEquals(expectedStateCode, (int)testInstance.getStateCode());
         
@@ -463,7 +463,7 @@ public class InstanceImplTestForEc2InstanceBehavior {
         System.out.println("getStateTransitionReason");
         Instance testInstance = testInstances.get(testInstanceIds.get(0));
         
-        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = AWS.access().ec2();
         String expectedStateTransitionReason = ec2.getInstanceStateTransitionReason(testInstance.getId());
         assertEquals(expectedStateTransitionReason, testInstance.getStateTransitionReason());        
     }

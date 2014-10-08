@@ -81,7 +81,7 @@ public class VPCImplTest {
         
         System.out.println("asEc2Vpc");
         
-        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = AWS.access().ec2();
         com.amazonaws.services.ec2.model.Vpc source = ec2.getExistEc2Vpc(testInstance.getId());
         com.amazonaws.services.ec2.model.Vpc viewAsEc2Vpc = ((VPCImpl)testInstance).asEc2Vpc();
         
@@ -184,7 +184,7 @@ public class VPCImplTest {
         }
         VPC shouldHaveBeenDeleted = new VPCImpl.Builder().id(deletedId).get();
         
-        AWSEC2 ec2 = (AWSEC2) AWS.access().get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = AWS.access().ec2();
         assertEquals(null, ec2.getExistEc2Vpc(deletedId));
         assertEquals("Unknown state", shouldHaveBeenDeleted.getState());
     }

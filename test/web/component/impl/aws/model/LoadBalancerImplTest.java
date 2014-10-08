@@ -612,7 +612,7 @@ public class LoadBalancerImplTest {
         System.out.println("getListeners");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         
-        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
+        AWSELB elb = AWS.access().elb();
         List<ListenerDescription> descs = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getListenerDescriptions();
         List<LoadBalancerListener> expectedList = new ArrayList<>();
         for(ListenerDescription desc : descs)
@@ -631,7 +631,7 @@ public class LoadBalancerImplTest {
         
         System.out.println("getZones");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
-        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
+        AWSELB elb = AWS.access().elb();
         List<String> expectedZoneNames = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getAvailabilityZones();
         
         List<Zone> expectedZones = new ArrayList<>();
@@ -650,7 +650,7 @@ public class LoadBalancerImplTest {
         System.out.println("getSubnets");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         
-        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
+        AWSELB elb = AWS.access().elb();
         List<String> expectedSubnetIds = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getSubnets();
         
         List<Subnet> expectedSubnets = new ArrayList<>();
@@ -876,7 +876,7 @@ public class LoadBalancerImplTest {
         System.out.println("toString");
         LoadBalancer testLb = testLbs.get(testLbNames.get(0));
         
-        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
+        AWSELB elb = AWS.access().elb();
         String expectedStringExpression = elb.getLoadBalancerDescription(testLb.getName()).toString();
 
         assertEquals(expectedStringExpression, testLb.toString());
@@ -916,7 +916,7 @@ public class LoadBalancerImplTest {
         testLb2.delete();
         testLb3.delete();
     }
-    
+
     /**
      * Test of configureHealthCheck method, of class LoadBalancerImpl.
      */

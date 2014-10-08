@@ -163,7 +163,7 @@ public class InstanceImplTestForElbInstanceBehavior {
             }
         }
         
-        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
+        AWSELB elb = AWS.access().elb();
         com.amazonaws.services.elasticloadbalancing.model.Instance source = elb.describeLoadBalancers(testLb.getName()).getLoadBalancerDescriptions().get(0).getInstances().get(0);
         com.amazonaws.services.elasticloadbalancing.model.Instance viewAsElbInstance = ((InstanceImpl)testInstance).asElbInstance();
 
