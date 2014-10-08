@@ -27,7 +27,7 @@ public class LaunchConfigurationImpl extends AWSModelBase implements LaunchConfi
     
     private static LaunchConfiguration create(Builder builder){
         
-        AWSAutoScaling as = (AWSAutoScaling)AWS.access().get(AWS.BlockName.AutoScaling);
+        AWSAutoScaling as = AWS.access().as();
         CreateLaunchConfigurationRequest request = new CreateLaunchConfigurationRequest();
         
         request.setAssociatePublicIpAddress(builder.associatePublicIpAddress);
@@ -45,15 +45,19 @@ public class LaunchConfigurationImpl extends AWSModelBase implements LaunchConfi
         request.setSpotPrice(builder.spotPrice);
         request.setUserData(builder.userData);
         
-        as.createLaunchConfiguration(builder.name);
+        as.createLaunchConfiguration(request);
         
         return new LaunchConfigurationImpl(as.getExistLaunchConfiguration(builder.name));
     }
     
     private static LaunchConfiguration get(Builder builder){
         
-        AWSAutoScaling as = (AWSAutoScaling)AWS.access().get(AWS.BlockName.AutoScaling);
+        AWSAutoScaling as = AWS.access().as();
         return new LaunchConfigurationImpl(as.getExistLaunchConfiguration(builder.name));
+    }
+
+    LaunchConfigurationImpl() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     private com.amazonaws.services.autoscaling.model.LaunchConfiguration copyAwsLaunchConfiguration(
@@ -185,6 +189,16 @@ public class LaunchConfigurationImpl extends AWSModelBase implements LaunchConfi
     @Override
     public int hashCode() {
         return 31 * awsLaunchConfiguration.hashCode();
+    }
+
+    @Override
+    public boolean isAssociatePublicIpAddress() {
+        return awsLaunchConfiguration.isAssociatePublicIpAddress();
+    }
+
+    @Override
+    public boolean isEbsOptimized() {
+        return awsLaunchConfiguration.isEbsOptimized();
     }
     
     

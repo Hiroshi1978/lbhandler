@@ -29,7 +29,7 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
     
     private static AutoScalingGroup create(Builder builder){
         
-        AWSAutoScaling as = (AWSAutoScaling)AWS.access().get(AWS.BlockName.AutoScaling);
+        AWSAutoScaling as = AWS.access().as();
         
         as.createAutoScalingGroup(
                 builder.name, 
@@ -43,7 +43,7 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
     
     private static AutoScalingGroup get(Builder builder){
         
-        AWSAutoScaling as = (AWSAutoScaling)AWS.access().get(AWS.BlockName.AutoScaling);
+        AWSAutoScaling as = AWS.access().as();
 
         if(as.getExistAutoScalingGroupByName(builder.name) == null)
             throw new RuntimeException("auto scaling group with the specified name [" + builder.name + "] not found.");

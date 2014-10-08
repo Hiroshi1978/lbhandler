@@ -51,7 +51,7 @@ public class AWS implements Cloud{
         return INSTANCE;
     }
     
-    public final CloudBlock get(BlockName name){
+    private final CloudBlock get(BlockName name){
         
         CloudBlock cb = components.get(name);
         
@@ -97,7 +97,17 @@ public class AWS implements Cloud{
         return new BasicAWSCredentials(awsKey, secretKey);
     }
     
-    public static enum BlockName{
+    public AWSAutoScaling as(){
+        return (AWSAutoScaling)get(BlockName.AutoScaling);
+    }
+    public AWSEC2 ec2(){
+        return (AWSEC2)get(BlockName.EC2);
+    }
+    public AWSELB elb(){
+        return (AWSELB)get(BlockName.ELB);
+    }
+    
+    private static enum BlockName{
         EC2,ELB,AutoScaling;
     }
 }

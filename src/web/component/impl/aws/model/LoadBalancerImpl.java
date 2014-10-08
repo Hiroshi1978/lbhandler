@@ -330,7 +330,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
     public static LoadBalancer getExistLoadBalancerByName(String name){
         
         LoadBalancer loadBalancer = null;
-        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
+        AWSELB elb = AWS.access().elb();
 
         try{
             LoadBalancerDescription description = elb.getLoadBalancerDescription(name);
@@ -601,7 +601,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
 
     private static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
 
-        AWSELB elb = (AWSELB)AWS.access().get(AWS.BlockName.ELB);
+        AWSELB elb = AWS.access().elb();
         DescribeLoadBalancersResult result = elb.describeLoadBalancers();
         return result;
     }
