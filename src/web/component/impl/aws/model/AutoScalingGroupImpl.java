@@ -36,7 +36,9 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
                 builder.maxSize, 
                 builder.minSize, 
                 builder.instanceId, 
-                builder.launchConfigurationName
+                builder.launchConfigurationName,
+                builder.zoneNames,
+                builder.vpcZoneIdentifier
             );
         return new AutoScalingGroupImpl(builder.name);
     }
@@ -281,6 +283,8 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
         private int minSize;
         private String instanceId;
         private String launchConfigurationName;
+        private List<String> zoneNames;
+        private String vpcZoneIdentifier;
         
         public Builder name(String name){
             this.name = name;
@@ -302,6 +306,14 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
             this.launchConfigurationName = lc;
             return this;
         }
+        public Builder zones(List<String> zones){
+            this.zoneNames = zones;
+            return this;
+        }
+        public Builder vpcZoneIdentifier(String vpcZoneIdentifier){
+            this.vpcZoneIdentifier = vpcZoneIdentifier;
+            return this;
+        }
         
         public AutoScalingGroup create(){
             
@@ -312,7 +324,13 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
             if((instanceId == null || instanceId.isEmpty()) &&
                     (launchConfigurationName == null || launchConfigurationName.isEmpty()))
                 throw new IllegalArgumentException("Either instancd ID or launch configuration name must be specified.");
-            
+            if((instanceId != null && !instanceId.isEmpty()) &&
+                    (launchConfigurationName != null && !launchConfigurationName.isEmpty()))
+                throw new IllegalArgumentException("Either instancd ID or launch configuration name must be specified.");
+            if((zoneNames == null || zoneNames.isEmpty()) &&
+                    (vpcZoneIdentifier != null && vpcZoneIdentifier.isEmpty()))
+                throw new IllegalArgumentException("Either availability zone or VPC zone identifier must be specified.");
+           
             return AutoScalingGroupImpl.create(this);
         }
         

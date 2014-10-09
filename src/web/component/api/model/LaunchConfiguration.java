@@ -29,4 +29,7 @@ public interface LaunchConfiguration extends Comparable<LaunchConfiguration>{
     public String getUserData();
     
     public void delete();
+    
+    public boolean isAssociatePublicIpAddress();
+    public boolean isEbsOptimized();
 }

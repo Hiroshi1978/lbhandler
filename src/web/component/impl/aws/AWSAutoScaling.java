@@ -154,11 +154,27 @@ public class AWSAutoScaling implements CloudBlock{
             throw new IllegalArgumentException("Max size not specified.");
         if(request.getMinSize() == null)
             throw new IllegalArgumentException("Min size not specified.");
-
+        if((request.getLaunchConfigurationName() == null || request.getLaunchConfigurationName().isEmpty()) &&
+                (request.getInstanceId() == null || request.getInstanceId().isEmpty()))
+            throw new IllegalArgumentException("Either launch configuration name or instance ID must be specified.");
+        if((request.getLaunchConfigurationName() != null && !request.getLaunchConfigurationName().isEmpty()) &&
+                (request.getInstanceId() != null && !request.getInstanceId().isEmpty()))
+            throw new IllegalArgumentException("Either launch configuration name or instance ID must be specified.");
+        if((request.getAvailabilityZones() == null || request.getAvailabilityZones().isEmpty()) &&
+                request.getVPCZoneIdentifier() == null)
+            throw new IllegalArgumentException("At least one availability zone or VPC subnet must be specified.");
+        
         awsHttpClient.createAutoScalingGroup(request);
     }
 
-    public void createAutoScalingGroup(String autoScalingGroupName, int maxSize, int minSize, String instanceId, String launchConfigurationName){
+    public void createAutoScalingGroup(
+                String autoScalingGroupName, 
+                int maxSize, 
+                int minSize, 
+                String instanceId, 
+                String launchConfigurationName,
+                List<String> zoneNames,
+                String vpcZoneIdentifier){
      
         CreateAutoScalingGroupRequest request = new CreateAutoScalingGroupRequest();
         request.setAutoScalingGroupName(autoScalingGroupName);
@@ -168,6 +184,10 @@ public class AWSAutoScaling implements CloudBlock{
             request.setInstanceId(instanceId);
         if(launchConfigurationName != null && !launchConfigurationName.isEmpty())
             request.setLaunchConfigurationName(launchConfigurationName);
+        if(zoneNames != null && !zoneNames.isEmpty())
+            request.setAvailabilityZones(zoneNames);
+        if(vpcZoneIdentifier != null && !vpcZoneIdentifier.isEmpty())
+            request.setVPCZoneIdentifier(vpcZoneIdentifier);
         
         createAutoScalingGroup(request);
     }
