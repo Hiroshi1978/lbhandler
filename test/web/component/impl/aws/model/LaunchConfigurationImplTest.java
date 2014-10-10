@@ -411,9 +411,4 @@ public class LaunchConfigurationImplTest {
         lc.delete();
         assertEquals(false, asImpl.exists());
     }
-
-    private Object LaunchConfigurationImpl(LaunchConfigurationImpl launchConfigurationImpl) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }
