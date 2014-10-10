@@ -201,6 +201,14 @@ public class LaunchConfigurationImpl extends AWSModelBase implements LaunchConfi
         return awsLaunchConfiguration.isEbsOptimized();
     }
     
+    @Override
+    public boolean exists(){
+        
+        com.amazonaws.services.autoscaling.model.LaunchConfiguration awsLc =
+                as().getExistLaunchConfiguration(getName());
+        
+        return awsLc != null;
+    }
     
     static class Builder{
         

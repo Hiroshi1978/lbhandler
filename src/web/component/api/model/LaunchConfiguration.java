@@ -32,4 +32,6 @@ public interface LaunchConfiguration extends Comparable<LaunchConfiguration>{
     
     public boolean isAssociatePublicIpAddress();
     public boolean isEbsOptimized();
+    
+    public boolean exists();
 }

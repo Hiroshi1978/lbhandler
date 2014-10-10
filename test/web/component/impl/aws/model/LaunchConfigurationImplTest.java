@@ -387,5 +387,33 @@ public class LaunchConfigurationImplTest {
         assertEquals(true, lc.isEbsOptimized());
 
     }
+
+    /**
+     * Test of exists method, of class LaunchConfigurationImpl.
+     */
+    @Test
+    public void testExists() {
+        
+        System.out.println("exists");
+        String lcName = "test-lc-for-exists";
+        LaunchConfiguration lc = new LaunchConfigurationImpl.Builder()
+                .associatePublicIpAddress(true)
+                .ebsOptimized(true)
+                .instanceId(testInstanceIds.get(0))
+                .name(lcName)
+                .create();
+        testLaunchConfigurationNames.add(lcName);
+        testLaunchConfigurations.put(lcName, lc);
+        
+        LaunchConfigurationImpl asImpl = (LaunchConfigurationImpl)lc;
+        assertEquals(true, asImpl.exists());
+        
+        lc.delete();
+        assertEquals(false, asImpl.exists());
+    }
+
+    private Object LaunchConfigurationImpl(LaunchConfigurationImpl launchConfigurationImpl) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }
