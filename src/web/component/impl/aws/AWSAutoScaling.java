@@ -174,12 +174,14 @@ public class AWSAutoScaling implements CloudBlock{
                 String instanceId, 
                 String launchConfigurationName,
                 List<String> zoneNames,
-                String vpcZoneIdentifier){
+                String vpcZoneIdentifier,
+                int desiredCapacity){
      
         CreateAutoScalingGroupRequest request = new CreateAutoScalingGroupRequest();
         request.setAutoScalingGroupName(autoScalingGroupName);
         request.setMaxSize(maxSize);
         request.setMinSize(minSize);
+        request.setDesiredCapacity(desiredCapacity);
         if(instanceId != null && !instanceId.isEmpty())
             request.setInstanceId(instanceId);
         if(launchConfigurationName != null && !launchConfigurationName.isEmpty())
