@@ -38,7 +38,8 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
                 builder.instanceId, 
                 builder.launchConfigurationName,
                 builder.zoneNames,
-                builder.vpcZoneIdentifier
+                builder.vpcZoneIdentifier,
+                builder.desiredCapacity
             );
         return new AutoScalingGroupImpl(builder.name);
     }
@@ -276,11 +277,17 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
             as().deleteAutoScalingGroup(name);
     }
     
+    @Override
+    public boolean exists(){
+        return as().getExistAutoScalingGroupByName(name) != null;
+    }
+    
     static class Builder {
 
         private String name;
         private int maxSize;
         private int minSize;
+        private int desiredCapacity;
         private String instanceId;
         private String launchConfigurationName;
         private List<String> zoneNames;
@@ -298,6 +305,11 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
             this.minSize = min;
             return this;
         }
+        public Builder desiredCapacity(int desiredCapacity){
+            this.desiredCapacity = desiredCapacity;
+            return this;
+        }
+        
         public Builder instanceId(String instanceId){
             this.instanceId = instanceId;
             return this;

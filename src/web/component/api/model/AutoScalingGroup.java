@@ -49,4 +49,5 @@ public interface AutoScalingGroup extends Comparable<AutoScalingGroup>{
     public void setTerminationPolicies(List<String> terminationPolicies);
     
     public void delete();
+    public boolean exists();
 }
