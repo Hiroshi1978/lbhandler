@@ -9,6 +9,7 @@ package web.component.impl.aws.model;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import web.component.api.model.AutoScalingGroup;
 import web.component.api.model.Instance;
 import web.component.api.model.Zone;
@@ -77,6 +78,10 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
         copy.setVPCZoneIdentifier(source.getVPCZoneIdentifier());
         
         return copy;
+    }
+    
+    com.amazonaws.services.autoscaling.model.AutoScalingGroup asAwsAutoScalingGroup(){
+        return as().getExistAutoScalingGroupByName(name);
     }
     
     @Override
@@ -280,6 +285,30 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
     @Override
     public boolean exists(){
         return as().getExistAutoScalingGroupByName(name) != null;
+    }
+    
+    @Override
+    public String toString(){
+        return as().getExistAutoScalingGroupByName(name).toString();
+    }
+    
+    @Override
+    public boolean equals(Object o){
+        
+        if(o instanceof AutoScalingGroupImpl){
+            AutoScalingGroupImpl asImpl = (AutoScalingGroupImpl)o;
+            com.amazonaws.services.autoscaling.model.AutoScalingGroup thisAwsASGroup
+                    = as().getExistAutoScalingGroupByName(name);
+            com.amazonaws.services.autoscaling.model.AutoScalingGroup awsASGroupToCompare
+                    = asImpl.asAwsAutoScalingGroup();
+            return thisAwsASGroup.equals(awsASGroupToCompare);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * as().getExistAutoScalingGroupByName(name).hashCode();
     }
     
     static class Builder {

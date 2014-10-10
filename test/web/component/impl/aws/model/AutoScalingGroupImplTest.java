@@ -8,12 +8,9 @@ package web.component.impl.aws.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -39,9 +36,11 @@ public class AutoScalingGroupImplTest {
     
     private static final Map<String,AutoScalingGroup> testASGroups = new HashMap<>();
     private static final List<String> testASGroupNames = new ArrayList<>();
-
-    private static final int testMaxSize = 4;
+    private static final Map<String, com.amazonaws.services.autoscaling.model.AutoScalingGroup> awsASGroups = new HashMap<>();
+    
+    private static final int testMaxSize = 1;
     private static final int testMinSize = 1;
+    private static final int testDesiredCapacity = 1;
     
     private static final Map<String,Instance> testInstances = new HashMap<>();
     private static List<String> testInstanceIds;
@@ -92,7 +91,7 @@ public class AutoScalingGroupImplTest {
     
     static private void getExistTestInstances(){
 
-        String[] existInstanceIds = {"",""};
+        String[] existInstanceIds = {""};
         testInstanceIds = Arrays.asList(existInstanceIds);
         
         for(String testInstanceId : testInstanceIds){
@@ -145,27 +144,8 @@ public class AutoScalingGroupImplTest {
                 .name(testGroupName1)
                 .max(testMaxSize)
                 .min(testMinSize)
+                .desiredCapacity(testDesiredCapacity)
                 //.launchConfiguration(testLaunchConfigurationNames.get(0))
-                .instanceId(testInstanceIds.get(0))
-                .zones(Arrays.asList(new String[]{testZoneName}))
-                .create();
-        
-        String testGroupName2 = "test-asg-2";
-        AutoScalingGroup testGroup2 = new AutoScalingGroupImpl.Builder()
-                .name(testGroupName2)
-                .max(testMaxSize)
-                .min(testMinSize)
-                //.launchConfiguration(testLaunchConfigurationNames.get(1))
-                .instanceId(testInstanceIds.get(0))
-                .zones(Arrays.asList(new String[]{testZoneName}))
-                .create();
-        
-        String testGroupName3 = "test-asg-3";
-        AutoScalingGroup testGroup3 = new AutoScalingGroupImpl.Builder()
-                .name(testGroupName3)
-                .max(testMaxSize)
-                .min(testMinSize)
-                //.launchConfiguration(testLaunchConfigurationNames.get(2))
                 .instanceId(testInstanceIds.get(0))
                 .zones(Arrays.asList(new String[]{testZoneName}))
                 .create();
@@ -177,16 +157,7 @@ public class AutoScalingGroupImplTest {
         String testLcName1 = testGroup1.getLaunchConfigurationName();
         testLaunchConfigurationNames.add(testLcName1);
         testLaunchConfigurations.put(testLcName1, new LaunchConfigurationImpl.Builder().name(testLcName1).get());
-        testASGroupNames.add(testGroupName2);
-        testASGroups.put(testGroupName2, testGroup2);        
-        String testLcName2 = testGroup2.getLaunchConfigurationName();
-        testLaunchConfigurationNames.add(testLcName2);
-        testLaunchConfigurations.put(testLcName2, new LaunchConfigurationImpl.Builder().name(testLcName2).get());
-        testASGroupNames.add(testGroupName3);
-        testASGroups.put(testGroupName3, testGroup3);
-        String testLcName3 = testGroup3.getLaunchConfigurationName();
-        testLaunchConfigurationNames.add(testLcName3);
-        testLaunchConfigurations.put(testLcName3, new LaunchConfigurationImpl.Builder().name(testLcName3).get());
+        awsASGroups.put(testGroupName1, as.getExistAutoScalingGroupByName(testGroupName1));
         
         for(String groupName : testASGroupNames)
             System.out.println("test autoscaling group " + groupName + " created.");
@@ -212,13 +183,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetAutoScalingGroupARN() {
+        
         System.out.println("getAutoScalingGroupARN");
-        AutoScalingGroupImpl instance = null;
-        String expResult = "";
-        String result = instance.getAutoScalingGroupARN();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getAutoScalingGroupARN(), testGroup.getAutoScalingGroupARN());
     }
 
     /**
@@ -226,13 +196,10 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetName() {
+        
         System.out.println("getName");
-        AutoScalingGroupImpl instance = null;
-        String expResult = "";
-        String result = instance.getName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        assertEquals(testASGroupNames.get(0), testGroup.getName());
     }
 
     /**
@@ -240,13 +207,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetZones() {
+
         System.out.println("getZones");
-        AutoScalingGroupImpl instance = null;
-        List<String> expResult = null;
-        List<String> result = instance.getZones();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getAvailabilityZones(), testGroup.getZones());
     }
 
     /**
@@ -254,13 +220,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetCreatedTime() {
+        
         System.out.println("getCreatedTime");
-        AutoScalingGroupImpl instance = null;
-        Date expResult = null;
-        Date result = instance.getCreatedTime();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getCreatedTime(), testGroup.getCreatedTime());
     }
 
     /**
@@ -268,13 +233,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetDefaultCoolDown() {
+        
         System.out.println("getDefaultCoolDown");
-        AutoScalingGroupImpl instance = null;
-        int expResult = 0;
-        int result = instance.getDefaultCoolDown();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals((int)awsGroup.getDefaultCooldown(), testGroup.getDefaultCoolDown());
     }
 
     /**
@@ -282,27 +246,25 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetDesiredCapacity() {
+        
         System.out.println("getDesiredCapacity");
-        AutoScalingGroupImpl instance = null;
-        int expResult = 0;
-        int result = instance.getDesiredCapacity();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals((int)awsGroup.getDesiredCapacity(), testGroup.getDesiredCapacity());
+   }
 
     /**
      * Test of getHealthCheckGracePeriod method, of class AutoScalingGroupImpl.
      */
     @Test
     public void testGetHealthCheckGracePeriod() {
+        
         System.out.println("getHealthCheckGracePeriod");
-        AutoScalingGroupImpl instance = null;
-        int expResult = 0;
-        int result = instance.getHealthCheckGracePeriod();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals((int)awsGroup.getHealthCheckGracePeriod(), testGroup.getHealthCheckGracePeriod());
     }
 
     /**
@@ -310,13 +272,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetHealthCheckType() {
+        
         System.out.println("getHealthCheckType");
-        AutoScalingGroupImpl instance = null;
-        String expResult = "";
-        String result = instance.getHealthCheckType();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getHealthCheckType(), testGroup.getHealthCheckType());
     }
 
     /**
@@ -324,13 +285,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetInstances() {
+        
         System.out.println("getInstances");
-        AutoScalingGroupImpl instance = null;
-        List<Instance> expResult = null;
-        List<Instance> result = instance.getInstances();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getInstances(), testGroup.getInstances());
     }
 
     /**
@@ -338,13 +298,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetLaunchConfigurationName() {
+        
         System.out.println("getLaunchConfigurationName");
-        AutoScalingGroupImpl instance = null;
-        String expResult = "";
-        String result = instance.getLaunchConfigurationName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getLaunchConfigurationName(), testGroup.getLaunchConfigurationName());
     }
 
     /**
@@ -352,13 +311,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetLoadBalancerNames() {
+        
         System.out.println("getLoadBalancerNames");
-        AutoScalingGroupImpl instance = null;
-        List<String> expResult = null;
-        List<String> result = instance.getLoadBalancerNames();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getLoadBalancerNames(), testGroup.getLoadBalancerNames());
     }
 
     /**
@@ -366,13 +324,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetMaxSize() {
+
         System.out.println("getMaxSize");
-        AutoScalingGroupImpl instance = null;
-        int expResult = 0;
-        int result = instance.getMaxSize();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals((int)awsGroup.getMaxSize(), testGroup.getMaxSize());
     }
 
     /**
@@ -380,13 +337,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetMinSize() {
+
         System.out.println("getMinSize");
-        AutoScalingGroupImpl instance = null;
-        int expResult = 0;
-        int result = instance.getMinSize();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals((int)awsGroup.getMinSize(), testGroup.getMinSize());
     }
 
     /**
@@ -394,13 +350,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetPlacementGroup() {
+        
         System.out.println("getPlacementGroup");
-        AutoScalingGroupImpl instance = null;
-        String expResult = "";
-        String result = instance.getPlacementGroup();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getPlacementGroup(), testGroup.getPlacementGroup());
     }
 
     /**
@@ -408,13 +363,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetStatus() {
+        
         System.out.println("getStatus");
-        AutoScalingGroupImpl instance = null;
-        String expResult = "";
-        String result = instance.getStatus();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getStatus(), testGroup.getStatus());
     }
 
     /**
@@ -422,13 +376,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetTerminationPolicies() {
+        
         System.out.println("getTerminationPolicies");
-        AutoScalingGroupImpl instance = null;
-        List<String> expResult = null;
-        List<String> result = instance.getTerminationPolicies();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getTerminationPolicies(), testGroup.getTerminationPolicies());
     }
 
     /**
@@ -436,13 +389,12 @@ public class AutoScalingGroupImplTest {
      */
     @Test
     public void testGetVPCZoneIdentifier() {
+        
         System.out.println("getVPCZoneIdentifier");
-        AutoScalingGroupImpl instance = null;
-        String expResult = "";
-        String result = instance.getVPCZoneIdentifier();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.getVPCZoneIdentifier(), testGroup.getVPCZoneIdentifier());
     }
 
     /**
@@ -652,6 +604,23 @@ public class AutoScalingGroupImplTest {
         AutoScalingGroupImpl instance = null;
         instance.setTerminationPolicies(terminationPolicies);
         // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+    
+    @Test
+    public void testToString(){
+        
+        System.out.println("toString");
+        AutoScalingGroup testGroup = testASGroups.get(testASGroupNames.get(0));
+        com.amazonaws.services.autoscaling.model.AutoScalingGroup awsGroup =
+                awsASGroups.get(testASGroupNames.get(0));
+        assertEquals(awsGroup.toString(), testGroup.toString());
+    }
+    
+    @Test 
+    public void testExists(){
+        
+        System.out.println("exists");
         fail("The test case is a prototype.");
     }
     
