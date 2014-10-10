@@ -92,7 +92,7 @@ public class AutoScalingGroupImplTest {
     
     static private void getExistTestInstances(){
 
-        String[] existInstanceIds = {"i-8c692c95","i-8d692c94"};
+        String[] existInstanceIds = {"",""};
         testInstanceIds = Arrays.asList(existInstanceIds);
         
         for(String testInstanceId : testInstanceIds){
