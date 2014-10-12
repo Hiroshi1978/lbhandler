@@ -60,7 +60,7 @@ public class ZoneImplTest {
         
         System.out.println("asEc2Zone");
         
-        AWSEC2 ec2 = (AWSEC2)AWS.access().get(AWS.BlockName.EC2);
+        AWSEC2 ec2 = AWS.access().ec2();
         AvailabilityZone source = ec2.getExistEc2AvailabilityZone(expectedZoneName);
         AvailabilityZone viewAsEc2Zone = ((ZoneImpl)testInstance).asEc2Zone();
 
