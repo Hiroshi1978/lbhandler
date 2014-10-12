@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import web.component.api.model.Zone;
-import web.component.impl.aws.AWS;
-import web.component.impl.aws.AWSEC2;
 
 /**
  *
@@ -97,16 +95,6 @@ public class ZoneImpl extends AWSModelBase implements Zone{
         return "{ZoneName: " + getName() + ", RegionName: " + getRegionName() + "}";
     }
 
-    public static List<Zone> getExistZones(){
-        
-        AWSEC2 ec2 = AWS.access().ec2();
-        List<com.amazonaws.services.ec2.model.AvailabilityZone> ec2Zones  = ec2.getExistEc2AvailabilityZones();
-        List<Zone> zones = new ArrayList<>();
-        for(com.amazonaws.services.ec2.model.AvailabilityZone ec2Zone : ec2Zones)
-            zones.add(new ZoneImpl.Builder().name(ec2Zone.getZoneName()).build());
-        return zones;
-    }
-    
     @Override
     public int compareTo(Zone o) {
         

@@ -6,7 +6,6 @@
 
 package web.component.impl.aws.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -313,23 +312,6 @@ public class InstanceImpl extends AWSModelBase implements Instance{
             throw new NullPointerException();
         
         return this.getId().compareTo(o.getId());
-    }
-    
-    public static List<Instance> getExistInstances(){
-        
-        AWSEC2 ec2 = AWS.access().ec2();
-        List<com.amazonaws.services.ec2.model.Instance> ec2Instances = ec2.getExistEc2Instances();
-        List<Instance> instances = new ArrayList<>();
-        for(com.amazonaws.services.ec2.model.Instance ec2Instance : ec2Instances)
-            instances.add(new InstanceImpl.Builder().id(ec2Instance.getInstanceId()).get());
-        return instances;
-    }
-    
-    public static Instance createDefaultInstance(){
-        
-        AWSEC2 ec2 = AWS.access().ec2();
-        String instanceId = ec2.createDefaultInstance().getInstanceId();
-        return new InstanceImpl.Builder().id(instanceId).get();
     }
     
    /*

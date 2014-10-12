@@ -255,6 +255,9 @@ public class AWSEC2 implements CloudBlock{
         subnetIds.add(subnetId);
         return describeSubnets(subnetIds);
     }
+    public List<Subnet> getExistEc2Subnets(){
+        return describeSubnets().getSubnets();
+    }
     public Subnet getExistEc2Subnet(String subnetId){
         Subnet subnet = null;
         
@@ -320,6 +323,9 @@ public class AWSEC2 implements CloudBlock{
         List<String> vpcIds = new ArrayList<>();
         vpcIds.add(vpcId);
         return describeVpcs(vpcIds);
+    }
+    public List<Vpc> getExistEc2Vpcs(){
+        return describeVpcs().getVpcs();
     }
     public Vpc getExistEc2Vpc(String vpcId){
         
