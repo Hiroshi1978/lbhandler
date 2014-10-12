@@ -55,8 +55,11 @@ public class AWS implements Cloud{
             CONF.load(new FileInputStream(confFile));
             
         } catch (IOException | RuntimeException ex) {
-            System.out.println("failed to load aws client configuration.");
-            ex.printStackTrace();
+            System.out.println(
+                    "failed to load aws client configuration. \n"
+                    + "You must specify '" + CONF_DIR_PROP_KEY + "' system property to the path of the directory where your aws client configuration file exists.\n"
+                    + "Otherwise you should place your aws client configuration file to the directory 'user.dir' system property indicates."
+            );
         }
     }
         
