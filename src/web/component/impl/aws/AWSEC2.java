@@ -135,6 +135,9 @@ public class AWSEC2 implements CloudBlock{
         return stopInstances(instanceIds);
     }
     
+    public DescribeInstancesResult describeInstances(){
+        return awsHttpClient.describeInstances();
+    }
     public DescribeInstancesResult describeInstances(DescribeInstancesRequest request){
 
         if(request.getInstanceIds() == null || request.getInstanceIds().isEmpty())
@@ -151,6 +154,10 @@ public class AWSEC2 implements CloudBlock{
         List<String> instanceIds = new ArrayList<>();
         instanceIds.add(instanceId);
         return describeInstances(instanceIds);
+    }
+    public List<Instance> getExistEc2Instances(){
+        DescribeInstancesResult result = describeInstances();
+        return result.getReservations().get(0).getInstances();
     }
     public Instance getExistEc2Instance(String instanceId){
         
