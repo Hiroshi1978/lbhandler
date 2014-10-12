@@ -83,7 +83,7 @@ You can also launch new web server instance from AWSResourceFactory assuming tha
 ```
 In this case, you can launch web server by writing only 1 line.
 ```java
-    Instance server = InstanceImpl.createDefaultInstance();
+    Instance server = AWSResourceFactory.createDefaultInstance();
 ```
 
 When stop it,
