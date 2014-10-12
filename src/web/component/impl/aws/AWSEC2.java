@@ -157,7 +157,11 @@ public class AWSEC2 implements CloudBlock{
     }
     public List<Instance> getExistEc2Instances(){
         DescribeInstancesResult result = describeInstances();
-        return result.getReservations().get(0).getInstances();
+        List<Instance> instances = new ArrayList<>();
+        for(Reservation reserv : result.getReservations())
+            for(Instance instance : reserv.getInstances())
+                instances.add(instance);
+        return instances;
     }
     public Instance getExistEc2Instance(String instanceId){
         
@@ -353,5 +357,15 @@ public class AWSEC2 implements CloudBlock{
     }
     public void deleteVpc(String vpcId){
         deleteVpc(new DeleteVpcRequest(vpcId));
+    }
+    
+    public Instance createDefaultInstance(){
+        
+        Properties conf = AWS.access().conf();
+        String defaultImageId = conf.getProperty("ec2.default.imageid");
+        String defaultInstanceType = conf.getProperty("ec2.default.instancetype");
+        String defaultZoneName = conf.getProperty("ec2.default.zonename");
+        
+        return createInstance(defaultImageId, defaultInstanceType, defaultZoneName);
     }
 }

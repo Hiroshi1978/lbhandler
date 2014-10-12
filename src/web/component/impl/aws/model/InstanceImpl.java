@@ -325,6 +325,13 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         return instances;
     }
     
+    public static Instance createDefaultInstance(){
+        
+        AWSEC2 ec2 = AWS.access().ec2();
+        String instanceId = ec2.createDefaultInstance().getInstanceId();
+        return new InstanceImpl.Builder().id(instanceId).get();
+    }
+    
    /*
     * The instance of this class expresses snapshot of the state of the specified Instance (VM).
     * So it is immutable and its equal method never returns true unless it is compared with itself.
