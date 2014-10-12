@@ -8,6 +8,7 @@ package web.component.impl.aws;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,13 +32,24 @@ public class AWS implements Cloud{
     
     private final Map<BlockName, CloudBlock> components = new HashMap<>();
 
+    private final String CONF_DIR_PROP_KEY = "aws.config.file.dir";
+    private final String CONF_FILE_NAME = "aws_config.txt";
+    
     private AWS(){     
 
         try {
-            AWS_CONFIG.load(AWS.class.getResourceAsStream("./aws_config.txt"));
-        } catch (IOException ex) {
-            System.out.println("configuration file not found.");
-            throw new RuntimeException(ex);
+            
+            StringBuilder confPath = 
+                    new StringBuilder(System.getProperty(CONF_DIR_PROP_KEY, System.getProperty("user.dir")));
+            if(!confPath.toString().endsWith(File.separator))
+                confPath.append(File.separator);
+            String confFile = confPath.append(CONF_FILE_NAME).toString();
+            System.out.println("Loading aws client configuration from [" + confFile + "] ...");
+            AWS_CONFIG.load(AWS.class.getResourceAsStream(confFile));
+            
+        } catch (IOException | RuntimeException ex) {
+            System.out.println("failed to load aws client configuration.");
+            ex.printStackTrace();
         }
 
         String awsKey = AWS_CONFIG.getProperty("aws.key");
