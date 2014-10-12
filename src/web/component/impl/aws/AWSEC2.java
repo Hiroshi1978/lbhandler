@@ -210,6 +210,9 @@ public class AWSEC2 implements CloudBlock{
         return terminateInstances(instanceIds);
     }
     
+    public DescribeAvailabilityZonesResult describeAvailabilityZones(){
+        return awsHttpClient.describeAvailabilityZones();
+    }
     public DescribeAvailabilityZonesResult describeAvailabilityZones(DescribeAvailabilityZonesRequest request){
 
         if(request.getZoneNames()== null || request.getZoneNames().isEmpty())
@@ -226,6 +229,9 @@ public class AWSEC2 implements CloudBlock{
         List<String> zoneNames = new ArrayList<>();
         zoneNames.add(zoneName);
         return describeAvailabilityZones(zoneNames);
+    }
+    public List<AvailabilityZone> getExistEc2AvailabilityZones(){
+        return describeAvailabilityZones().getAvailabilityZones();
     }
     public AvailabilityZone getExistEc2AvailabilityZone(String zoneName){
         return describeAvailabilityZone(zoneName).getAvailabilityZones().get(0);
