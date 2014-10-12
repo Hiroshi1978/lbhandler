@@ -74,7 +74,7 @@ Make sure you have your own AMI that contains your web server application. Next 
                         .imageId("id-of-your-ami").type("instance.type").create();
 ```
 
-You can also launch new web server instance from configuration file assuming that you specified required keys,that are 'ec2.default.imageid', 'ec2.default.instancetype' and 'ec2.default.zonename'(Please refer to [Set up HTTP Client](#setting-up-http-client) sction).
+You can also launch new web server instance from AWSResourceFactory assuming that you specified required keys,that are 'ec2.default.imageid', 'ec2.default.instancetype' and 'ec2.default.zonename'(Please refer to [Set up HTTP Client](#setting-up-http-client) sction).
 
 ```
     ec2.default.imageid=your-default-ami
