@@ -23,13 +23,9 @@ import web.component.impl.aws.AWSELB;
  */
 public class AWSResouceFactory {
  
-    private static final AWSEC2 ec2 = AWS.access().ec2();
-    private static final AWSELB elb = AWS.access().elb();
-    private static final AWSAutoScaling as = AWS.access().as();
-    
     public static List<Instance> getExistInstances(){
         
-       List<com.amazonaws.services.ec2.model.Instance> ec2Instances = ec2.getExistEc2Instances();
+       List<com.amazonaws.services.ec2.model.Instance> ec2Instances = AWS.access().ec2().getExistEc2Instances();
         List<Instance> instances = new ArrayList<>();
         for(com.amazonaws.services.ec2.model.Instance ec2Instance : ec2Instances)
             instances.add(new InstanceImpl.Builder().id(ec2Instance.getInstanceId()).get());
@@ -38,13 +34,13 @@ public class AWSResouceFactory {
 
     public static Instance createDefaultInstance(){
         
-        String instanceId = ec2.createDefaultInstance().getInstanceId();
+        String instanceId = AWS.access().ec2().createDefaultInstance().getInstanceId();
         return new InstanceImpl.Builder().id(instanceId).get();
     }
 
     public static List<Zone> getExistZones(){
         
-        List<com.amazonaws.services.ec2.model.AvailabilityZone> ec2Zones  = ec2.getExistEc2AvailabilityZones();
+        List<com.amazonaws.services.ec2.model.AvailabilityZone> ec2Zones  = AWS.access().ec2().getExistEc2AvailabilityZones();
         List<Zone> zones = new ArrayList<>();
         for(com.amazonaws.services.ec2.model.AvailabilityZone ec2Zone : ec2Zones)
             zones.add(new ZoneImpl.Builder().name(ec2Zone.getZoneName()).build());
@@ -52,7 +48,7 @@ public class AWSResouceFactory {
     }
     
     public static List<VPC> getExistVPCs(){
-        List<com.amazonaws.services.ec2.model.Vpc> ec2Vpcs = ec2.getExistEc2Vpcs();
+        List<com.amazonaws.services.ec2.model.Vpc> ec2Vpcs = AWS.access().ec2().getExistEc2Vpcs();
         List<VPC> vpcs = new ArrayList<>();
         for(com.amazonaws.services.ec2.model.Vpc ec2Vpc : ec2Vpcs)
             vpcs.add(new VPCImpl.Builder().id(ec2Vpc.getVpcId()).get());
@@ -60,7 +56,7 @@ public class AWSResouceFactory {
     }
     
     public static List<Subnet> getExistSubnets(){
-        List<com.amazonaws.services.ec2.model.Subnet> ec2Subnets = ec2.getExistEc2Subnets();
+        List<com.amazonaws.services.ec2.model.Subnet> ec2Subnets = AWS.access().ec2().getExistEc2Subnets();
         List<Subnet> subnets = new ArrayList<>();
         for(com.amazonaws.services.ec2.model.Subnet ec2Subnet : ec2Subnets)
             subnets.add(new SubnetImpl.Builder().id(ec2Subnet.getSubnetId()).get());
