@@ -13,7 +13,9 @@ import com.amazonaws.services.elasticloadbalancing.model.Listener;
 import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import web.component.api.model.BackendState;
 import web.component.api.model.HealthCheck;
 import web.component.api.model.Instance;
@@ -82,29 +84,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
     private LoadBalancerImpl(String name){
         this.name = name;
     }
-    
-   /*
-    * This constructor should be called only inside the getExistLoadBalancerByName method.
-    */
-    private LoadBalancerImpl(
-            String name, 
-            List<LoadBalancerListener> listeners,
-            List<Zone> zones,
-            List<Subnet> subnets,
-            List<Instance> backendInstances
-    ) {
         
-        if(name == null || name.isEmpty())
-            throw new IllegalArgumentException("Load balancer name not specified.");
-        if(listeners == null || listeners.isEmpty())
-            throw new IllegalArgumentException("Load balancer listeners not specified.");
-        if(zones == null || zones.isEmpty())
-            throw new IllegalArgumentException("Zones not specified.");
-        
-        //set load balancer name.
-        this.name = name;
-    }
-    
     /**
      * Check the state of the load balancer by calling DescribeLoadBalancers API.
      * The result is true if the name of this load balancer could be found in the response.
@@ -330,33 +310,13 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
     public static LoadBalancer getExistLoadBalancerByName(String name){
         
         LoadBalancer loadBalancer = null;
-        AWSELB elb = AWS.access().elb();
 
         try{
-            LoadBalancerDescription description = elb.getLoadBalancerDescription(name);
-            if(name.equals(description.getLoadBalancerName())){
-            
-                List<LoadBalancerListener> listeners = new ArrayList<>();
-                List<ListenerDescription> listenerDescriptions = description.getListenerDescriptions();
-                for(ListenerDescription listenerDescription : listenerDescriptions)
-                    listeners.add(new LoadBalancerListenerImpl.Builder().description(listenerDescription).build());
-                List<Zone> zones = new ArrayList<>();
-                List<String> zoneNames = description.getAvailabilityZones();
-                for(String zoneName : zoneNames)
-                    zones.add(new ZoneImpl.Builder().name(zoneName).build());
-                
-                List<Subnet> subnets = new ArrayList<>();
-                List<String> subnetIds = description.getSubnets();
-                for(String subnetId : subnetIds)
-                    subnets.add(new SubnetImpl.Builder().id(subnetId).get());
-                
-                List<Instance> registeredInstances = new ArrayList<>();
-                List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = description.getInstances();
-                for(com.amazonaws.services.elasticloadbalancing.model.Instance elbInstance : elbInstances)
-                    registeredInstances.add(new InstanceImpl.Builder().id(elbInstance.getInstanceId()).get());
 
-                loadBalancer = new LoadBalancerImpl(name,listeners,zones,subnets,registeredInstances);
-            }
+            LoadBalancerDescription description = AWS.access().elb().getLoadBalancerDescription(name);
+            if(name.equals(description.getLoadBalancerName()))
+                loadBalancer = new LoadBalancerImpl(name);
+
         }catch(AmazonServiceException ase){
             System.out.println(ase.getMessage());
             System.out.println("Load balancer with the name [" + name + "] does not exist.");
