@@ -239,6 +239,9 @@ public class AWSAutoScaling implements CloudBlock{
         return describeAutoScalingGroups(autoScalingGroupNames);
     }
 
+    public List<AutoScalingGroup> getExistAutoScalingGroups(){
+        return describeAutoScalingGroups().getAutoScalingGroups();
+    }
     public AutoScalingGroup getExistAutoScalingGroupByName(String autoScalingGroupName){
         
         List<AutoScalingGroup> existASGroups = describeAutoScalingGroup(autoScalingGroupName).getAutoScalingGroups();

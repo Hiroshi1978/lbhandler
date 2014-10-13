@@ -8,6 +8,7 @@ package web.component.impl.aws.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import web.component.api.model.AutoScalingGroup;
 import web.component.api.model.Instance;
 import web.component.api.model.LoadBalancer;
 import web.component.api.model.Subnet;
@@ -92,6 +93,22 @@ public class AWSResouceFactory {
     }
     public static LoadBalancer getLoadBalancer(String name){
         return LoadBalancerImpl.getExistLoadBalancerByName(name);
+    }
+    
+   /*
+    * auto scaling group
+    */
+    public static List<AutoScalingGroup> getAutoScalingGroups(){
+        
+        List<com.amazonaws.services.autoscaling.model.AutoScalingGroup> awsASGroups
+                = AWS.access().as().getExistAutoScalingGroups();
+        List<AutoScalingGroup> asGroups = new ArrayList<>();
+        for(com.amazonaws.services.autoscaling.model.AutoScalingGroup awsASGroup : awsASGroups)
+            asGroups.add(new AutoScalingGroupImpl.Builder().name(awsASGroup.getAutoScalingGroupName()).get());
+        return asGroups;
+    }
+    public static AutoScalingGroup getAutoScalingGroup(String name){
+        return new AutoScalingGroupImpl.Builder().name(name).get();
     }
 }
 
