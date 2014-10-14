@@ -20,7 +20,7 @@ import web.component.impl.aws.AWS;
  *
  * @author Hiroshi
  */
-public class AWSResouceFactory {
+public class AWSResourceFactory {
  
    /*
     * instance
