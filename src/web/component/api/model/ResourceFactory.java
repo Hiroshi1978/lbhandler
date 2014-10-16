@@ -7,7 +7,6 @@
 package web.component.api.model;
 
 import java.util.List;
-import web.component.impl.aws.model.AWSResourceFactory;
 
 /**
  *
@@ -35,7 +34,7 @@ public abstract class ResourceFactory {
         //this is only temporary.
         //to be refactored to be able to change dependency,
         //for example, using Spring ?
-        return new AWSResourceFactory();
+        return new web.component.impl.aws.model.AWSResourceFactory();
     }
     
 }
