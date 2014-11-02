@@ -7,6 +7,7 @@
 package web.component.impl.aws.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import web.component.api.model.AutoScalingGroup;
 import web.component.api.model.Instance;
@@ -30,10 +31,11 @@ public class AWSResourceFactory extends ResourceFactory{
     @Override
     public List<Instance> getInstances(){
         
-       List<com.amazonaws.services.ec2.model.Instance> ec2Instances = AWS.access().ec2().getExistEc2Instances();
+        List<com.amazonaws.services.ec2.model.Instance> ec2Instances = AWS.access().ec2().getExistEc2Instances();
         List<Instance> instances = new ArrayList<>();
         for(com.amazonaws.services.ec2.model.Instance ec2Instance : ec2Instances)
             instances.add(new InstanceImpl.Builder().id(ec2Instance.getInstanceId()).get());
+        Collections.sort(instances);
         return instances;
     }
     
