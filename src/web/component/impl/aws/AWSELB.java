@@ -10,19 +10,31 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancing;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient;
+import com.amazonaws.services.elasticloadbalancing.model.ApplySecurityGroupsToLoadBalancerRequest;
+import com.amazonaws.services.elasticloadbalancing.model.ApplySecurityGroupsToLoadBalancerResult;
 import com.amazonaws.services.elasticloadbalancing.model.AttachLoadBalancerToSubnetsRequest;
 import com.amazonaws.services.elasticloadbalancing.model.AttachLoadBalancerToSubnetsResult;
 import com.amazonaws.services.elasticloadbalancing.model.ConfigureHealthCheckRequest;
 import com.amazonaws.services.elasticloadbalancing.model.ConfigureHealthCheckResult;
+import com.amazonaws.services.elasticloadbalancing.model.CreateAppCookieStickinessPolicyRequest;
+import com.amazonaws.services.elasticloadbalancing.model.CreateAppCookieStickinessPolicyResult;
+import com.amazonaws.services.elasticloadbalancing.model.CreateLBCookieStickinessPolicyRequest;
+import com.amazonaws.services.elasticloadbalancing.model.CreateLBCookieStickinessPolicyResult;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerListenersRequest;
+import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerPolicyRequest;
+import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerPolicyResult;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerResult;
 import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerListenersRequest;
+import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerPolicyRequest;
+import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerPolicyResult;
 import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DeregisterInstancesFromLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DeregisterInstancesFromLoadBalancerResult;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeInstanceHealthRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeInstanceHealthResult;
+import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancerPoliciesRequest;
+import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancerPoliciesResult;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersResult;
 import com.amazonaws.services.elasticloadbalancing.model.DetachLoadBalancerFromSubnetsRequest;
@@ -37,7 +49,13 @@ import com.amazonaws.services.elasticloadbalancing.model.Listener;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerResult;
+import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerListenerSSLCertificateRequest;
+import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPoliciesOfListenerRequest;
+import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPoliciesOfListenerResult;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import web.component.impl.CloudBlock;
@@ -84,7 +102,7 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.describeLoadBalancers(request);
     }
 
-    public DescribeLoadBalancersResult describeLoadBalancers(List<String> loadBalancerNames){
+    public DescribeLoadBalancersResult describeLoadBalancers(Collection<String> loadBalancerNames){
         
         if(loadBalancerNames == null || loadBalancerNames.isEmpty())
             throw new IllegalArgumentException("Load Balancer Names not specified.");
@@ -97,9 +115,7 @@ public class AWSELB implements CloudBlock{
 
     public DescribeLoadBalancersResult describeLoadBalancers(String loadBalancerName){
     
-        List<String> loadBalancerNames = new ArrayList<>();
-        loadBalancerNames.add(loadBalancerName);
-        return this.describeLoadBalancers(loadBalancerNames);
+        return this.describeLoadBalancers(Collections.singleton(loadBalancerName));
     }
 
     public CreateLoadBalancerResult createLoadBalancer(CreateLoadBalancerRequest request){ 
@@ -120,10 +136,7 @@ public class AWSELB implements CloudBlock{
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
        
         CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName); 
-       
-        List<Listener> listeners = new ArrayList<>(); 
-        listeners.add(getDefaultHttpListener()); 
-        request.setListeners(listeners); 
+        request.setListeners(Collections.singleton(getDefaultHttpListener())); 
        
         return awsHttpClient.createLoadBalancer(request); 
     } 
@@ -136,10 +149,7 @@ public class AWSELB implements CloudBlock{
             throw new IllegalArgumentException("Certificate ID not specified."); 
 
         CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName); 
-       
-        List<Listener> listeners = new ArrayList<>(); 
-        listeners.add(getDefaultHttpsListener(certificateId)); 
-        request.setListeners(listeners); 
+               request.setListeners(Collections.singleton(getDefaultHttpsListener(certificateId))); 
        
         return awsHttpClient.createLoadBalancer(request); 
     } 
@@ -178,14 +188,14 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.registerInstancesWithLoadBalancer(request);
     }
     
-    public RegisterInstancesWithLoadBalancerResult registerInstancesWithLoadBalancer(String loadBalancerName, List<Instance> instances){
+    public RegisterInstancesWithLoadBalancerResult registerInstancesWithLoadBalancer(String loadBalancerName, Collection<Instance> instances){
     
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified.");
         if(instances == null || instances.isEmpty())
             throw new IllegalArgumentException("Instances not specified.");
 
-        RegisterInstancesWithLoadBalancerRequest request = new RegisterInstancesWithLoadBalancerRequest(loadBalancerName, instances);
+        RegisterInstancesWithLoadBalancerRequest request = new RegisterInstancesWithLoadBalancerRequest(loadBalancerName, new ArrayList<>(instances) );
         return awsHttpClient.registerInstancesWithLoadBalancer(request);
     }
 
@@ -201,14 +211,14 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.deregisterInstancesFromLoadBalancer(request);
     }
 
-    public DeregisterInstancesFromLoadBalancerResult deregisterInstancesFromLoadBalancer(String loadBalancerName, List<Instance> instances){
+    public DeregisterInstancesFromLoadBalancerResult deregisterInstancesFromLoadBalancer(String loadBalancerName, Collection<Instance> instances){
 
         if(loadBalancerName == null || loadBalancerName.isEmpty())
            throw new IllegalArgumentException("Load Balancer Name not specified.");
         if(instances == null || instances.isEmpty())
            throw new IllegalArgumentException("Instances not specified.");
 
-        DeregisterInstancesFromLoadBalancerRequest request = new DeregisterInstancesFromLoadBalancerRequest(loadBalancerName,instances);
+        DeregisterInstancesFromLoadBalancerRequest request = new DeregisterInstancesFromLoadBalancerRequest(loadBalancerName,new ArrayList<>(instances));
         return awsHttpClient.deregisterInstancesFromLoadBalancer(request);
     }
 
@@ -224,7 +234,7 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.attachLoadBalancerToSubnets(request);
     }
 
-    public AttachLoadBalancerToSubnetsResult attachLoadBalancerToSubnets(String loadBalancerName, List<String> subnetIds){
+    public AttachLoadBalancerToSubnetsResult attachLoadBalancerToSubnets(String loadBalancerName, Collection<String> subnetIds){
 
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
@@ -241,7 +251,7 @@ public class AWSELB implements CloudBlock{
    public void deleteLoadBalancerListeners(DeleteLoadBalancerListenersRequest request){
        awsHttpClient.deleteLoadBalancerListeners(request);
    }
-   public void deleteLoadBalancerListeners(String loadBalancerName, List<Listener> listeners){
+   public void deleteLoadBalancerListeners(String loadBalancerName, Collection<Listener> listeners){
        
        DeleteLoadBalancerListenersRequest request = new DeleteLoadBalancerListenersRequest();
        request.setLoadBalancerName(loadBalancerName);
@@ -254,7 +264,7 @@ public class AWSELB implements CloudBlock{
    }
 
    
-    public CreateLoadBalancerResult createLoadBalancer(String loadBalancerName, List<Listener> listeners){
+    public CreateLoadBalancerResult createLoadBalancer(String loadBalancerName, Collection<Listener> listeners){
 
        if(loadBalancerName == null || loadBalancerName.equals(""))
            throw new IllegalArgumentException("Load Balancer Name not specified.");
@@ -266,7 +276,7 @@ public class AWSELB implements CloudBlock{
        return awsHttpClient.createLoadBalancer(request);
     }
 
-    public CreateLoadBalancerResult createLoadBalancerWithSubnets(String loadBalancerName, List<Listener> listeners, List<String> subnetIds){
+    public CreateLoadBalancerResult createLoadBalancerWithSubnets(String loadBalancerName, Collection<Listener> listeners, Collection<String> subnetIds){
 
        if(loadBalancerName == null || loadBalancerName.equals(""))
            throw new IllegalArgumentException("Load Balancer Name not specified.");
@@ -281,7 +291,7 @@ public class AWSELB implements CloudBlock{
        return awsHttpClient.createLoadBalancer(request);
     }
 
-    public CreateLoadBalancerResult createLoadBalancerWithAvailabilityZones(String loadBalancerName, List<Listener> listeners, List<AvailabilityZone> availabilityZones){
+    public CreateLoadBalancerResult createLoadBalancerWithAvailabilityZones(String loadBalancerName, Collection<Listener> listeners, Collection<AvailabilityZone> availabilityZones){
 
        if(loadBalancerName == null || loadBalancerName.equals(""))
            throw new IllegalArgumentException("Load Balancer Name not specified.");
@@ -335,7 +345,7 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.detachLoadBalancerFromSubnets(request);
     }
 
-    public DetachLoadBalancerFromSubnetsResult detachLoadBalancerFromSubnets(String loadBalancerName, List<String> subnetIds){
+    public DetachLoadBalancerFromSubnetsResult detachLoadBalancerFromSubnets(String loadBalancerName, Collection<String> subnetIds){
 
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
@@ -361,14 +371,14 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.enableAvailabilityZonesForLoadBalancer(request);
     }
 
-    public EnableAvailabilityZonesForLoadBalancerResult enableAvailabilityZonesForLoadBalancer(String loadBalancerName, List<String> availabilityZones){
+    public EnableAvailabilityZonesForLoadBalancerResult enableAvailabilityZonesForLoadBalancer(String loadBalancerName, Collection<String> availabilityZones){
        
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
         if(availabilityZones == null || availabilityZones.isEmpty())
             throw new IllegalArgumentException("Availability Zones not specified.");
        
-        EnableAvailabilityZonesForLoadBalancerRequest request = new EnableAvailabilityZonesForLoadBalancerRequest(loadBalancerName, availabilityZones);
+        EnableAvailabilityZonesForLoadBalancerRequest request = new EnableAvailabilityZonesForLoadBalancerRequest(loadBalancerName, new ArrayList<>(availabilityZones));
         return awsHttpClient.enableAvailabilityZonesForLoadBalancer(request);
     }
 
@@ -384,14 +394,14 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.disableAvailabilityZonesForLoadBalancer(request);
     }
 
-    public DisableAvailabilityZonesForLoadBalancerResult disableAvailabilityZonesForLoadBalancer(String loadBalancerName, List<String> availabilityZones){
+    public DisableAvailabilityZonesForLoadBalancerResult disableAvailabilityZonesForLoadBalancer(String loadBalancerName, Collection<String> availabilityZones){
        
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
         if(availabilityZones == null || availabilityZones.isEmpty())
             throw new IllegalArgumentException("Availability Zones not specified.");
        
-        DisableAvailabilityZonesForLoadBalancerRequest request = new DisableAvailabilityZonesForLoadBalancerRequest(loadBalancerName, availabilityZones);
+        DisableAvailabilityZonesForLoadBalancerRequest request = new DisableAvailabilityZonesForLoadBalancerRequest(loadBalancerName, new ArrayList<>(availabilityZones));
         return awsHttpClient.disableAvailabilityZonesForLoadBalancer(request);
     }
 
@@ -407,14 +417,14 @@ public class AWSELB implements CloudBlock{
         awsHttpClient.createLoadBalancerListeners(request);
     }
 
-    public void createLoadBalancerListeners(String loadBalancerName, List<Listener> listeners){
+    public void createLoadBalancerListeners(String loadBalancerName, Collection<Listener> listeners){
         
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
         if(listeners == null || listeners.isEmpty())
             throw new IllegalArgumentException("Listeners not specified.");
 
-        CreateLoadBalancerListenersRequest request  = new CreateLoadBalancerListenersRequest(loadBalancerName, listeners);
+        CreateLoadBalancerListenersRequest request  = new CreateLoadBalancerListenersRequest(loadBalancerName, new ArrayList<>(listeners));
         awsHttpClient.createLoadBalancerListeners(request);
     }
 
@@ -430,10 +440,8 @@ public class AWSELB implements CloudBlock{
         Listener listener = getDefaultHttpListener();
         listener.setInstancePort(instancePort);
         listener.setLoadBalancerPort(servicePort);
-        List<Listener> listeners = new ArrayList<>();
-        listeners.add(listener);
         
-        CreateLoadBalancerListenersRequest request  = new CreateLoadBalancerListenersRequest(loadBalancerName, listeners);
+        CreateLoadBalancerListenersRequest request  = new CreateLoadBalancerListenersRequest(loadBalancerName, Collections.singletonList(listener));
         awsHttpClient.createLoadBalancerListeners(request);
     }
 
@@ -446,7 +454,7 @@ public class AWSELB implements CloudBlock{
         
     }
 
-    public List<LoadBalancerDescription> getLoadBalancerDescriptions(List<String> loadBalancerNames){
+    public List<LoadBalancerDescription> getLoadBalancerDescriptions(Collection<String> loadBalancerNames){
 
         DescribeLoadBalancersResult result = null;
         
@@ -481,7 +489,7 @@ public class AWSELB implements CloudBlock{
         return awsHttpClient.describeInstanceHealth(request);
     }
 
-    public DescribeInstanceHealthResult describeInstanceHealth(String loadBalancerName, List<Instance> instances){
+    public DescribeInstanceHealthResult describeInstanceHealth(String loadBalancerName, Collection<Instance> instances){
         
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
@@ -500,9 +508,7 @@ public class AWSELB implements CloudBlock{
         
         DescribeInstanceHealthRequest request = new DescribeInstanceHealthRequest(loadBalancerName);
         if(instance != null){
-            List<Instance> instances = new ArrayList<>();
-            instances.add(instance);
-            request.setInstances(instances);
+            request.setInstances(Collections.singleton(instance));
         }
         
         return awsHttpClient.describeInstanceHealth(request);
@@ -525,5 +531,168 @@ public class AWSELB implements CloudBlock{
         request.setHealthCheck(hc);
         
         return configureHealthCheck(request);
+    }
+
+    public DescribeLoadBalancerPoliciesResult describeLoadBalancerPolicies(){
+
+        return awsHttpClient.describeLoadBalancerPolicies();
+    }
+    public DescribeLoadBalancerPoliciesResult describeLoadBalancerPolicies(DescribeLoadBalancerPoliciesRequest request){
+
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        
+        return awsHttpClient.describeLoadBalancerPolicies(request);
+    }
+    public DescribeLoadBalancerPoliciesResult describeLoadBalancerPolicies(String loadBalancerName){
+
+        if(loadBalancerName == null || loadBalancerName.isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        
+        DescribeLoadBalancerPoliciesRequest request = new DescribeLoadBalancerPoliciesRequest();
+        request.setLoadBalancerName(loadBalancerName);
+        
+        return describeLoadBalancerPolicies(request);
+    }
+    
+    public CreateLoadBalancerPolicyResult createLoadBalancerPolicy(CreateLoadBalancerPolicyRequest request){
+        
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+
+        return awsHttpClient.createLoadBalancerPolicy(request);
+    }
+
+    public DeleteLoadBalancerPolicyResult deleteLoadBalancerPolicy(DeleteLoadBalancerPolicyRequest request){
+        
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(request.getPolicyName() == null || request.getPolicyName().isEmpty())
+            throw new IllegalArgumentException("Policy name not specified.");
+
+        return awsHttpClient.deleteLoadBalancerPolicy(request);
+    }
+    public DeleteLoadBalancerPolicyResult deleteLoadBalancerPolicy(String loadBalancerName, String policyName){
+        
+        if(loadBalancerName == null || loadBalancerName.isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(policyName == null || policyName.isEmpty())
+            throw new IllegalArgumentException("Policy name not specified.");
+        
+        DeleteLoadBalancerPolicyRequest request = new DeleteLoadBalancerPolicyRequest();
+        request.setLoadBalancerName(loadBalancerName);
+        request.setPolicyName(policyName);
+        
+        return deleteLoadBalancerPolicy(request);
+    }
+
+    public CreateAppCookieStickinessPolicyResult createAppCookieStickinessPolicy(CreateAppCookieStickinessPolicyRequest request){
+    
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(request.getPolicyName() == null || request.getPolicyName().isEmpty())
+            throw new IllegalArgumentException("Policy name not specified.");
+        if(request.getCookieName() == null || request.getCookieName().isEmpty())
+            throw new IllegalArgumentException("Cookie name not specified.");
+
+        return awsHttpClient.createAppCookieStickinessPolicy(request);
+    }
+    public CreateAppCookieStickinessPolicyResult createAppCookieStickinessPolicy(String loadBalancerName, String policyName, String cookieName){
+        
+        CreateAppCookieStickinessPolicyRequest request = new CreateAppCookieStickinessPolicyRequest();
+        request.setLoadBalancerName(loadBalancerName);
+        request.setPolicyName(policyName);
+        request.setCookieName(cookieName);
+        
+        return createAppCookieStickinessPolicy(request);
+    }
+    
+    public CreateLBCookieStickinessPolicyResult createLBCookieStickinessPolicy(CreateLBCookieStickinessPolicyRequest request){
+    
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(request.getPolicyName() == null || request.getPolicyName().isEmpty())
+            throw new IllegalArgumentException("Policy name not specified.");
+
+        return awsHttpClient.createLBCookieStickinessPolicy(request);
+    }
+    public CreateLBCookieStickinessPolicyResult createLBCookieStickinessPolicy(String loadBalancerName, String policyName){
+        
+        CreateLBCookieStickinessPolicyRequest request = new CreateLBCookieStickinessPolicyRequest();
+        request.setLoadBalancerName(loadBalancerName);
+        request.setPolicyName(policyName);
+
+        return createLBCookieStickinessPolicy(request);
+    }
+    
+    public void setLoadBalancerListenerSSLCertificate(SetLoadBalancerListenerSSLCertificateRequest request){
+        
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(request.getLoadBalancerPort() == null)
+            throw new IllegalArgumentException("Load balancer port not specified.");
+        if(request.getSSLCertificateId() == null || request.getSSLCertificateId().isEmpty())
+            throw new IllegalArgumentException("SSL certificate id not specified.");
+
+        awsHttpClient.setLoadBalancerListenerSSLCertificate(request);
+    }
+
+    public void setLoadBalancerListenerSSLCertificate(String loadBalancerName, int port, String certificateId){
+        
+        SetLoadBalancerListenerSSLCertificateRequest request = new SetLoadBalancerListenerSSLCertificateRequest();
+        
+        request.setLoadBalancerName(loadBalancerName);
+        request.setLoadBalancerPort(port);
+        request.setSSLCertificateId(certificateId);
+        
+        setLoadBalancerListenerSSLCertificate(request);
+    }
+    
+    public SetLoadBalancerPoliciesOfListenerResult setLoadBalancerPoliciesOfListener(SetLoadBalancerPoliciesOfListenerRequest request){
+        
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(request.getLoadBalancerPort() == null)
+            throw new IllegalArgumentException("Load balancer port not specified.");
+        if(request.getPolicyNames() == null || request.getPolicyNames().isEmpty())
+            throw new IllegalArgumentException("Policy name not specified.");
+
+        return awsHttpClient.setLoadBalancerPoliciesOfListener(request);
+    }
+    public SetLoadBalancerPoliciesOfListenerResult setLoadBalancerPoliciesOfListener(String loadBalancerName, int port, Collection<String> policyNames){
+        
+        SetLoadBalancerPoliciesOfListenerRequest request = new SetLoadBalancerPoliciesOfListenerRequest();
+        request.setLoadBalancerName(loadBalancerName);
+        request.setLoadBalancerPort(port);
+        request.setPolicyNames(policyNames);
+        
+        return setLoadBalancerPoliciesOfListener(request);
+        
+    }
+    public SetLoadBalancerPoliciesOfListenerResult setLoadBalancerPoliciesOfListener(String loadBalancerName, int port, String policyName){
+                
+        return setLoadBalancerPoliciesOfListener(loadBalancerName, port, Collections.singleton(policyName));
+        
+    }
+
+    public ApplySecurityGroupsToLoadBalancerResult applySecurityGroupsToLoadBalancer(ApplySecurityGroupsToLoadBalancerRequest request){
+       
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(request.getSecurityGroups() == null || request.getSecurityGroups().isEmpty())
+            throw new IllegalArgumentException("Security groups not specified.");
+        
+        return awsHttpClient.applySecurityGroupsToLoadBalancer(request);
+    }
+    public ApplySecurityGroupsToLoadBalancerResult applySecurityGroupsToLoadBalancer(String loadBalancerName, Collection<String> securityGroups){
+       
+        ApplySecurityGroupsToLoadBalancerRequest request = new ApplySecurityGroupsToLoadBalancerRequest();
+        request.setLoadBalancerName(loadBalancerName);
+        request.setSecurityGroups(securityGroups);
+        return applySecurityGroupsToLoadBalancer(request);
+    }
+    public ApplySecurityGroupsToLoadBalancerResult applySecurityGroupsToLoadBalancer(String loadBalancerName, String securityGroup){
+
+        return applySecurityGroupsToLoadBalancer(loadBalancerName, Collections.singleton(securityGroup));
     }
 }
