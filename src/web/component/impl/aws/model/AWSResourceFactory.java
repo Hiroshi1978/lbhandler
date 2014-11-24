@@ -9,6 +9,7 @@ package web.component.impl.aws.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import web.component.api.model.AutoScalingGroup;
 import web.component.api.model.Instance;
 import web.component.api.model.LaunchConfiguration;
@@ -56,11 +57,10 @@ public class AWSResourceFactory extends ResourceFactory{
     @Override
     public List<Zone> getZones(){
         
-        List<com.amazonaws.services.ec2.model.AvailabilityZone> ec2Zones  = AWS.access().ec2().getExistEc2AvailabilityZones();
-        List<Zone> zones = new ArrayList<>();
-        for(com.amazonaws.services.ec2.model.AvailabilityZone ec2Zone : ec2Zones)
-            zones.add(new ZoneImpl.Builder().name(ec2Zone.getZoneName()).build());
-        return zones;
+        return AWS.access().ec2()
+                .getExistEc2AvailabilityZones().stream()
+                .map(ec2Zone -> new ZoneImpl.Builder().name(ec2Zone.getZoneName()).build())
+                .collect(Collectors.toList());
     }
     
     @Override
@@ -73,11 +73,11 @@ public class AWSResourceFactory extends ResourceFactory{
     */
     @Override
     public List<VPC> getVPCs(){
-        List<com.amazonaws.services.ec2.model.Vpc> ec2Vpcs = AWS.access().ec2().getExistEc2Vpcs();
-        List<VPC> vpcs = new ArrayList<>();
-        for(com.amazonaws.services.ec2.model.Vpc ec2Vpc : ec2Vpcs)
-            vpcs.add(new VPCImpl.Builder().id(ec2Vpc.getVpcId()).get());
-        return vpcs;
+
+        return AWS.access().ec2()
+                .getExistEc2Vpcs().stream()
+                .map(ec2Vpc -> new VPCImpl.Builder().id(ec2Vpc.getVpcId()).get())
+                .collect(Collectors.toList());
     }
     
     @Override
@@ -90,11 +90,11 @@ public class AWSResourceFactory extends ResourceFactory{
     */
     @Override
     public List<Subnet> getSubnets(){
-        List<com.amazonaws.services.ec2.model.Subnet> ec2Subnets = AWS.access().ec2().getExistEc2Subnets();
-        List<Subnet> subnets = new ArrayList<>();
-        for(com.amazonaws.services.ec2.model.Subnet ec2Subnet : ec2Subnets)
-            subnets.add(new SubnetImpl.Builder().id(ec2Subnet.getSubnetId()).get());
-        return subnets;
+
+        return AWS.access().ec2()
+                .getExistEc2Subnets().stream()
+                .map(ec2Subnet -> new SubnetImpl.Builder().id(ec2Subnet.getSubnetId()).get())
+                .collect(Collectors.toList());
     }
     
     @Override
@@ -121,12 +121,10 @@ public class AWSResourceFactory extends ResourceFactory{
     @Override
     public List<AutoScalingGroup> getAutoScalingGroups(){
         
-        List<com.amazonaws.services.autoscaling.model.AutoScalingGroup> awsASGroups
-                = AWS.access().as().getExistAutoScalingGroups();
-        List<AutoScalingGroup> asGroups = new ArrayList<>();
-        for(com.amazonaws.services.autoscaling.model.AutoScalingGroup awsASGroup : awsASGroups)
-            asGroups.add(new AutoScalingGroupImpl.Builder().name(awsASGroup.getAutoScalingGroupName()).get());
-        return asGroups;
+        return AWS.access().as()
+                .getExistAutoScalingGroups().stream()
+                .map(awsASGroup -> new AutoScalingGroupImpl.Builder().name(awsASGroup.getAutoScalingGroupName()).get())
+                .collect(Collectors.toList());
     }
     
     @Override
