@@ -26,6 +26,7 @@ import com.amazonaws.services.autoscaling.model.TerminateInstanceInAutoScalingGr
 import com.amazonaws.services.autoscaling.model.TerminateInstanceInAutoScalingGroupResult;
 import com.amazonaws.services.autoscaling.model.UpdateAutoScalingGroupRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import web.component.impl.CloudBlock;
@@ -80,11 +81,7 @@ public class AWSAutoScaling implements CloudBlock{
     }
 
     public void attachInstance(String autoScalingGroupName, String instanceId){
-        
-        List<String> instanceIds = new ArrayList<>();
-        instanceIds.add(instanceId);
-        
-        attachInstances(autoScalingGroupName, instanceIds);
+        attachInstances(autoScalingGroupName, Collections.singletonList(instanceId));
     }
     
     public void detachInstances(DetachInstancesRequest request){
@@ -124,25 +121,13 @@ public class AWSAutoScaling implements CloudBlock{
         detachInstances(request);
     }
     public void detachInstance(String autoScalingGroupName, String instanceId, boolean shouldDecrementDesiredCapacity){
-        
-        List<String> instanceIds = new ArrayList<>();
-        instanceIds.add(instanceId);
-        
-        detachInstances(autoScalingGroupName,instanceIds,shouldDecrementDesiredCapacity);
+        detachInstances(autoScalingGroupName,Collections.singletonList(instanceId),shouldDecrementDesiredCapacity);
     }
     public void detachInstance(String autoScalingGroupName, String instanceId){
-        
-        List<String> instanceIds = new ArrayList<>();
-        instanceIds.add(instanceId);
-        
-        detachInstances(autoScalingGroupName,instanceIds);
+        detachInstances(autoScalingGroupName,Collections.singletonList(instanceId));
     }
     public void detachInstanceDecreasingDesiredCapacity(String autoScalingGroupName, String instanceId){
-        
-        List<String> instanceIds = new ArrayList<>();
-        instanceIds.add(instanceId);
-        
-        detachInstancesDecreasingDesiredCapacity(autoScalingGroupName,instanceIds);
+        detachInstancesDecreasingDesiredCapacity(autoScalingGroupName,Collections.singletonList(instanceId));
     }
     
     
