@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import web.component.impl.CloudBlock;
 
 /**
@@ -273,11 +274,11 @@ public class AWSAutoScaling implements CloudBlock{
     }
     
     public List<String> getAttachedInstanceIds(String autoScalingGroupName){
-        List<Instance> instances = getExistAutoScalingGroupByName(autoScalingGroupName).getInstances();
-        List<String> instanceIds = new ArrayList<>();
-        for(Instance instance : instances)
-            instanceIds.add(instance.getInstanceId());
-        return instanceIds;
+        
+        return getExistAutoScalingGroupByName(autoScalingGroupName)
+                .getInstances().stream()
+                .map(Instance::getInstanceId)
+                .collect(Collectors.toList());
     }
     
     public void createLaunchConfiguration(CreateLaunchConfigurationRequest request){

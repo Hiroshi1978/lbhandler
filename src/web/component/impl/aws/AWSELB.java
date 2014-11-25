@@ -57,6 +57,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import web.component.impl.CloudBlock;
 
 /**
@@ -252,15 +253,14 @@ public class AWSELB implements CloudBlock{
    }
    public void deleteLoadBalancerListeners(String loadBalancerName, Collection<Listener> listeners){
        
-       DeleteLoadBalancerListenersRequest request = new DeleteLoadBalancerListenersRequest();
-       request.setLoadBalancerName(loadBalancerName);
-       List<Integer> ports = new ArrayList<>();
-       for(Listener listener : listeners)
-           ports.add(listener.getLoadBalancerPort());
-       request.setLoadBalancerPorts(ports);
-       
-       deleteLoadBalancerListeners(request);
-   }
+        DeleteLoadBalancerListenersRequest request = new DeleteLoadBalancerListenersRequest();
+        request.setLoadBalancerName(loadBalancerName);
+        List<Integer> ports = listeners.stream()
+               .map(Listener::getLoadBalancerPort)
+               .collect(Collectors.toList());
+        request.setLoadBalancerPorts(ports);
+        deleteLoadBalancerListeners(request);
+    }
 
    
     public CreateLoadBalancerResult createLoadBalancer(String loadBalancerName, Collection<Listener> listeners){
@@ -301,11 +301,10 @@ public class AWSELB implements CloudBlock{
 
        CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName);
        request.setListeners(listeners);
-       List<String> availabilityZoneNames = new ArrayList<>();
-       for(AvailabilityZone avz : availabilityZones)
-           availabilityZoneNames.add(avz.getZoneName());
+       List<String> availabilityZoneNames = availabilityZones.stream()
+               .map(AvailabilityZone::getZoneName)
+               .collect(Collectors.toList());
        request.setAvailabilityZones(availabilityZoneNames);
-       
        return awsHttpClient.createLoadBalancer(request);
     }
     
