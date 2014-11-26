@@ -6,6 +6,7 @@
 
 package web.component.impl.aws;
 
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancing;
@@ -160,22 +161,23 @@ public class AWSELB implements CloudBlock{
     }
 
     public int deleteAllLoadBalancers(){
-        DescribeLoadBalancersResult result = awsHttpClient.describeLoadBalancers();
-        List<LoadBalancerDescription> descriptions = result.getLoadBalancerDescriptions();
         
-        int deleteCount = 0;
-        
-        for(LoadBalancerDescription description : descriptions){
-            String loadBalancerName = description.getLoadBalancerName();
-            DeleteLoadBalancerRequest request = new DeleteLoadBalancerRequest(loadBalancerName);
-            try{
-                awsHttpClient.deleteLoadBalancer(request);
-            }catch(Exception e){
-                System.out.println("Delete Load Balancer failed. [" + loadBalancerName + "]");
-            }
-            deleteCount++;
-        }
-        return deleteCount;
+        return (int) awsHttpClient.describeLoadBalancers()
+                .getLoadBalancerDescriptions().stream()
+                //i don't have confidence in the appropriateness of the codes below.
+                .map(LoadBalancerDescription::getLoadBalancerName)
+                .map(DeleteLoadBalancerRequest::new)
+                .map(request -> {
+                    boolean succeededToDelete = false;
+                    try{
+                        awsHttpClient.deleteLoadBalancer(request);
+                        succeededToDelete = true;
+                    }catch(AmazonClientException e){
+                    }
+                    return succeededToDelete;
+                })
+                .filter(succeededToDelete -> true)
+                .count();
     }
 
         public RegisterInstancesWithLoadBalancerResult registerInstancesWithLoadBalancer(RegisterInstancesWithLoadBalancerRequest request){
