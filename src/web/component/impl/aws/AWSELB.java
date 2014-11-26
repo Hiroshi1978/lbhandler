@@ -176,7 +176,7 @@ public class AWSELB implements CloudBlock{
                     }
                     return succeededToDelete;
                 })
-                .filter(succeededToDelete -> true)
+                .filter(succeededToDelete -> succeededToDelete)
                 .count();
     }
 
