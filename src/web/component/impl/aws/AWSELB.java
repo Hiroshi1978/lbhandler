@@ -180,7 +180,7 @@ public class AWSELB implements CloudBlock{
                 .count();
     }
 
-        public RegisterInstancesWithLoadBalancerResult registerInstancesWithLoadBalancer(RegisterInstancesWithLoadBalancerRequest request){
+    public RegisterInstancesWithLoadBalancerResult registerInstancesWithLoadBalancer(RegisterInstancesWithLoadBalancerRequest request){
     
         if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified.");
