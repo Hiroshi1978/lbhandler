@@ -58,8 +58,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 import web.component.impl.CloudBlock;
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -261,7 +261,7 @@ public class AWSELB implements CloudBlock{
                     .withLoadBalancerName(loadBalancerName)
                     .withLoadBalancerPorts(listeners.stream()
                                             .map(Listener::getLoadBalancerPort)
-                                            .collect(Collectors.toList()));
+                                            .collect(toList()));
 
         deleteLoadBalancerListeners(request);
     }
@@ -312,7 +312,7 @@ public class AWSELB implements CloudBlock{
                     .withListeners(listeners)
                     .withAvailabilityZones(availabilityZones.stream()
                                             .map(AvailabilityZone::getZoneName)
-                                            .collect(Collectors.toList()));
+                                            .collect(toList()));
 
        return awsHttpClient.createLoadBalancer(request);
     }

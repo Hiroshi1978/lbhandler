@@ -25,12 +25,11 @@ import com.amazonaws.services.autoscaling.model.SetDesiredCapacityRequest;
 import com.amazonaws.services.autoscaling.model.TerminateInstanceInAutoScalingGroupRequest;
 import com.amazonaws.services.autoscaling.model.TerminateInstanceInAutoScalingGroupResult;
 import com.amazonaws.services.autoscaling.model.UpdateAutoScalingGroupRequest;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 import web.component.impl.CloudBlock;
+import static java.util.stream.Collectors.toList;
+import static java.util.Collections.singletonList;
 
 /**
  *
@@ -74,15 +73,13 @@ public class AWSAutoScaling implements CloudBlock{
     
     public void attachInstances(String autoScalingGroupName, List<String> instanceIds){
         
-        AttachInstancesRequest request = new AttachInstancesRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setInstanceIds(instanceIds);
-        
-        attachInstances(request);
+        attachInstances(new AttachInstancesRequest()
+                        .withAutoScalingGroupName(autoScalingGroupName)
+                        .withInstanceIds(instanceIds));
     }
 
     public void attachInstance(String autoScalingGroupName, String instanceId){
-        attachInstances(autoScalingGroupName, Collections.singletonList(instanceId));
+        attachInstances(autoScalingGroupName, singletonList(instanceId));
     }
     
     public void detachInstances(DetachInstancesRequest request){
@@ -96,39 +93,33 @@ public class AWSAutoScaling implements CloudBlock{
     }
     public void detachInstances(String autoScalingGroupName, List<String> instanceIds, boolean shouldDecrementDesiredCapacity){
         
-        DetachInstancesRequest request = new DetachInstancesRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setInstanceIds(instanceIds);
-        request.setShouldDecrementDesiredCapacity(shouldDecrementDesiredCapacity);
-        
-        detachInstances(request);
+        detachInstances(new DetachInstancesRequest()
+                        .withAutoScalingGroupName(autoScalingGroupName)
+                        .withInstanceIds(instanceIds)
+                        .withShouldDecrementDesiredCapacity(shouldDecrementDesiredCapacity));
     }
     public void detachInstances(String autoScalingGroupName, List<String> instanceIds){
         
-        DetachInstancesRequest request = new DetachInstancesRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setInstanceIds(instanceIds);
-        request.setShouldDecrementDesiredCapacity(false);
-        
-        detachInstances(request);
+        detachInstances(new DetachInstancesRequest()
+                        .withAutoScalingGroupName(autoScalingGroupName)
+                        .withInstanceIds(instanceIds)
+                        .withShouldDecrementDesiredCapacity(false));
     }
     public void detachInstancesDecreasingDesiredCapacity(String autoScalingGroupName, List<String> instanceIds){
         
-        DetachInstancesRequest request = new DetachInstancesRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setInstanceIds(instanceIds);
-        request.setShouldDecrementDesiredCapacity(true);
-        
-        detachInstances(request);
+        detachInstances(new DetachInstancesRequest()
+                        .withAutoScalingGroupName(autoScalingGroupName)
+                        .withInstanceIds(instanceIds)
+                        .withShouldDecrementDesiredCapacity(true));
     }
     public void detachInstance(String autoScalingGroupName, String instanceId, boolean shouldDecrementDesiredCapacity){
-        detachInstances(autoScalingGroupName,Collections.singletonList(instanceId),shouldDecrementDesiredCapacity);
+        detachInstances(autoScalingGroupName,singletonList(instanceId),shouldDecrementDesiredCapacity);
     }
     public void detachInstance(String autoScalingGroupName, String instanceId){
-        detachInstances(autoScalingGroupName,Collections.singletonList(instanceId));
+        detachInstances(autoScalingGroupName,singletonList(instanceId));
     }
     public void detachInstanceDecreasingDesiredCapacity(String autoScalingGroupName, String instanceId){
-        detachInstancesDecreasingDesiredCapacity(autoScalingGroupName,Collections.singletonList(instanceId));
+        detachInstancesDecreasingDesiredCapacity(autoScalingGroupName,singletonList(instanceId));
     }
     
     
@@ -163,10 +154,12 @@ public class AWSAutoScaling implements CloudBlock{
                 String vpcZoneIdentifier,
                 int desiredCapacity){
      
-        CreateAutoScalingGroupRequest request = new CreateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setMaxSize(maxSize);
-        request.setMinSize(minSize);
+        CreateAutoScalingGroupRequest request = 
+                new CreateAutoScalingGroupRequest()
+                    .withAutoScalingGroupName(autoScalingGroupName)
+                    .withMaxSize(maxSize)
+                    .withMinSize(minSize);
+        
         request.setDesiredCapacity(desiredCapacity);
         if(instanceId != null && !instanceId.isEmpty())
             request.setInstanceId(instanceId);
@@ -190,10 +183,8 @@ public class AWSAutoScaling implements CloudBlock{
 
     public void deleteAutoScalingGroup(String autoScalingGroupName){
      
-        DeleteAutoScalingGroupRequest request = new DeleteAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        
-        deleteAutoScalingGroup(request);
+        deleteAutoScalingGroup(new DeleteAutoScalingGroupRequest()
+                                 .withAutoScalingGroupName(autoScalingGroupName));        
     }
 
     public DescribeAutoScalingGroupsResult describeAutoScalingGroups(){
@@ -211,18 +202,13 @@ public class AWSAutoScaling implements CloudBlock{
 
     public DescribeAutoScalingGroupsResult describeAutoScalingGroups(List<String> autoScalingGroupNames){
         
-        DescribeAutoScalingGroupsRequest request = new DescribeAutoScalingGroupsRequest();
-        request.setAutoScalingGroupNames(autoScalingGroupNames);
-            
-        return describeAutoScalingGroups(request);
+        return describeAutoScalingGroups(new DescribeAutoScalingGroupsRequest()
+                                                .withAutoScalingGroupNames(autoScalingGroupNames));           
     }
 
     public DescribeAutoScalingGroupsResult describeAutoScalingGroup(String autoScalingGroupName){
         
-        List<String> autoScalingGroupNames = new ArrayList<>();
-        autoScalingGroupNames.add(autoScalingGroupName);
-            
-        return describeAutoScalingGroups(autoScalingGroupNames);
+        return describeAutoScalingGroups(singletonList(autoScalingGroupName));
     }
 
     public List<AutoScalingGroup> getExistAutoScalingGroups(){
@@ -251,17 +237,12 @@ public class AWSAutoScaling implements CloudBlock{
     }
     public DescribeLaunchConfigurationsResult describeLaunchConfigurations(List<String> launchConfigurationNames){
         
-        DescribeLaunchConfigurationsRequest request = new DescribeLaunchConfigurationsRequest();
-        request.setLaunchConfigurationNames(launchConfigurationNames);
-        
-        return describeLaunchConfigurations(request);
+        return describeLaunchConfigurations(new DescribeLaunchConfigurationsRequest()
+                                                .withLaunchConfigurationNames(launchConfigurationNames));
     }
     public DescribeLaunchConfigurationsResult describeLaunchConfiguration(String launchConfigurationName){
         
-        List<String> launchConfigurationNames = new ArrayList<>();
-        launchConfigurationNames.add(launchConfigurationName);
-        
-        return describeLaunchConfigurations(launchConfigurationNames);
+        return describeLaunchConfigurations(singletonList(launchConfigurationName));
     }
     public LaunchConfiguration getExistLaunchConfiguration(String launchConfigurationName){
         
@@ -278,7 +259,7 @@ public class AWSAutoScaling implements CloudBlock{
         return getExistAutoScalingGroupByName(autoScalingGroupName)
                 .getInstances().stream()
                 .map(Instance::getInstanceId)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
     
     public void createLaunchConfiguration(CreateLaunchConfigurationRequest request){
@@ -291,10 +272,8 @@ public class AWSAutoScaling implements CloudBlock{
 
     public void createLaunchConfiguration(String launchConfigurationName){
      
-        CreateLaunchConfigurationRequest request = new CreateLaunchConfigurationRequest();
-        request.setLaunchConfigurationName(launchConfigurationName);
-        
-        createLaunchConfiguration(request);
+        createLaunchConfiguration(new CreateLaunchConfigurationRequest()
+                                      .withLaunchConfigurationName(launchConfigurationName));        
     }
 
     public void deleteLaunchConfiguration(DeleteLaunchConfigurationRequest request){
@@ -307,10 +286,8 @@ public class AWSAutoScaling implements CloudBlock{
 
     public void deleteLaunchConfiguration(String launchConfigurationName){
      
-        DeleteLaunchConfigurationRequest request = new DeleteLaunchConfigurationRequest();
-        request.setLaunchConfigurationName(launchConfigurationName);
-
-        deleteLaunchConfiguration(request);
+        deleteLaunchConfiguration(new DeleteLaunchConfigurationRequest()
+                                    .withLaunchConfigurationName(launchConfigurationName));
     }
     
     public void setDesiredCapacity(SetDesiredCapacityRequest request){
@@ -324,11 +301,10 @@ public class AWSAutoScaling implements CloudBlock{
     }
     public void setDesiredCapacity(String autoScalingGroupName, int desiredCapacity){
         
-        SetDesiredCapacityRequest request = new SetDesiredCapacityRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setDesiredCapacity(desiredCapacity);
+        awsHttpClient.setDesiredCapacity(new SetDesiredCapacityRequest()
+                                            .withAutoScalingGroupName(autoScalingGroupName)
+                                            .withDesiredCapacity(desiredCapacity));
         
-        awsHttpClient.setDesiredCapacity(request);
     }
     
     public void updateAutoScalingGroup(UpdateAutoScalingGroupRequest request){
@@ -340,73 +316,63 @@ public class AWSAutoScaling implements CloudBlock{
     }
     public void updateAutoScalingGroupAvailabilityZones(String autoScalingGroupName, List<String> zoneNames){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setAvailabilityZones(zoneNames);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                   .withAutoScalingGroupName(autoScalingGroupName)
+                                   .withAvailabilityZones(zoneNames));        
     }
     public void updateAutoScalingGroupDefaultCoolDown(String autoScalingGroupName, int defaultCoolDown){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setDefaultCooldown(defaultCoolDown);
-        updateAutoScalingGroup(request);
-    }
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withDefaultCooldown(defaultCoolDown)); 
+   }
     public void updateAutoScalingGroupHealthCheckGracePeriod(String autoScalingGroupName, int healthCheckGracePeriod){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setHealthCheckGracePeriod(healthCheckGracePeriod);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withHealthCheckGracePeriod(healthCheckGracePeriod));       
     }
     public void updateAutoScalingGroupHealthCheckType(String autoScalingGroupName, String healthCheckType){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setHealthCheckType(healthCheckType);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withHealthCheckType(healthCheckType));
     }
     public void updateAutoScalingGroupLaunchConfigurationName(String autoScalingGroupName, String launchConfigurationName){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setLaunchConfigurationName(launchConfigurationName);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withLaunchConfigurationName(launchConfigurationName));
     }
     public void updateAutoScalingGroupMaxSize(String autoScalingGroupName, int maxSize){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setMaxSize(maxSize);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withMaxSize(maxSize));
     }
     public void updateAutoScalingGroupMinSize(String autoScalingGroupName, int minSize){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setMinSize(minSize);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withMinSize(minSize));
     }
     public void updateAutoScalingGroupPlacementGroup(String autoScalingGroupName, String placementGroup){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setPlacementGroup(placementGroup);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withPlacementGroup(placementGroup));
     }
     public void updateAutoScalingGroupVPCZoneIdentifier(String autoScalingGroupName, String vpcZoneIdentifier){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setVPCZoneIdentifier(vpcZoneIdentifier);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withVPCZoneIdentifier(vpcZoneIdentifier));
     }
     public void updateAutoScalingGroupTerminationPolicies(String autoScalingGroupName, List<String> terminationPolicies){
         
-        UpdateAutoScalingGroupRequest request = new UpdateAutoScalingGroupRequest();
-        request.setAutoScalingGroupName(autoScalingGroupName);
-        request.setTerminationPolicies(terminationPolicies);
-        updateAutoScalingGroup(request);
+        updateAutoScalingGroup(new UpdateAutoScalingGroupRequest()
+                                    .withAutoScalingGroupName(autoScalingGroupName)
+                                    .withTerminationPolicies(terminationPolicies));
     }
     
     public TerminateInstanceInAutoScalingGroupResult terminateInstanceInAutoScalingGroup(TerminateInstanceInAutoScalingGroupRequest request){
@@ -420,18 +386,15 @@ public class AWSAutoScaling implements CloudBlock{
     }
     public TerminateInstanceInAutoScalingGroupResult terminateInstanceInAutoScalingGroup(String instanceId){
         
-        TerminateInstanceInAutoScalingGroupRequest request = new TerminateInstanceInAutoScalingGroupRequest();
-        request.setInstanceId(instanceId);
-        request.setShouldDecrementDesiredCapacity(false);
-
-        return terminateInstanceInAutoScalingGroup(request);
+        return terminateInstanceInAutoScalingGroup(new TerminateInstanceInAutoScalingGroupRequest()
+                                                        .withInstanceId(instanceId)
+                                                        .withShouldDecrementDesiredCapacity(false));
     }
     public TerminateInstanceInAutoScalingGroupResult terminateInstanceInAutoScalingGroupDecreasingDesiredCapacity(String instanceId){
         
-        TerminateInstanceInAutoScalingGroupRequest request = new TerminateInstanceInAutoScalingGroupRequest();
-        request.setInstanceId(instanceId);
-        request.setShouldDecrementDesiredCapacity(true);
+        return terminateInstanceInAutoScalingGroup(new TerminateInstanceInAutoScalingGroupRequest()
+                                                    .withInstanceId(instanceId)
+                                                    .withShouldDecrementDesiredCapacity(true));
 
-        return terminateInstanceInAutoScalingGroup(request);
     }
 }
