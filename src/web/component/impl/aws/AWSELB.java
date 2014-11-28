@@ -55,11 +55,12 @@ import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPolicies
 import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPoliciesOfListenerResult;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import web.component.impl.CloudBlock;
 import static java.util.stream.Collectors.toList;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 
 /**
  *
@@ -116,7 +117,7 @@ public class AWSELB implements CloudBlock{
 
     public DescribeLoadBalancersResult describeLoadBalancers(String loadBalancerName){
     
-        return this.describeLoadBalancers(Collections.singleton(loadBalancerName));
+        return this.describeLoadBalancers(singleton(loadBalancerName));
     }
 
     public CreateLoadBalancerResult createLoadBalancer(CreateLoadBalancerRequest request){ 
@@ -137,7 +138,7 @@ public class AWSELB implements CloudBlock{
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
        
         CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName); 
-        request.setListeners(Collections.singleton(getDefaultHttpListener())); 
+        request.setListeners(singleton(getDefaultHttpListener())); 
        
         return awsHttpClient.createLoadBalancer(request); 
     } 
@@ -150,7 +151,7 @@ public class AWSELB implements CloudBlock{
             throw new IllegalArgumentException("Certificate ID not specified."); 
 
         CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName); 
-               request.setListeners(Collections.singleton(getDefaultHttpsListener(certificateId))); 
+               request.setListeners(singleton(getDefaultHttpsListener(certificateId))); 
        
         return awsHttpClient.createLoadBalancer(request); 
     } 
@@ -444,9 +445,9 @@ public class AWSELB implements CloudBlock{
         CreateLoadBalancerListenersRequest request  = 
                 new CreateLoadBalancerListenersRequest(
                         loadBalancerName, 
-                        Collections.singletonList(getDefaultHttpListener()
-                                                    .withInstancePort(instancePort)
-                                                    .withLoadBalancerPort(servicePort)));
+                        singletonList(getDefaultHttpListener()
+                                        .withInstancePort(instancePort)
+                                        .withLoadBalancerPort(servicePort)));
         
         awsHttpClient.createLoadBalancerListeners(request);
     }
@@ -514,7 +515,7 @@ public class AWSELB implements CloudBlock{
         
         DescribeInstanceHealthRequest request = 
                 new DescribeInstanceHealthRequest(loadBalancerName)
-                    .withInstances(Collections.singleton(instance));
+                    .withInstances(singleton(instance));
         
         return awsHttpClient.describeInstanceHealth(request);
     }
@@ -682,7 +683,7 @@ public class AWSELB implements CloudBlock{
     }
     public SetLoadBalancerPoliciesOfListenerResult setLoadBalancerPoliciesOfListener(String loadBalancerName, int port, String policyName){
                 
-        return setLoadBalancerPoliciesOfListener(loadBalancerName, port, Collections.singleton(policyName));
+        return setLoadBalancerPoliciesOfListener(loadBalancerName, port, singleton(policyName));
         
     }
 
@@ -706,6 +707,6 @@ public class AWSELB implements CloudBlock{
     }
     public ApplySecurityGroupsToLoadBalancerResult applySecurityGroupsToLoadBalancer(String loadBalancerName, String securityGroup){
 
-        return applySecurityGroupsToLoadBalancer(loadBalancerName, Collections.singleton(securityGroup));
+        return applySecurityGroupsToLoadBalancer(loadBalancerName, singleton(securityGroup));
     }
 }

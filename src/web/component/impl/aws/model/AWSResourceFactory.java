@@ -6,8 +6,6 @@
 
 package web.component.impl.aws.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import web.component.api.model.AutoScalingGroup;
@@ -19,6 +17,7 @@ import web.component.api.model.Subnet;
 import web.component.api.model.VPC;
 import web.component.api.model.Zone;
 import web.component.impl.aws.AWS;
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -32,12 +31,10 @@ public class AWSResourceFactory extends ResourceFactory{
     @Override
     public List<Instance> getInstances(){
         
-        List<com.amazonaws.services.ec2.model.Instance> ec2Instances = AWS.access().ec2().getExistEc2Instances();
-        List<Instance> instances = new ArrayList<>();
-        for(com.amazonaws.services.ec2.model.Instance ec2Instance : ec2Instances)
-            instances.add(new InstanceImpl.Builder().id(ec2Instance.getInstanceId()).get());
-        Collections.sort(instances);
-        return instances;
+        return AWS.access().ec2().getExistEc2Instances().stream()
+                .map(ec2Instance -> new InstanceImpl.Builder().id(ec2Instance.getInstanceId()).get())
+                .sorted()
+                .collect(toList());
     }
     
     @Override

@@ -38,10 +38,10 @@ import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 import com.amazonaws.services.ec2.model.Vpc;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import web.component.impl.CloudBlock;
+import static java.util.Collections.singletonList;
 
 /**
  *
@@ -114,7 +114,7 @@ public class AWSEC2 implements CloudBlock{
         return startInstances(request);
     }
     public StartInstancesResult startInstance(String instanceId){
-        return startInstances(Collections.singletonList(instanceId));
+        return startInstances(singletonList(instanceId));
     }    
     
     public StopInstancesResult stopInstances(StopInstancesRequest request){
@@ -129,9 +129,7 @@ public class AWSEC2 implements CloudBlock{
         return stopInstances(request);
     }
     public StopInstancesResult stopInstance(String instanceId){
-        List<String> instanceIds = new ArrayList<>();
-        instanceIds.add(instanceId);
-        return stopInstances(instanceIds);
+        return stopInstances(singletonList(instanceId));
     }
     
     public DescribeInstancesResult describeInstances(){
@@ -145,12 +143,11 @@ public class AWSEC2 implements CloudBlock{
         return awsHttpClient.describeInstances(request);
     }
     public DescribeInstancesResult describeInstances(List<String> instanceIds){
-        DescribeInstancesRequest request = new DescribeInstancesRequest();
-        request.setInstanceIds(instanceIds);
-        return describeInstances(request);
+        return describeInstances(new DescribeInstancesRequest()
+                                        .withInstanceIds(instanceIds));
     }
     public DescribeInstancesResult describeInstance(String instanceId){
-        return describeInstances(Collections.singletonList(instanceId));
+        return describeInstances(singletonList(instanceId));
     }
     public List<Instance> getExistEc2Instances(){
         DescribeInstancesResult result = describeInstances();
@@ -198,11 +195,10 @@ public class AWSEC2 implements CloudBlock{
         return awsHttpClient.terminateInstances(request);
     }
     public TerminateInstancesResult terminateInstances(List<String> instanceIds){
-        TerminateInstancesRequest request = new TerminateInstancesRequest(instanceIds);
-        return terminateInstances(request);
+        return terminateInstances(new TerminateInstancesRequest(instanceIds));
     }
     public TerminateInstancesResult terminateInstance(String instanceId){
-        return terminateInstances(Collections.singletonList(instanceId));
+        return terminateInstances(singletonList(instanceId));
     }
     
     public DescribeAvailabilityZonesResult describeAvailabilityZones(){
@@ -246,7 +242,7 @@ public class AWSEC2 implements CloudBlock{
         return describeSubnets(request);
     }
     public DescribeSubnetsResult describeSubnet(String subnetId){
-        return describeSubnets(Collections.singletonList(subnetId));
+        return describeSubnets(singletonList(subnetId));
     }
     public List<Subnet> getExistEc2Subnets(){
         return describeSubnets().getSubnets();
@@ -274,11 +270,10 @@ public class AWSEC2 implements CloudBlock{
     }
     public CreateSubnetResult createSubnet(String vpcId, String cidrBlock, String availabilityZone){
 
-        CreateSubnetRequest request = new CreateSubnetRequest();
-        request.setVpcId(vpcId);
-        request.setCidrBlock(cidrBlock);
-        request.setAvailabilityZone(availabilityZone);
-        return createSubnet(request);
+        return createSubnet(new CreateSubnetRequest()
+                            .withVpcId(vpcId)
+                            .withCidrBlock(cidrBlock)
+                            .withAvailabilityZone(availabilityZone));
     }
     public CreateSubnetResult createSubnet(String vpcId, String cidrBlock){
 
@@ -308,12 +303,10 @@ public class AWSEC2 implements CloudBlock{
         return awsHttpClient.describeVpcs(request);
     }    
     public DescribeVpcsResult describeVpcs(List<String> vpcIds){
-        DescribeVpcsRequest request = new DescribeVpcsRequest();
-        request.setVpcIds(vpcIds);
-        return describeVpcs(request);
+        return describeVpcs(new DescribeVpcsRequest().withVpcIds(vpcIds));
     }
     public DescribeVpcsResult describeVpc(String vpcId){
-        return describeVpcs(Collections.singletonList(vpcId));
+        return describeVpcs(singletonList(vpcId));
     }
     public List<Vpc> getExistEc2Vpcs(){
         return describeVpcs().getVpcs();
@@ -342,10 +335,9 @@ public class AWSEC2 implements CloudBlock{
     }
     public CreateVpcResult createVpc(String cidrBlock, String tenancy){
 
-        CreateVpcRequest request = new CreateVpcRequest();
-        request.setCidrBlock(cidrBlock);
-        request.setInstanceTenancy(tenancy);
-        return createVpc(request);
+        return createVpc(new CreateVpcRequest()
+                                .withCidrBlock(cidrBlock)
+                                .withInstanceTenancy(tenancy));
     }
     public Vpc getNewVpc(String cidrBlock, String tenancy){
         return createVpc(cidrBlock, tenancy).getVpc();
