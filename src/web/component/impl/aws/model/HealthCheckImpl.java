@@ -23,25 +23,25 @@ public class HealthCheckImpl extends AWSModelBase implements HealthCheck{
     
     private static HealthCheck create(Builder builder){
         
-        com.amazonaws.services.elasticloadbalancing.model.HealthCheck elbHealthCheck = new com.amazonaws.services.elasticloadbalancing.model.HealthCheck();
-        elbHealthCheck.setHealthyThreshold(builder.healthThreshold);
-        elbHealthCheck.setInterval(builder.interval);
-        elbHealthCheck.setTarget(builder.target);
-        elbHealthCheck.setTimeout(builder.timeout);
-        elbHealthCheck.setUnhealthyThreshold(builder.unhealthThreshold);
+        com.amazonaws.services.elasticloadbalancing.model.HealthCheck elbHealthCheck = 
+                new com.amazonaws.services.elasticloadbalancing.model.HealthCheck()
+                        .withHealthyThreshold(builder.healthThreshold)
+                        .withInterval(builder.interval)
+                        .withTarget(builder.target)
+                        .withTimeout(builder.timeout)
+                        .withUnhealthyThreshold(builder.unhealthThreshold);
+        
         return new HealthCheckImpl(elbHealthCheck);
     }
     
     private com.amazonaws.services.elasticloadbalancing.model.HealthCheck copyElbHealthCheck(com.amazonaws.services.elasticloadbalancing.model.HealthCheck source){
         
-        com.amazonaws.services.elasticloadbalancing.model.HealthCheck copy = new com.amazonaws.services.elasticloadbalancing.model.HealthCheck();
-        copy.setHealthyThreshold(source.getHealthyThreshold());
-        copy.setInterval(source.getInterval());
-        copy.setTarget(source.getTarget());
-        copy.setTimeout(source.getTimeout());
-        copy.setUnhealthyThreshold(source.getUnhealthyThreshold());
-        
-        return copy;
+        return new com.amazonaws.services.elasticloadbalancing.model.HealthCheck()
+                    .withHealthyThreshold(source.getHealthyThreshold())
+                    .withInterval(source.getInterval())
+                    .withTarget(source.getTarget())
+                    .withTimeout(source.getTimeout())
+                    .withUnhealthyThreshold(source.getUnhealthyThreshold());
     }
     
     com.amazonaws.services.elasticloadbalancing.model.HealthCheck asElbHealthCheck(){

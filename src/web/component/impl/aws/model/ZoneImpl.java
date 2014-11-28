@@ -8,11 +8,11 @@ package web.component.impl.aws.model;
 
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.ec2.model.AvailabilityZoneMessage;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import web.component.api.model.Zone;
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -35,20 +35,17 @@ public class ZoneImpl extends AWSModelBase implements Zone{
     }
     
     private AvailabilityZone copyEc2Zone(AvailabilityZone original){
-        AvailabilityZone copy = new AvailabilityZone();
-        copy.setMessages(original.getMessages());
-        copy.setRegionName(original.getRegionName());
-        copy.setZoneName(original.getZoneName());
-        return copy;
+        return new AvailabilityZone()
+                    .withMessages(original.getMessages())
+                    .withRegionName(original.getRegionName())
+                    .withZoneName(original.getZoneName());
     }
     
     @Override
     public List<String> getMessages(){
-        List<AvailabilityZoneMessage> messages = ec2Zone.getMessages();
-        List<String> messageStrings = new ArrayList<>();
-        for(AvailabilityZoneMessage message : messages)
-            messageStrings.add(message.getMessage());
-        return messageStrings;
+        return ec2Zone.getMessages().stream()
+                .map(AvailabilityZoneMessage::getMessage)
+                .collect(toList());
     }
 
     @Override

@@ -85,52 +85,50 @@ public class InstanceImpl extends AWSModelBase implements Instance{
  
     private com.amazonaws.services.elasticloadbalancing.model.Instance copyElbInstance(com.amazonaws.services.elasticloadbalancing.model.Instance original){
         
-        com.amazonaws.services.elasticloadbalancing.model.Instance copy = new com.amazonaws.services.elasticloadbalancing.model.Instance();
-        copy.setInstanceId(original.getInstanceId());
-        return copy;
+        return new com.amazonaws.services.elasticloadbalancing.model.Instance()
+                .withInstanceId(original.getInstanceId());
     }
     
     private com.amazonaws.services.ec2.model.Instance copyEc2Instance(com.amazonaws.services.ec2.model.Instance original){
         
-        com.amazonaws.services.ec2.model.Instance copy = new com.amazonaws.services.ec2.model.Instance();
-
-        copy.setAmiLaunchIndex(original.getAmiLaunchIndex());
-        copy.setArchitecture(original.getArchitecture());
-        copy.setBlockDeviceMappings(original.getBlockDeviceMappings());
-        copy.setClientToken(original.getClientToken());
-        copy.setEbsOptimized(original.getEbsOptimized());
-        copy.setHypervisor(original.getHypervisor());
-        copy.setIamInstanceProfile(original.getIamInstanceProfile());
-        copy.setImageId(original.getImageId());
-        copy.setInstanceId(original.getInstanceId());
-        copy.setInstanceLifecycle(original.getInstanceLifecycle());
-        copy.setInstanceType(original.getInstanceType());
-        copy.setKernelId(original.getKernelId());
-        copy.setKeyName(original.getKeyName());
-        copy.setLaunchTime(original.getLaunchTime());
-        copy.setMonitoring(original.getMonitoring());
-        copy.setNetworkInterfaces(original.getNetworkInterfaces());
-        copy.setPlacement(original.getPlacement());
-        copy.setPlatform(original.getPlatform());
-        copy.setPrivateDnsName(original.getPrivateDnsName());
-        copy.setPrivateIpAddress(original.getPrivateIpAddress());
-        copy.setProductCodes(original.getProductCodes());
-        copy.setPublicDnsName(original.getPublicDnsName());
-        copy.setPublicIpAddress(original.getPublicIpAddress());
-        copy.setMonitoring(original.getMonitoring());
-        copy.setRamdiskId(original.getRamdiskId());
-        copy.setRootDeviceName(original.getRootDeviceName());
-        copy.setRootDeviceType(original.getRootDeviceType());
-        copy.setSecurityGroups(original.getSecurityGroups());
-        copy.setSourceDestCheck(original.getSourceDestCheck());
-        copy.setSpotInstanceRequestId(original.getSpotInstanceRequestId());
-        copy.setSriovNetSupport(original.getSriovNetSupport());
-        copy.setSubnetId(original.getSubnetId());
-        copy.setTags(original.getTags());
-        copy.setVirtualizationType(original.getVirtualizationType());
-        copy.setVpcId(original.getVpcId());
-        
-        return copy;
+        return new com.amazonaws.services.ec2.model.Instance()
+                .withAmiLaunchIndex(original.getAmiLaunchIndex())
+                .withArchitecture(original.getArchitecture())
+                .withBlockDeviceMappings(original.getBlockDeviceMappings())
+                .withClientToken(original.getClientToken())
+                .withEbsOptimized(original.getEbsOptimized())
+                .withHypervisor(original.getHypervisor())
+                .withIamInstanceProfile(original.getIamInstanceProfile())
+                .withImageId(original.getImageId())
+                .withInstanceId(original.getInstanceId())
+                .withInstanceLifecycle(original.getInstanceLifecycle())
+                .withInstanceType(original.getInstanceType())
+                .withKernelId(original.getKernelId())
+                .withKeyName(original.getKeyName())
+                .withLaunchTime(original.getLaunchTime())
+                .withMonitoring(original.getMonitoring())
+                .withNetworkInterfaces(original.getNetworkInterfaces())
+                .withPlacement(original.getPlacement())
+                .withPlatform(original.getPlatform())
+                .withPrivateDnsName(original.getPrivateDnsName())
+                .withPrivateIpAddress(original.getPrivateIpAddress())
+                .withPublicDnsName(original.getPublicDnsName())
+                .withProductCodes(original.getProductCodes())
+                .withPublicIpAddress(original.getPublicIpAddress())
+                .withRamdiskId(original.getRamdiskId())
+                .withRootDeviceName(original.getRootDeviceName())
+                .withRootDeviceType(original.getRootDeviceType())
+                .withSecurityGroups(original.getSecurityGroups())
+                .withSourceDestCheck(original.getSourceDestCheck())
+                .withSpotInstanceRequestId(original.getSpotInstanceRequestId())
+                .withSriovNetSupport(original.getSriovNetSupport())
+                .withState(original.getState())
+                .withStateReason(original.getStateReason())
+                .withStateTransitionReason(original.getStateTransitionReason())
+                .withSubnetId(original.getSubnetId())
+                .withTags(original.getTags())
+                .withVirtualizationType(original.getVirtualizationType())
+                .withVpcId(original.getVpcId());
     }
 
     @Override

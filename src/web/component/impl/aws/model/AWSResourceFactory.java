@@ -7,7 +7,6 @@
 package web.component.impl.aws.model;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import web.component.api.model.AutoScalingGroup;
 import web.component.api.model.Instance;
 import web.component.api.model.LaunchConfiguration;
@@ -57,7 +56,7 @@ public class AWSResourceFactory extends ResourceFactory{
         return AWS.access().ec2()
                 .getExistEc2AvailabilityZones().stream()
                 .map(ec2Zone -> new ZoneImpl.Builder().name(ec2Zone.getZoneName()).build())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
     
     @Override
@@ -74,7 +73,7 @@ public class AWSResourceFactory extends ResourceFactory{
         return AWS.access().ec2()
                 .getExistEc2Vpcs().stream()
                 .map(ec2Vpc -> new VPCImpl.Builder().id(ec2Vpc.getVpcId()).get())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
     
     @Override
@@ -91,7 +90,7 @@ public class AWSResourceFactory extends ResourceFactory{
         return AWS.access().ec2()
                 .getExistEc2Subnets().stream()
                 .map(ec2Subnet -> new SubnetImpl.Builder().id(ec2Subnet.getSubnetId()).get())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
     
     @Override
@@ -121,7 +120,7 @@ public class AWSResourceFactory extends ResourceFactory{
         return AWS.access().as()
                 .getExistAutoScalingGroups().stream()
                 .map(awsASGroup -> new AutoScalingGroupImpl.Builder().name(awsASGroup.getAutoScalingGroupName()).get())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
     
     @Override

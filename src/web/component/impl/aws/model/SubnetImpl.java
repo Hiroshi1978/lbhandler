@@ -44,17 +44,15 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
     
     private com.amazonaws.services.ec2.model.Subnet copyEc2Subnet(com.amazonaws.services.ec2.model.Subnet original){
         
-        com.amazonaws.services.ec2.model.Subnet copy = new com.amazonaws.services.ec2.model.Subnet();
-        copy.setSubnetId(original.getSubnetId());
-        copy.setAvailabilityZone(original.getAvailabilityZone());
-        copy.setAvailableIpAddressCount(original.getAvailableIpAddressCount());
-        copy.setCidrBlock(original.getCidrBlock());
-        copy.setDefaultForAz(original.getDefaultForAz());
-        copy.setMapPublicIpOnLaunch(original.getMapPublicIpOnLaunch());
-        copy.setTags(original.getTags());
-        copy.setVpcId(original.getVpcId());
-        
-        return copy;
+        return  new com.amazonaws.services.ec2.model.Subnet()
+                        .withSubnetId(original.getSubnetId())
+                        .withAvailabilityZone(original.getAvailabilityZone())
+                        .withAvailableIpAddressCount(original.getAvailableIpAddressCount())
+                        .withCidrBlock(original.getCidrBlock())
+                        .withDefaultForAz(original.getDefaultForAz())
+                        .withMapPublicIpOnLaunch(original.getMapPublicIpOnLaunch())
+                        .withTags(original.getTags())
+                        .withVpcId(original.getVpcId());
     }
     
     @Override

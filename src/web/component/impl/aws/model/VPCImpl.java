@@ -42,14 +42,13 @@ public class VPCImpl extends AWSModelBase implements VPC{
     
     private com.amazonaws.services.ec2.model.Vpc copyEc2Vpc(com.amazonaws.services.ec2.model.Vpc original){
         
-        com.amazonaws.services.ec2.model.Vpc copy = new com.amazonaws.services.ec2.model.Vpc();
-        copy.setCidrBlock(original.getCidrBlock());
-        copy.setDhcpOptionsId(original.getDhcpOptionsId());
-        copy.setInstanceTenancy(original.getInstanceTenancy());
-        copy.setIsDefault(original.getIsDefault());
-        copy.setTags(original.getTags());
-        copy.setVpcId(original.getVpcId());
-        return copy;
+        return new com.amazonaws.services.ec2.model.Vpc()
+                    .withCidrBlock(original.getCidrBlock())
+                    .withDhcpOptionsId(original.getDhcpOptionsId())
+                    .withInstanceTenancy(original.getInstanceTenancy())
+                    .withIsDefault(original.getIsDefault())
+                    .withTags(original.getTags())
+                    .withVpcId(original.getVpcId());
     }
     
     @Override

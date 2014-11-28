@@ -25,12 +25,12 @@ public class LoadBalancerListenerImpl extends AWSModelBase implements LoadBalanc
     
     private static LoadBalancerListener create(Builder builder){
 
-        Listener newListener = new Listener();
-        newListener.setInstancePort(builder.instancePort);
-        newListener.setInstanceProtocol(builder.instanceProtocol);
-        newListener.setLoadBalancerPort(builder.servicePort);
-        newListener.setProtocol(builder.serviceProtocol);
-        newListener.setSSLCertificateId(builder.certificateId);
+        Listener newListener = new Listener()
+                    .withInstancePort(builder.instancePort)
+                    .withInstanceProtocol(builder.instanceProtocol)
+                    .withLoadBalancerPort(builder.servicePort)
+                    .withProtocol(builder.serviceProtocol)
+                    .withSSLCertificateId(builder.certificateId);
         
         return new LoadBalancerListenerImpl(newListener);
     }
@@ -41,15 +41,12 @@ public class LoadBalancerListenerImpl extends AWSModelBase implements LoadBalanc
     
     private Listener copyElbListener(Listener source){
         
-        Listener copy = new Listener();
-        
-        copy.setInstancePort(source.getInstancePort());
-        copy.setInstanceProtocol(source.getInstanceProtocol());
-        copy.setLoadBalancerPort(source.getLoadBalancerPort());
-        copy.setProtocol(source.getProtocol());
-        copy.setSSLCertificateId(source.getSSLCertificateId());
-        
-        return copy;
+        return new Listener()
+                .withInstancePort(source.getInstancePort())
+                .withInstanceProtocol(source.getInstanceProtocol())
+                .withLoadBalancerPort(source.getLoadBalancerPort())
+                .withProtocol(source.getProtocol())
+                .withSSLCertificateId(source.getSSLCertificateId());
     }
     
     @Override
