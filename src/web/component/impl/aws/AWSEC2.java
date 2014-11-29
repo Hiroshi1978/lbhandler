@@ -88,15 +88,13 @@ public class AWSEC2 implements CloudBlock{
     }
     public Instance createInstance(String imageId, String instanceType, String zoneName){
         
-        RunInstancesRequest request = new RunInstancesRequest();
-        request.setImageId(imageId);
-        request.setInstanceType(instanceType);
-        if(zoneName != null && !zoneName.isEmpty())
-            request.setPlacement(new Placement(zoneName));
-        RunInstancesResult  result = runInstances(request);
-        Instance newInstance = result.getReservation().getInstances().get(0);
-        
-        return newInstance;
+        return runInstances(new RunInstancesRequest()
+                                .withImageId(imageId)
+                                .withInstanceType(instanceType)
+                                .withPlacement((new Placement(zoneName))))
+                    .getReservation()
+                    .getInstances()
+                    .get(0);
     }
     public Instance createInstance(String imageId, String instanceType){
         return createInstance(imageId, instanceType, null);
@@ -110,8 +108,7 @@ public class AWSEC2 implements CloudBlock{
         return awsHttpClient.startInstances(request);
     }
     public StartInstancesResult startInstances(List<String> instanceIds){
-        StartInstancesRequest request = new StartInstancesRequest(instanceIds);
-        return startInstances(request);
+        return startInstances(new StartInstancesRequest(instanceIds));
     }
     public StartInstancesResult startInstance(String instanceId){
         return startInstances(singletonList(instanceId));
@@ -125,8 +122,7 @@ public class AWSEC2 implements CloudBlock{
         return awsHttpClient.stopInstances(request);
     }
     public StopInstancesResult stopInstances(List<String> instanceIds){
-        StopInstancesRequest request = new StopInstancesRequest(instanceIds);
-        return stopInstances(request);
+        return stopInstances(new StopInstancesRequest(instanceIds));
     }
     public StopInstancesResult stopInstance(String instanceId){
         return stopInstances(singletonList(instanceId));
@@ -212,9 +208,8 @@ public class AWSEC2 implements CloudBlock{
         return awsHttpClient.describeAvailabilityZones(request);
     }
     public DescribeAvailabilityZonesResult describeAvailabilityZones(List<String> zoneNames){
-        DescribeAvailabilityZonesRequest request = new DescribeAvailabilityZonesRequest();
-        request.setZoneNames(zoneNames);
-        return describeAvailabilityZones(request);
+        return describeAvailabilityZones(new DescribeAvailabilityZonesRequest()
+                                                .withZoneNames(zoneNames));
     }
     public DescribeAvailabilityZonesResult describeAvailabilityZone(String zoneName){
         return describeAvailabilityZones(singletonList(zoneName));
@@ -235,9 +230,8 @@ public class AWSEC2 implements CloudBlock{
         return awsHttpClient.describeSubnets(request);
     }    
     public DescribeSubnetsResult describeSubnets(List<String> subnetIds){
-        DescribeSubnetsRequest request = new DescribeSubnetsRequest();
-        request.setSubnetIds(subnetIds);
-        return describeSubnets(request);
+        return describeSubnets(new DescribeSubnetsRequest()
+                                    .withSubnetIds(subnetIds));
     }
     public DescribeSubnetsResult describeSubnet(String subnetId){
         return describeSubnets(singletonList(subnetId));
@@ -274,7 +268,6 @@ public class AWSEC2 implements CloudBlock{
                             .withAvailabilityZone(availabilityZone));
     }
     public CreateSubnetResult createSubnet(String vpcId, String cidrBlock){
-
         return createSubnet(vpcId, cidrBlock, null);
     }
     public Subnet getNewSubnet(String vpcId, String cidrBlock, String availabilityZone){
