@@ -217,9 +217,7 @@ public class AWSEC2 implements CloudBlock{
         return describeAvailabilityZones(request);
     }
     public DescribeAvailabilityZonesResult describeAvailabilityZone(String zoneName){
-        List<String> zoneNames = new ArrayList<>();
-        zoneNames.add(zoneName);
-        return describeAvailabilityZones(zoneNames);
+        return describeAvailabilityZones(singletonList(zoneName));
     }
     public List<AvailabilityZone> getExistEc2AvailabilityZones(){
         return describeAvailabilityZones().getAvailabilityZones();

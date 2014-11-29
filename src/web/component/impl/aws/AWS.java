@@ -103,12 +103,10 @@ public class AWS implements Cloud{
 
         Properties copyConf = new Properties();
         
-        List<Object> keys = new ArrayList<>(CONF.keySet());
-        for(Object key : keys){
-            String keyString = (String)key;
-            copyConf.setProperty(keyString, CONF.getProperty(keyString));
-        }
-        
+        CONF.keySet().stream()
+            .map(key -> (String)key)
+            .forEach(keyString -> copyConf.setProperty(keyString, CONF.getProperty(keyString)));
+
         return copyConf;
     }
     
@@ -117,11 +115,9 @@ public class AWS implements Cloud{
     */
     AWSCredentials credentials(){
         
-        String awsKey = AWS_CREDENTIALS.getAWSAccessKeyId();
-        String secretKey = AWS_CREDENTIALS.getAWSSecretKey();
-        
         //return a copy instance.
-        return new BasicAWSCredentials(awsKey, secretKey);
+        return new BasicAWSCredentials( AWS_CREDENTIALS.getAWSAccessKeyId(), 
+                                        AWS_CREDENTIALS.getAWSSecretKey()    );
     }
     
     private static enum BlockName{
