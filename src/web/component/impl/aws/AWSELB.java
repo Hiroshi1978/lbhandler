@@ -55,6 +55,7 @@ import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPolicies
 import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPoliciesOfListenerResult;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import web.component.impl.CloudBlock;
@@ -454,9 +455,7 @@ public class AWSELB implements CloudBlock{
 
     public LoadBalancerDescription getLoadBalancerDescription(String loadBalancerName){
 
-        List<String> loadBalancerNames = new ArrayList<>();
-        loadBalancerNames.add(loadBalancerName);
-        List<LoadBalancerDescription> descriptions = this.getLoadBalancerDescriptions(loadBalancerNames);
+        List<LoadBalancerDescription> descriptions = getLoadBalancerDescriptions(singletonList(loadBalancerName));
         return descriptions.isEmpty() ? new LoadBalancerDescription() : descriptions.get(0);
         
     }
