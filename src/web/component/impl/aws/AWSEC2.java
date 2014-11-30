@@ -40,8 +40,10 @@ import com.amazonaws.services.ec2.model.Vpc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Stream;
 import web.component.impl.CloudBlock;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -146,12 +148,9 @@ public class AWSEC2 implements CloudBlock{
         return describeInstances(singletonList(instanceId));
     }
     public List<Instance> getExistEc2Instances(){
-        DescribeInstancesResult result = describeInstances();
-        List<Instance> instances = new ArrayList<>();
-        for(Reservation reserv : result.getReservations())
-            for(Instance instance : reserv.getInstances())
-                instances.add(instance);
-        return instances;
+        return describeInstances().getReservations().stream()
+                .flatMap(reserv -> reserv.getInstances().stream())
+                .collect(toList());
     }
     public Instance getExistEc2Instance(String instanceId){
         
