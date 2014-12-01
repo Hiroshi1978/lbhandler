@@ -455,8 +455,9 @@ public class AWSELB implements CloudBlock{
 
     public LoadBalancerDescription getLoadBalancerDescription(String loadBalancerName){
 
-        List<LoadBalancerDescription> descriptions = getLoadBalancerDescriptions(singletonList(loadBalancerName));
-        return descriptions.isEmpty() ? new LoadBalancerDescription() : descriptions.get(0);
+        return getLoadBalancerDescriptions(singletonList(loadBalancerName))
+                .stream().findFirst()
+                .orElse(new LoadBalancerDescription());
         
     }
 

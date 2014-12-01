@@ -10,7 +10,6 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersResult;
 import com.amazonaws.services.elasticloadbalancing.model.Listener;
-import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,6 @@ import web.component.api.model.LoadBalancerListener;
 import web.component.api.model.Subnet;
 import web.component.api.model.Zone;
 import web.component.impl.aws.AWS;
-import web.component.impl.aws.AWSELB;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
@@ -534,7 +532,10 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        return getInstanceStatesByInstanceId(singletonList(backendInstanceId)).get(0);
+        return getInstanceStatesByInstanceId(singletonList(backendInstanceId))
+                .stream()
+                .findFirst()
+                .get();
     }
     
     @Override
@@ -543,16 +544,15 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        List<Instance> backendInstances = new ArrayList<>();
-        backendInstances.add(backendInstance);
-        return this.getInstanceStates(backendInstances).get(0);
+        return getInstanceStates(singletonList(backendInstance))
+                .stream()
+                .findFirst()
+                .get();
     }
 
     private static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
 
-        AWSELB elb = AWS.access().elb();
-        DescribeLoadBalancersResult result = elb.describeLoadBalancers();
-        return result;
+        return AWS.access().elb().describeLoadBalancers();
     }
 
     @Override
