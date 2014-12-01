@@ -14,7 +14,6 @@ import com.amazonaws.services.elasticloadbalancing.model.ListenerDescription;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import web.component.api.model.BackendState;
 import web.component.api.model.HealthCheck;
 import web.component.api.model.Instance;
@@ -24,6 +23,8 @@ import web.component.api.model.Subnet;
 import web.component.api.model.Zone;
 import web.component.impl.aws.AWS;
 import web.component.impl.aws.AWSELB;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -330,8 +331,9 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
                 = getAllLoadBalancerDescriptions().getLoadBalancerDescriptions();
 
         return descs.stream()
-                        .map(desc -> LoadBalancerImpl.getExistLoadBalancerByName(desc.getLoadBalancerName()))
-                        .collect(Collectors.toList());
+                    .map(LoadBalancerDescription::getLoadBalancerName)
+                    .map(LoadBalancerImpl::getExistLoadBalancerByName)
+                    .collect(toList());
     }
     
     @Override
@@ -345,11 +347,9 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        List<ListenerDescription> descs = elb().getLoadBalancerDescription(name).getListenerDescriptions();
-
-        return descs.stream()
+        return elb().getLoadBalancerDescription(name).getListenerDescriptions().stream()
                 .map(desc -> new LoadBalancerListenerImpl.Builder().description(desc).build())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -358,11 +358,9 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        List<String> zoneNames = elb().getLoadBalancerDescription(name).getAvailabilityZones();
-
-        return zoneNames.stream()
+        return elb().getLoadBalancerDescription(name).getAvailabilityZones().stream()
                 .map(zoneName -> new ZoneImpl.Builder().name(zoneName).build())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -371,11 +369,9 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        List<String> subnetIds = elb().getLoadBalancerDescription(name).getSubnets();
-
-        return subnetIds.stream()
+        return elb().getLoadBalancerDescription(name).getSubnets().stream()
                 .map(subnetId -> new SubnetImpl.Builder().id(subnetId).get())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -384,11 +380,9 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = elb().getLoadBalancerDescription(name).getInstances();
-
-        return elbInstances.stream()
+        return elb().getLoadBalancerDescription(name).getInstances().stream()
                 .map(elbInstance -> new InstanceImpl.Builder().id(elbInstance.getInstanceId()).get())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
    /*
@@ -488,11 +482,9 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        List<com.amazonaws.services.elasticloadbalancing.model.InstanceState> elbInstanceStates = elb().describeInstanceHealth(name).getInstanceStates();
-
-        return elbInstanceStates.stream()
-                .map(elbInstanceState -> InstanceImpl.BackendStateImpl.create(elbInstanceState))
-                .collect(Collectors.toList());
+        return elb().describeInstanceHealth(name).getInstanceStates().stream()
+                .map(InstanceImpl.BackendStateImpl::create)
+                .collect(toList());
     }
     
     @Override
@@ -512,13 +504,10 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
             }
         }
         
-        List<com.amazonaws.services.elasticloadbalancing.model.InstanceState> elbInstanceStates = elb().describeInstanceHealth(name, elbInstances).getInstanceStates();
-        List<BackendState> states  = 
-                elbInstanceStates.stream()
-                .map(elbInstanceState -> InstanceImpl.BackendStateImpl.create(elbInstanceState))
-                .collect(Collectors.toList());
-        
-        return states;
+        return elb().describeInstanceHealth(name, elbInstances)
+                        .getInstanceStates().stream()
+                        .map(InstanceImpl.BackendStateImpl::create)
+                        .collect(toList());
     }
     
     @Override
@@ -529,14 +518,14 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         
         List<com.amazonaws.services.elasticloadbalancing.model.Instance> elbInstances = 
                 instanceIds.stream()
-                .map(id -> new com.amazonaws.services.elasticloadbalancing.model.Instance(id))
-                .collect(Collectors.toList());
+                .map(com.amazonaws.services.elasticloadbalancing.model.Instance::new)
+                .collect(toList());
         
         List<com.amazonaws.services.elasticloadbalancing.model.InstanceState> elbInstanceStates = elb().describeInstanceHealth(name, elbInstances).getInstanceStates();
         
         return elbInstanceStates.stream()
-                .map(elbInstanceState -> InstanceImpl.BackendStateImpl.create(elbInstanceState))
-                .collect(Collectors.toList());
+                .map(InstanceImpl.BackendStateImpl::create)
+                .collect(toList());
     }
 
     @Override
@@ -545,9 +534,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        List<String> backendInstanceIds = new ArrayList<>();
-        backendInstanceIds.add(backendInstanceId);
-        return this.getInstanceStatesByInstanceId(backendInstanceIds).get(0);
+        return getInstanceStatesByInstanceId(singletonList(backendInstanceId)).get(0);
     }
     
     @Override
