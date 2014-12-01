@@ -153,14 +153,10 @@ public class AWSEC2 implements CloudBlock{
                 .collect(toList());
     }
     public Instance getExistEc2Instance(String instanceId){
-        
-        Instance existInstance = null;
-        List<Reservation> reservs = describeInstance(instanceId).getReservations();
-        if(reservs != null && !reservs.isEmpty()){
-            existInstance = reservs.get(0).getInstances().get(0);
-        }
-        
-        return existInstance;
+        //return the instance of the specified instanceId, or null if it does not exist.
+        return describeInstance(instanceId).getReservations().stream()
+                .flatMap(reserv -> reserv.getInstances().stream())
+                .findFirst().orElse(null);
     }
     public InstanceState getInstanceState(String instanceId){
         Instance existInstance = getExistEc2Instance(instanceId);
