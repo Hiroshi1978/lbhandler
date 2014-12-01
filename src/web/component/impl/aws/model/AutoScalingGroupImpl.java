@@ -6,10 +6,9 @@
 
 package web.component.impl.aws.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
+import static java.util.stream.Collectors.toList;
 import web.component.api.model.AutoScalingGroup;
 import web.component.api.model.Instance;
 import web.component.api.model.Zone;
@@ -57,27 +56,25 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
     
     private com.amazonaws.services.autoscaling.model.AutoScalingGroup copyAwsASGroup(com.amazonaws.services.autoscaling.model.AutoScalingGroup source){
         
-        com.amazonaws.services.autoscaling.model.AutoScalingGroup copy = new com.amazonaws.services.autoscaling.model.AutoScalingGroup();
-        copy.setAutoScalingGroupARN(source.getAutoScalingGroupARN());
-        copy.setAutoScalingGroupName(source.getAutoScalingGroupName());
-        copy.setAvailabilityZones(source.getAvailabilityZones());
-        copy.setDefaultCooldown(source.getDefaultCooldown());
-        copy.setDesiredCapacity(source.getDesiredCapacity());
-        copy.setEnabledMetrics(source.getEnabledMetrics());
-        copy.setHealthCheckGracePeriod(source.getHealthCheckGracePeriod());
-        copy.setHealthCheckType(source.getHealthCheckType());
-        copy.setInstances(source.getInstances());
-        copy.setLaunchConfigurationName(source.getLaunchConfigurationName());
-        copy.setLoadBalancerNames(source.getLoadBalancerNames());
-        copy.setMaxSize(source.getMaxSize());
-        copy.setMinSize(source.getMinSize());
-        copy.setPlacementGroup(source.getPlacementGroup());
-        copy.setSuspendedProcesses(source.getSuspendedProcesses());
-        copy.setTags(source.getTags());
-        copy.setTerminationPolicies(source.getTerminationPolicies());
-        copy.setVPCZoneIdentifier(source.getVPCZoneIdentifier());
-        
-        return copy;
+        return new com.amazonaws.services.autoscaling.model.AutoScalingGroup()
+                        .withAutoScalingGroupARN(source.getAutoScalingGroupARN())
+                        .withAutoScalingGroupName(source.getAutoScalingGroupName())
+                        .withAvailabilityZones(source.getAvailabilityZones())
+                        .withDefaultCooldown(source.getDefaultCooldown())
+                        .withDesiredCapacity(source.getDesiredCapacity())
+                        .withEnabledMetrics(source.getEnabledMetrics())
+                        .withHealthCheckGracePeriod(source.getHealthCheckGracePeriod())
+                        .withHealthCheckType(source.getHealthCheckType())
+                        .withInstances(source.getInstances())
+                        .withLaunchConfigurationName(source.getLaunchConfigurationName())
+                        .withLoadBalancerNames(source.getLoadBalancerNames())
+                        .withMaxSize(source.getMaxSize())
+                        .withMinSize(source.getMinSize())
+                        .withPlacementGroup(source.getPlacementGroup())
+                        .withSuspendedProcesses(source.getSuspendedProcesses())
+                        .withTags(source.getTags())
+                        .withTerminationPolicies(source.getTerminationPolicies())
+                        .withVPCZoneIdentifier(source.getVPCZoneIdentifier());
     }
     
     com.amazonaws.services.autoscaling.model.AutoScalingGroup asAwsAutoScalingGroup(){
@@ -126,12 +123,9 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
 
     @Override
     public List<Instance> getInstances() {
-
-        List<Instance> instances = new ArrayList<>();
-        for(String id : as().getAttachedInstanceIds(name))
-            instances.add(new InstanceImpl.Builder().id(id).get());
-        
-        return instances;
+        return as().getAttachedInstanceIds(name).stream()
+                .map(id -> new InstanceImpl.Builder().id(id).get())
+                .collect(toList());
     }
 
     @Override
@@ -194,11 +188,9 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
         if(instances == null || instances.isEmpty())
             throw new IllegalArgumentException("Instances not specified.");
         
-        List<String> instanceIds = new ArrayList<>();
-        for(Instance instance : instances)
-            instanceIds.add(instance.getId());
-        
-        as().attachInstances(name, instanceIds);
+        as().attachInstances(name, instances.stream()
+                                        .map(Instance::getId)
+                                        .collect(toList()));
     }
     public void attachInstance(Instance instance) {
         as().attachInstance(name, instance.getId());
@@ -210,11 +202,9 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
         if(instances == null || instances.isEmpty())
             throw new IllegalArgumentException("Instances not specified.");
         
-        List<String> instanceIds = new ArrayList<>();
-        for(Instance instance : instances)
-            instanceIds.add(instance.getId());
-        
-        as().detachInstances(name, instanceIds);
+        as().detachInstances(name, instances.stream()
+                                        .map(Instance::getId)
+                                        .collect(toList()));
     }
     public void detachInstance(Instance instance) {
         as().detachInstance(name, instance.getId());
@@ -223,11 +213,12 @@ public class AutoScalingGroupImpl extends AWSModelBase implements AutoScalingGro
     @Override
     public void setZones(List<Zone> zones){
         
-        List<String> zoneNames = new ArrayList<>();
-        for(Zone z : zones)
-            zoneNames.add(z.getName());
+        if(zones == null || zones.isEmpty())
+            throw new IllegalArgumentException("Zones not specified.");
         
-        as().updateAutoScalingGroupAvailabilityZones(name, zoneNames);
+        as().updateAutoScalingGroupAvailabilityZones(name, zones.stream()
+                                                                .map(Zone::getName)
+                                                                .collect(toList()));
     }
 
     @Override
