@@ -68,7 +68,6 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.Function;
 import static java.util.stream.Collectors.toList;
 import web.component.impl.CloudBlock;
 
