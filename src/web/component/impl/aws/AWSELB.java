@@ -68,6 +68,7 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 import static java.util.stream.Collectors.toList;
 import web.component.impl.CloudBlock;
 
@@ -177,7 +178,7 @@ public class AWSELB implements CloudBlock{
                 //i don't have confidence in the appropriateness of the codes below.
                 .map(LoadBalancerDescription::getLoadBalancerName)
                 .map(DeleteLoadBalancerRequest::new)
-                .map(request -> {
+                .filter(request -> {
                     boolean succeededToDelete = false;
                     try{
                         awsHttpClient.deleteLoadBalancer(request);
@@ -186,7 +187,6 @@ public class AWSELB implements CloudBlock{
                     }
                     return succeededToDelete;
                 })
-                .filter(succeededToDelete -> succeededToDelete)
                 .count();
     }
 
