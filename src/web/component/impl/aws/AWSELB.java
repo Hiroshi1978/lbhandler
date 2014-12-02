@@ -11,12 +11,15 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancing;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient;
+import com.amazonaws.services.elasticloadbalancing.model.AccessLog;
 import com.amazonaws.services.elasticloadbalancing.model.ApplySecurityGroupsToLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.ApplySecurityGroupsToLoadBalancerResult;
 import com.amazonaws.services.elasticloadbalancing.model.AttachLoadBalancerToSubnetsRequest;
 import com.amazonaws.services.elasticloadbalancing.model.AttachLoadBalancerToSubnetsResult;
 import com.amazonaws.services.elasticloadbalancing.model.ConfigureHealthCheckRequest;
 import com.amazonaws.services.elasticloadbalancing.model.ConfigureHealthCheckResult;
+import com.amazonaws.services.elasticloadbalancing.model.ConnectionDraining;
+import com.amazonaws.services.elasticloadbalancing.model.ConnectionSettings;
 import com.amazonaws.services.elasticloadbalancing.model.CreateAppCookieStickinessPolicyRequest;
 import com.amazonaws.services.elasticloadbalancing.model.CreateAppCookieStickinessPolicyResult;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLBCookieStickinessPolicyRequest;
@@ -26,6 +29,7 @@ import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerPolic
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerPolicyResult;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerResult;
+import com.amazonaws.services.elasticloadbalancing.model.CrossZoneLoadBalancing;
 import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerListenersRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerPolicyRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerPolicyResult;
@@ -36,6 +40,8 @@ import com.amazonaws.services.elasticloadbalancing.model.DescribeInstanceHealthR
 import com.amazonaws.services.elasticloadbalancing.model.DescribeInstanceHealthResult;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancerPoliciesRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancerPoliciesResult;
+import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancerPolicyTypesRequest;
+import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancerPolicyTypesResult;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersRequest;
 import com.amazonaws.services.elasticloadbalancing.model.DescribeLoadBalancersResult;
 import com.amazonaws.services.elasticloadbalancing.model.DetachLoadBalancerFromSubnetsRequest;
@@ -47,7 +53,10 @@ import com.amazonaws.services.elasticloadbalancing.model.EnableAvailabilityZones
 import com.amazonaws.services.elasticloadbalancing.model.HealthCheck;
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.Listener;
+import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerAttributes;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
+import com.amazonaws.services.elasticloadbalancing.model.ModifyLoadBalancerAttributesRequest;
+import com.amazonaws.services.elasticloadbalancing.model.ModifyLoadBalancerAttributesResult;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerResult;
 import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerListenerSSLCertificateRequest;
@@ -55,13 +64,12 @@ import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPolicies
 import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPoliciesOfListenerResult;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import web.component.impl.CloudBlock;
-import static java.util.stream.Collectors.toList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import java.util.List;
+import java.util.Properties;
+import static java.util.stream.Collectors.toList;
+import web.component.impl.CloudBlock;
 
 /**
  *
@@ -455,9 +463,8 @@ public class AWSELB implements CloudBlock{
 
     public LoadBalancerDescription getLoadBalancerDescription(String loadBalancerName){
 
-        return getLoadBalancerDescriptions(singletonList(loadBalancerName))
-                .stream().findFirst()
-                .orElse(new LoadBalancerDescription());
+        List<LoadBalancerDescription> descriptions = getLoadBalancerDescriptions(singletonList(loadBalancerName));
+        return descriptions.isEmpty() ? new LoadBalancerDescription() : descriptions.get(0);
         
     }
 
@@ -708,5 +715,117 @@ public class AWSELB implements CloudBlock{
     public ApplySecurityGroupsToLoadBalancerResult applySecurityGroupsToLoadBalancer(String loadBalancerName, String securityGroup){
 
         return applySecurityGroupsToLoadBalancer(loadBalancerName, singleton(securityGroup));
+    }
+    
+    public DescribeLoadBalancerPolicyTypesResult describeLoadBalancerPolicyTypes(){
+        return awsHttpClient.describeLoadBalancerPolicyTypes();
+    }
+    public DescribeLoadBalancerPolicyTypesResult describeLoadBalancerPolicyTypes(DescribeLoadBalancerPolicyTypesRequest request){
+        if(request == null)
+            throw new IllegalArgumentException("Invalid request.");
+        return awsHttpClient.describeLoadBalancerPolicyTypes(request);
+    }
+    public DescribeLoadBalancerPolicyTypesResult describeLoadBalancerPolicyTypes(List<String> policyTypeNames){
+        return describeLoadBalancerPolicyTypes(new DescribeLoadBalancerPolicyTypesRequest()
+                                                    .withPolicyTypeNames(policyTypeNames));
+    }
+    public DescribeLoadBalancerPolicyTypesResult describeLoadBalancerPolicyTypes(String policyTypeName){
+        if(policyTypeName == null || policyTypeName.isEmpty())
+            throw new IllegalArgumentException("Policy type name not specified.");
+        return describeLoadBalancerPolicyTypes(singletonList(policyTypeName));
+    }
+    
+    public ModifyLoadBalancerAttributesResult modifyLoadBalancerAttributes(ModifyLoadBalancerAttributesRequest request){
+        if(request.getLoadBalancerName() == null || request.getLoadBalancerName().isEmpty())
+            throw new IllegalArgumentException("Load balancer name not specified.");
+        if(request.getLoadBalancerAttributes() == null)
+            throw new IllegalArgumentException("Load balancer attributes not specified.");
+        return awsHttpClient.modifyLoadBalancerAttributes(request);
+    }
+    public ModifyLoadBalancerAttributesResult modifyLoadBalancerAttributes(String loadBalancerName, LoadBalancerAttributes attributes){
+        return modifyLoadBalancerAttributes(new ModifyLoadBalancerAttributesRequest()
+                                                .withLoadBalancerName(loadBalancerName)
+                                                .withLoadBalancerAttributes(attributes));
+    }
+    public ModifyLoadBalancerAttributesResult modifyLoadBalancerAttributes(String loadBalancerName, AccessLog accessLog){
+        
+        if(accessLog == null)
+            throw new IllegalArgumentException("Access log not specified.");
+        
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new LoadBalancerAttributes()
+                                                .withAccessLog(accessLog));
+    }
+    public ModifyLoadBalancerAttributesResult enableAccessLog(String loadBalancerName){
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new AccessLog().withEnabled(Boolean.TRUE));
+    }
+    public ModifyLoadBalancerAttributesResult enableAccessLog(String loadBalancerName, Integer emitInterval){
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new AccessLog().withEnabled(Boolean.TRUE)
+                                                .withEmitInterval(emitInterval));
+    }
+    public ModifyLoadBalancerAttributesResult enableAccessLog(String loadBalancerName, String s3BucketName, String s3BucketPrefix){
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new AccessLog().withEnabled(Boolean.TRUE)
+                                                .withS3BucketName(s3BucketName)
+                                                .withS3BucketPrefix(s3BucketPrefix));
+    }
+    public ModifyLoadBalancerAttributesResult disableAccessLog(String loadBalancerName){
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new AccessLog().withEnabled(Boolean.FALSE));
+    }
+    public ModifyLoadBalancerAttributesResult modifyLoadBalancerAttributes(String loadBalancerName, ConnectionDraining draining){
+        
+        if(draining == null)
+            throw new IllegalArgumentException("ConnectionDraining not specified.");
+        
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new LoadBalancerAttributes()
+                                                .withConnectionDraining(draining));
+    }
+    public ModifyLoadBalancerAttributesResult enableConnectionDraining(String loadBalancerName){
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new ConnectionDraining().withEnabled(Boolean.TRUE));
+    }
+    public ModifyLoadBalancerAttributesResult enableConnectionDraining(String loadBalancerName, Integer timeout){
+
+        if(timeout == null)
+            throw new IllegalArgumentException("ConnectionDraining timeout not specified.");
+        
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new ConnectionDraining().withEnabled(Boolean.TRUE)
+                                                .withTimeout(timeout));
+    }
+    public ModifyLoadBalancerAttributesResult disableConnectionDraining(String loadBalancerName){
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new ConnectionDraining().withEnabled(Boolean.FALSE));
+    }
+    public ModifyLoadBalancerAttributesResult modifyLoadBalancerAttributes(String loadBalancerName, ConnectionSettings settings){
+        
+        if(settings == null)
+            throw new IllegalArgumentException("ConnectionSettings not specified.");
+        
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new LoadBalancerAttributes()
+                                                .withConnectionSettings(settings));
+    }
+    public ModifyLoadBalancerAttributesResult configureIdleTimeout(String loadBalancerName, Integer idleTimeout){
+        
+        if(idleTimeout == null)
+            throw new IllegalArgumentException("Idle timeout not specified.");
+        
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new ConnectionSettings()
+                                                .withIdleTimeout(idleTimeout));
+    }
+    public ModifyLoadBalancerAttributesResult modifyLoadBalancerAttributes(String loadBalancerName, CrossZoneLoadBalancing crossZoneBalancing){
+        
+        if(crossZoneBalancing == null)
+            throw new IllegalArgumentException("CrossZoneLoadBalancing not specified.");
+        
+        return modifyLoadBalancerAttributes(loadBalancerName,
+                                            new LoadBalancerAttributes()
+                                                .withCrossZoneLoadBalancing(crossZoneBalancing));
     }
 }
