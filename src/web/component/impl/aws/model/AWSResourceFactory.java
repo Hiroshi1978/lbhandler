@@ -69,7 +69,6 @@ public class AWSResourceFactory extends ResourceFactory{
     */
     @Override
     public List<VPC> getVPCs(){
-
         return AWS.access().ec2()
                 .getExistEc2Vpcs().stream()
                 .map(ec2Vpc -> new VPCImpl.Builder().id(ec2Vpc.getVpcId()).get())
@@ -115,8 +114,7 @@ public class AWSResourceFactory extends ResourceFactory{
     * auto scaling group
     */
     @Override
-    public List<AutoScalingGroup> getAutoScalingGroups(){
-        
+    public List<AutoScalingGroup> getAutoScalingGroups(){     
         return AWS.access().as()
                 .getExistAutoScalingGroups().stream()
                 .map(awsASGroup -> new AutoScalingGroupImpl.Builder().name(awsASGroup.getAutoScalingGroupName()).get())

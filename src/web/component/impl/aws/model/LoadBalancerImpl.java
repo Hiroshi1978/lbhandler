@@ -20,7 +20,7 @@ import web.component.api.model.LoadBalancer;
 import web.component.api.model.LoadBalancerListener;
 import web.component.api.model.Subnet;
 import web.component.api.model.Zone;
-import web.component.impl.aws.AWS;
+import web.component.impl.aws.AWSImpl;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
@@ -311,7 +311,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
 
         try{
 
-            LoadBalancerDescription description = AWS.access().elb().getLoadBalancerDescription(name);
+            LoadBalancerDescription description = AWSImpl.access().elb().getLoadBalancerDescription(name);
             if(name.equals(description.getLoadBalancerName()))
                 loadBalancer = new LoadBalancerImpl(name);
 
@@ -532,10 +532,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        return getInstanceStatesByInstanceId(singletonList(backendInstanceId))
-                .stream()
-                .findFirst()
-                .get();
+        return getInstanceStatesByInstanceId(singletonList(backendInstanceId)).get(0);
     }
     
     @Override
@@ -544,15 +541,13 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        return getInstanceStates(singletonList(backendInstance))
-                .stream()
-                .findFirst()
-                .get();
+        List<Instance> backendInstances = new ArrayList<>();
+        backendInstances.add(backendInstance);
+        return this.getInstanceStates(backendInstances).get(0);
     }
 
     private static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
-
-        return AWS.access().elb().describeLoadBalancers();
+        return AWSImpl.access().elb().describeLoadBalancers();
     }
 
     @Override
