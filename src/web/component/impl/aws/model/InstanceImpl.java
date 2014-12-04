@@ -15,6 +15,7 @@ import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
 import web.component.impl.aws.AWS;
 import web.component.impl.aws.AWSEC2;
+import web.component.impl.aws.AWSELB;
 
 /**
  *
@@ -132,8 +133,8 @@ public class InstanceImpl extends AWSModelBase implements Instance{
 
     @Override
     public LoadBalancer getLoadBalancer() {
-        return getLoadBalancers().stream()
-                    .findFirst().orElse(null);
+        List<LoadBalancer> loadBalancers = getLoadBalancers();
+        return loadBalancers.isEmpty() ? null : loadBalancers.get(0);
     }
 
     @Override
@@ -317,10 +318,15 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     */
     public static class InstanceStateImpl implements InstanceState{
 
-        private final com.amazonaws.services.ec2.model.InstanceState ec2InstanceState;
+        private final com.amazonaws.services.ec2.model.InstanceState ec2InstanceState = 
+                                        new com.amazonaws.services.ec2.model.InstanceState();
     
-        private InstanceStateImpl(Instance instance){            
-            ec2InstanceState = AWS.access().ec2().getInstanceState(instance.getId());
+        private InstanceStateImpl(Instance instance){
+            
+            AWSEC2 ec2 = AWS.access().ec2();
+            com.amazonaws.services.ec2.model.InstanceState source = ec2.getInstanceState(instance.getId());
+            ec2InstanceState.setCode(source.getCode());
+            ec2InstanceState.setName(source.getName());
         }
         
         //only InstanceImpl class can create instance.
@@ -346,27 +352,28 @@ public class InstanceImpl extends AWSModelBase implements Instance{
     
     public static class BackendStateImpl implements BackendState {
 
-        private final com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState;
+        private final com.amazonaws.services.elasticloadbalancing.model.InstanceState elbInstanceState = 
+                                        new com.amazonaws.services.elasticloadbalancing.model.InstanceState();
 
         private BackendStateImpl(Instance instance, LoadBalancer lb){
             
             if(instance == null || lb == null)
                 throw new IllegalArgumentException("Both instance and load balancer must be specified.");
                 
-            elbInstanceState = 
-                    AWS.access().elb()
-                            .describeInstanceHealth(lb.getName(), ((InstanceImpl)instance).asElbInstance())
-                            .getInstanceStates().stream()
-                            .findFirst().orElse(null);
+            AWSELB elb = AWS.access().elb();
+            com.amazonaws.services.elasticloadbalancing.model.InstanceState source = 
+                elb.describeInstanceHealth(lb.getName(), ((InstanceImpl)instance).asElbInstance()).getInstanceStates().get(0);
+            elbInstanceState.setDescription(source.getDescription());
+            elbInstanceState.setInstanceId(source.getInstanceId());
+            elbInstanceState.setReasonCode(source.getReasonCode());
+            elbInstanceState.setState(source.getState());
         }
         
         private BackendStateImpl(com.amazonaws.services.elasticloadbalancing.model.InstanceState source){
-            elbInstanceState = 
-                    new com.amazonaws.services.elasticloadbalancing.model.InstanceState()
-                            .withDescription(source.getDescription())
-                            .withInstanceId(source.getInstanceId())
-                            .withReasonCode(source.getReasonCode())
-                            .withState(source.getState());
+            elbInstanceState.setDescription(source.getDescription());
+            elbInstanceState.setInstanceId(source.getInstanceId());
+            elbInstanceState.setReasonCode(source.getReasonCode());
+            elbInstanceState.setState(source.getState());
         }
         
         //only InstanceImpl class can create instance.

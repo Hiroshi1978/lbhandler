@@ -126,7 +126,7 @@ public class AWSELB implements CloudBlock{
 
     public DescribeLoadBalancersResult describeLoadBalancers(String loadBalancerName){
     
-        return this.describeLoadBalancers(singleton(loadBalancerName));
+        return describeLoadBalancers(singleton(loadBalancerName));
     }
 
     public CreateLoadBalancerResult createLoadBalancer(CreateLoadBalancerRequest request){ 
@@ -146,10 +146,8 @@ public class AWSELB implements CloudBlock{
         if(loadBalancerName == null || loadBalancerName.equals("")) 
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
        
-        CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName); 
-        request.setListeners(singleton(getDefaultHttpListener())); 
-       
-        return awsHttpClient.createLoadBalancer(request); 
+        return awsHttpClient.createLoadBalancer(new CreateLoadBalancerRequest(loadBalancerName)
+                                                    .withListeners(singleton(getDefaultHttpListener()))); 
     } 
    
     public CreateLoadBalancerResult createLoadBalancer(String loadBalancerName, String certificateId){ 
@@ -159,15 +157,12 @@ public class AWSELB implements CloudBlock{
         if(certificateId == null || certificateId.equals("")) 
             throw new IllegalArgumentException("Certificate ID not specified."); 
 
-        CreateLoadBalancerRequest request = new CreateLoadBalancerRequest(loadBalancerName); 
-               request.setListeners(singleton(getDefaultHttpsListener(certificateId))); 
-       
-        return awsHttpClient.createLoadBalancer(request); 
+        return awsHttpClient.createLoadBalancer(new CreateLoadBalancerRequest(loadBalancerName)
+                                                    .withListeners(singleton(getDefaultHttpsListener(certificateId)))); 
     } 
 
     public void deleteLoadBalancer(String loadBalancerName){
-        DeleteLoadBalancerRequest request = new DeleteLoadBalancerRequest(loadBalancerName);
-        awsHttpClient.deleteLoadBalancer(request);
+        awsHttpClient.deleteLoadBalancer(new DeleteLoadBalancerRequest(loadBalancerName));
     }
 
     public int deleteAllLoadBalancers(){
@@ -206,8 +201,7 @@ public class AWSELB implements CloudBlock{
         if(instances == null || instances.isEmpty())
             throw new IllegalArgumentException("Instances not specified.");
 
-        RegisterInstancesWithLoadBalancerRequest request = new RegisterInstancesWithLoadBalancerRequest(loadBalancerName, new ArrayList<>(instances) );
-        return awsHttpClient.registerInstancesWithLoadBalancer(request);
+        return awsHttpClient.registerInstancesWithLoadBalancer(new RegisterInstancesWithLoadBalancerRequest(loadBalancerName, new ArrayList<>(instances) ));
     }
 
     public DeregisterInstancesFromLoadBalancerResult deregisterInstancesFromLoadBalancer(DeregisterInstancesFromLoadBalancerRequest request){
@@ -229,8 +223,7 @@ public class AWSELB implements CloudBlock{
         if(instances == null || instances.isEmpty())
            throw new IllegalArgumentException("Instances not specified.");
 
-        DeregisterInstancesFromLoadBalancerRequest request = new DeregisterInstancesFromLoadBalancerRequest(loadBalancerName,new ArrayList<>(instances));
-        return awsHttpClient.deregisterInstancesFromLoadBalancer(request);
+        return awsHttpClient.deregisterInstancesFromLoadBalancer(new DeregisterInstancesFromLoadBalancerRequest(loadBalancerName,new ArrayList<>(instances)));
     }
 
     public AttachLoadBalancerToSubnetsResult attachLoadBalancerToSubnets(AttachLoadBalancerToSubnetsRequest request){
@@ -252,12 +245,9 @@ public class AWSELB implements CloudBlock{
         if(subnetIds == null || subnetIds.isEmpty())
             throw new IllegalArgumentException("Subnets not specified.");
 
-        AttachLoadBalancerToSubnetsRequest request = 
-                new AttachLoadBalancerToSubnetsRequest()
-                    .withLoadBalancerName(loadBalancerName)
-                    .withSubnets(subnetIds);
-        
-        return awsHttpClient.attachLoadBalancerToSubnets(request);
+        return awsHttpClient.attachLoadBalancerToSubnets(new AttachLoadBalancerToSubnetsRequest()
+                                                                .withLoadBalancerName(loadBalancerName)
+                                                                .withSubnets(subnetIds));
     }
     
    public void deleteLoadBalancerListeners(DeleteLoadBalancerListenersRequest request){
@@ -283,11 +273,8 @@ public class AWSELB implements CloudBlock{
        if(listeners == null || listeners.isEmpty())
            throw new IllegalArgumentException("Listeners not specified.");
 
-       CreateLoadBalancerRequest request = 
-                new CreateLoadBalancerRequest(loadBalancerName)
-                    .withListeners(listeners);
-
-       return awsHttpClient.createLoadBalancer(request);
+       return awsHttpClient.createLoadBalancer(new CreateLoadBalancerRequest(loadBalancerName)
+                                                    .withListeners(listeners));
     }
 
     public CreateLoadBalancerResult createLoadBalancerWithSubnets(String loadBalancerName, Collection<Listener> listeners, Collection<String> subnetIds){
@@ -299,12 +286,9 @@ public class AWSELB implements CloudBlock{
        if(subnetIds == null || subnetIds.isEmpty())
            throw new IllegalArgumentException("Subnets not specified.");
 
-       CreateLoadBalancerRequest request = 
-                new CreateLoadBalancerRequest(loadBalancerName)
-                    .withListeners(listeners)
-                    .withSubnets(subnetIds);
-
-       return awsHttpClient.createLoadBalancer(request);
+       return awsHttpClient.createLoadBalancer(new CreateLoadBalancerRequest(loadBalancerName)
+                                                    .withListeners(listeners)
+                                                    .withSubnets(subnetIds));
     }
 
     public CreateLoadBalancerResult createLoadBalancerWithAvailabilityZones(String loadBalancerName, Collection<Listener> listeners, Collection<AvailabilityZone> availabilityZones){
@@ -316,14 +300,11 @@ public class AWSELB implements CloudBlock{
        if(availabilityZones == null || availabilityZones.isEmpty())
            throw new IllegalArgumentException("Availability zones not specified.");
 
-       CreateLoadBalancerRequest request = 
-                new CreateLoadBalancerRequest(loadBalancerName)
-                    .withListeners(listeners)
-                    .withAvailabilityZones(availabilityZones.stream()
-                                            .map(AvailabilityZone::getZoneName)
-                                            .collect(toList()));
-
-       return awsHttpClient.createLoadBalancer(request);
+       return awsHttpClient.createLoadBalancer(new CreateLoadBalancerRequest(loadBalancerName)
+                                                      .withListeners(listeners)
+                                                      .withAvailabilityZones(availabilityZones.stream()
+                                                                                .map(AvailabilityZone::getZoneName)
+                                                                                .collect(toList())));
     }
     
     private Listener getDefaultHttpListener(){
@@ -364,12 +345,9 @@ public class AWSELB implements CloudBlock{
         if(subnetIds == null || subnetIds.isEmpty())
             throw new IllegalArgumentException("Subnets not specified.");
 
-        DetachLoadBalancerFromSubnetsRequest request = 
-                new DetachLoadBalancerFromSubnetsRequest()
-                    .withLoadBalancerName(loadBalancerName)
-                    .withSubnets(subnetIds);
-       
-        return awsHttpClient.detachLoadBalancerFromSubnets(request);
+        return awsHttpClient.detachLoadBalancerFromSubnets(new DetachLoadBalancerFromSubnetsRequest()
+                                                                .withLoadBalancerName(loadBalancerName)
+                                                                .withSubnets(subnetIds));
     }
    
     public EnableAvailabilityZonesForLoadBalancerResult enableAvailabilityZonesForLoadBalancer(EnableAvailabilityZonesForLoadBalancerRequest request){
@@ -391,8 +369,7 @@ public class AWSELB implements CloudBlock{
         if(availabilityZones == null || availabilityZones.isEmpty())
             throw new IllegalArgumentException("Availability Zones not specified.");
        
-        EnableAvailabilityZonesForLoadBalancerRequest request = new EnableAvailabilityZonesForLoadBalancerRequest(loadBalancerName, new ArrayList<>(availabilityZones));
-        return awsHttpClient.enableAvailabilityZonesForLoadBalancer(request);
+        return awsHttpClient.enableAvailabilityZonesForLoadBalancer(new EnableAvailabilityZonesForLoadBalancerRequest(loadBalancerName, new ArrayList<>(availabilityZones)));
     }
 
     public DisableAvailabilityZonesForLoadBalancerResult disableAvailabilityZonesForLoadBalancer(DisableAvailabilityZonesForLoadBalancerRequest request){
@@ -414,8 +391,7 @@ public class AWSELB implements CloudBlock{
         if(availabilityZones == null || availabilityZones.isEmpty())
             throw new IllegalArgumentException("Availability Zones not specified.");
        
-        DisableAvailabilityZonesForLoadBalancerRequest request = new DisableAvailabilityZonesForLoadBalancerRequest(loadBalancerName, new ArrayList<>(availabilityZones));
-        return awsHttpClient.disableAvailabilityZonesForLoadBalancer(request);
+        return awsHttpClient.disableAvailabilityZonesForLoadBalancer(new DisableAvailabilityZonesForLoadBalancerRequest(loadBalancerName, new ArrayList<>(availabilityZones)));
     }
 
     public void createLoadBalancerListeners(CreateLoadBalancerListenersRequest request){
@@ -437,8 +413,7 @@ public class AWSELB implements CloudBlock{
         if(listeners == null || listeners.isEmpty())
             throw new IllegalArgumentException("Listeners not specified.");
 
-        CreateLoadBalancerListenersRequest request  = new CreateLoadBalancerListenersRequest(loadBalancerName, new ArrayList<>(listeners));
-        awsHttpClient.createLoadBalancerListeners(request);
+        awsHttpClient.createLoadBalancerListeners(new CreateLoadBalancerListenersRequest(loadBalancerName, new ArrayList<>(listeners)));
     }
 
     public void createHttpListenerOfLoadBalancerWithPort(String loadBalancerName, int instancePort, int servicePort){
@@ -450,14 +425,11 @@ public class AWSELB implements CloudBlock{
         if(servicePort < 0 )
             throw new IllegalArgumentException("Invalid service port specified.");
 
-        CreateLoadBalancerListenersRequest request  = 
-                new CreateLoadBalancerListenersRequest(
-                        loadBalancerName, 
-                        singletonList(getDefaultHttpListener()
-                                        .withInstancePort(instancePort)
-                                        .withLoadBalancerPort(servicePort)));
-        
-        awsHttpClient.createLoadBalancerListeners(request);
+        awsHttpClient.createLoadBalancerListeners(new CreateLoadBalancerListenersRequest(
+                                                        loadBalancerName, 
+                                                        singletonList(getDefaultHttpListener()
+                                                                        .withInstancePort(instancePort)
+                                                                        .withLoadBalancerPort(servicePort))));
     }
 
     public LoadBalancerDescription getLoadBalancerDescription(String loadBalancerName){
@@ -499,8 +471,7 @@ public class AWSELB implements CloudBlock{
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
 
-        DescribeInstanceHealthRequest request = new DescribeInstanceHealthRequest(loadBalancerName);
-        return awsHttpClient.describeInstanceHealth(request);
+        return awsHttpClient.describeInstanceHealth(new DescribeInstanceHealthRequest(loadBalancerName));
     }
 
     public DescribeInstanceHealthResult describeInstanceHealth(String loadBalancerName, Collection<Instance> instances){
@@ -508,11 +479,9 @@ public class AWSELB implements CloudBlock{
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
         
-        DescribeInstanceHealthRequest request = 
-                new DescribeInstanceHealthRequest(loadBalancerName)
-                    .withInstances(instances);
-        
-        return awsHttpClient.describeInstanceHealth(request);
+        return awsHttpClient.describeInstanceHealth(
+                                new DescribeInstanceHealthRequest(loadBalancerName)
+                                    .withInstances(instances));
     }
 
     public DescribeInstanceHealthResult describeInstanceHealth(String loadBalancerName, Instance instance){
@@ -520,11 +489,9 @@ public class AWSELB implements CloudBlock{
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load Balancer Name not specified."); 
         
-        DescribeInstanceHealthRequest request = 
-                new DescribeInstanceHealthRequest(loadBalancerName)
-                    .withInstances(singleton(instance));
-        
-        return awsHttpClient.describeInstanceHealth(request);
+        return awsHttpClient.describeInstanceHealth(
+                                 new DescribeInstanceHealthRequest(loadBalancerName)
+                                        .withInstances(singleton(instance)));
     }
 
     public ConfigureHealthCheckResult configureHealthCheck(ConfigureHealthCheckRequest request){
@@ -539,12 +506,10 @@ public class AWSELB implements CloudBlock{
     
     public ConfigureHealthCheckResult configureHealthCheck(String loadBalancerName, HealthCheck hc){
         
-        ConfigureHealthCheckRequest request = 
+        return configureHealthCheck(
                 new ConfigureHealthCheckRequest()
                     .withLoadBalancerName(loadBalancerName)
-                    .withHealthCheck(hc);
-        
-        return configureHealthCheck(request);
+                    .withHealthCheck(hc));
     }
 
     public DescribeLoadBalancerPoliciesResult describeLoadBalancerPolicies(){
@@ -563,11 +528,9 @@ public class AWSELB implements CloudBlock{
         if(loadBalancerName == null || loadBalancerName.isEmpty())
             throw new IllegalArgumentException("Load balancer name not specified.");
         
-        DescribeLoadBalancerPoliciesRequest request = 
+        return describeLoadBalancerPolicies(
                 new DescribeLoadBalancerPoliciesRequest()
-                    .withLoadBalancerName(loadBalancerName);
-        
-        return describeLoadBalancerPolicies(request);
+                    .withLoadBalancerName(loadBalancerName));
     }
     
     public CreateLoadBalancerPolicyResult createLoadBalancerPolicy(CreateLoadBalancerPolicyRequest request){
@@ -594,12 +557,10 @@ public class AWSELB implements CloudBlock{
         if(policyName == null || policyName.isEmpty())
             throw new IllegalArgumentException("Policy name not specified.");
         
-        DeleteLoadBalancerPolicyRequest request = 
+        return deleteLoadBalancerPolicy(
                 new DeleteLoadBalancerPolicyRequest()
                     .withLoadBalancerName(loadBalancerName)
-                    .withPolicyName(policyName);
-        
-        return deleteLoadBalancerPolicy(request);
+                    .withPolicyName(policyName));
     }
 
     public CreateAppCookieStickinessPolicyResult createAppCookieStickinessPolicy(CreateAppCookieStickinessPolicyRequest request){
@@ -615,13 +576,11 @@ public class AWSELB implements CloudBlock{
     }
     public CreateAppCookieStickinessPolicyResult createAppCookieStickinessPolicy(String loadBalancerName, String policyName, String cookieName){
         
-        CreateAppCookieStickinessPolicyRequest request = 
+        return createAppCookieStickinessPolicy(
                 new CreateAppCookieStickinessPolicyRequest()
                     .withLoadBalancerName(loadBalancerName)
                     .withPolicyName(policyName)
-                    .withCookieName(cookieName);
-        
-        return createAppCookieStickinessPolicy(request);
+                    .withCookieName(cookieName));
     }
     
     public CreateLBCookieStickinessPolicyResult createLBCookieStickinessPolicy(CreateLBCookieStickinessPolicyRequest request){
@@ -635,12 +594,10 @@ public class AWSELB implements CloudBlock{
     }
     public CreateLBCookieStickinessPolicyResult createLBCookieStickinessPolicy(String loadBalancerName, String policyName){
         
-        CreateLBCookieStickinessPolicyRequest request = 
+        return createLBCookieStickinessPolicy(
                 new CreateLBCookieStickinessPolicyRequest()
                     .withLoadBalancerName(loadBalancerName)
-                    .withPolicyName(policyName);
-
-        return createLBCookieStickinessPolicy(request);
+                    .withPolicyName(policyName));
     }
     
     public void setLoadBalancerListenerSSLCertificate(SetLoadBalancerListenerSSLCertificateRequest request){
@@ -657,13 +614,11 @@ public class AWSELB implements CloudBlock{
 
     public void setLoadBalancerListenerSSLCertificate(String loadBalancerName, int port, String certificateId){
         
-        SetLoadBalancerListenerSSLCertificateRequest request = 
-                new SetLoadBalancerListenerSSLCertificateRequest()
+        setLoadBalancerListenerSSLCertificate(
+            new SetLoadBalancerListenerSSLCertificateRequest()
                     .withLoadBalancerName(loadBalancerName)
                     .withLoadBalancerPort(port)
-                    .withSSLCertificateId(certificateId);
-        
-        setLoadBalancerListenerSSLCertificate(request);
+                    .withSSLCertificateId(certificateId));
     }
     
     public SetLoadBalancerPoliciesOfListenerResult setLoadBalancerPoliciesOfListener(SetLoadBalancerPoliciesOfListenerRequest request){
@@ -679,13 +634,11 @@ public class AWSELB implements CloudBlock{
     }
     public SetLoadBalancerPoliciesOfListenerResult setLoadBalancerPoliciesOfListener(String loadBalancerName, int port, Collection<String> policyNames){
         
-        SetLoadBalancerPoliciesOfListenerRequest request = 
+        return setLoadBalancerPoliciesOfListener(
                 new SetLoadBalancerPoliciesOfListenerRequest()
                     .withLoadBalancerName(loadBalancerName)
                     .withLoadBalancerPort(port)
-                    .withPolicyNames(policyNames);
-        
-        return setLoadBalancerPoliciesOfListener(request);
+                    .withPolicyNames(policyNames));
         
     }
     public SetLoadBalancerPoliciesOfListenerResult setLoadBalancerPoliciesOfListener(String loadBalancerName, int port, String policyName){
@@ -705,12 +658,10 @@ public class AWSELB implements CloudBlock{
     }
     public ApplySecurityGroupsToLoadBalancerResult applySecurityGroupsToLoadBalancer(String loadBalancerName, Collection<String> securityGroups){
        
-        ApplySecurityGroupsToLoadBalancerRequest request = 
+        return applySecurityGroupsToLoadBalancer(
                 new ApplySecurityGroupsToLoadBalancerRequest()
                     .withLoadBalancerName(loadBalancerName)
-                    .withSecurityGroups(securityGroups);
-                    
-        return applySecurityGroupsToLoadBalancer(request);
+                    .withSecurityGroups(securityGroups));
     }
     public ApplySecurityGroupsToLoadBalancerResult applySecurityGroupsToLoadBalancer(String loadBalancerName, String securityGroup){
 

@@ -532,10 +532,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        return getInstanceStatesByInstanceId(singletonList(backendInstanceId))
-                .stream()
-                .findFirst()
-                .get();
+        return getInstanceStatesByInstanceId(singletonList(backendInstanceId)).get(0);
     }
     
     @Override
@@ -544,14 +541,12 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         if(isDestroyed())
             return null;
         
-        return getInstanceStates(singletonList(backendInstance))
-                .stream()
-                .findFirst()
-                .get();
+        List<Instance> backendInstances = new ArrayList<>();
+        backendInstances.add(backendInstance);
+        return this.getInstanceStates(backendInstances).get(0);
     }
 
     private static DescribeLoadBalancersResult getAllLoadBalancerDescriptions(){
-
         return AWS.access().elb().describeLoadBalancers();
     }
 

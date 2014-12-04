@@ -216,9 +216,12 @@ public class AWSAutoScaling implements CloudBlock{
     }
     public AutoScalingGroup getExistAutoScalingGroupByName(String autoScalingGroupName){
         
-        return describeAutoScalingGroup(autoScalingGroupName)
-                .getAutoScalingGroups().stream()
-                .findFirst().orElse(null);
+        List<AutoScalingGroup> existASGroups = describeAutoScalingGroup(autoScalingGroupName).getAutoScalingGroups();
+        AutoScalingGroup existOne = null;
+        if(existASGroups != null && !existASGroups.isEmpty())
+            existOne = existASGroups.get(0);
+        
+        return existOne;
     }
     
     public DescribeLaunchConfigurationsResult describeLaunchConfigurations(){
@@ -243,9 +246,12 @@ public class AWSAutoScaling implements CloudBlock{
     }
     public LaunchConfiguration getExistLaunchConfiguration(String launchConfigurationName){
         
-        return describeLaunchConfiguration(launchConfigurationName)
-                .getLaunchConfigurations().stream()
-                .findFirst().orElse(null);
+        List<LaunchConfiguration> lcs = describeLaunchConfiguration(launchConfigurationName).getLaunchConfigurations();
+        LaunchConfiguration existOne = null;
+        if(lcs != null && !lcs.isEmpty())
+            existOne = lcs.get(0);
+        
+        return existOne;
     }
     
     public List<String> getAttachedInstanceIds(String autoScalingGroupName){
