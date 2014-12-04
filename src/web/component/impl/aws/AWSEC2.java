@@ -36,8 +36,10 @@ import com.amazonaws.services.ec2.model.Subnet;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 import com.amazonaws.services.ec2.model.Vpc;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Stream;
 import web.component.impl.CloudBlock;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -91,9 +93,8 @@ public class AWSEC2 implements CloudBlock{
                                 .withImageId(imageId)
                                 .withInstanceType(instanceType)
                                 .withPlacement((new Placement(zoneName))))
-                    .getReservation()
-                    .getInstances()
-                    .get(0);
+                    .getReservation().getInstances().stream()
+                    .findFirst().get();
     }
     public Instance createInstance(String imageId, String instanceType){
         return createInstance(imageId, instanceType, null);
@@ -210,7 +211,8 @@ public class AWSEC2 implements CloudBlock{
         return describeAvailabilityZones().getAvailabilityZones();
     }
     public AvailabilityZone getExistEc2AvailabilityZone(String zoneName){
-        return describeAvailabilityZone(zoneName).getAvailabilityZones().get(0);
+        return describeAvailabilityZone(zoneName).getAvailabilityZones().stream()
+                .findFirst().get();
     }
     
     public DescribeSubnetsResult describeSubnets(){
@@ -232,15 +234,8 @@ public class AWSEC2 implements CloudBlock{
         return describeSubnets().getSubnets();
     }
     public Subnet getExistEc2Subnet(String subnetId){
-        Subnet subnet = null;
-        
-        try{
-            subnet = describeSubnet(subnetId).getSubnets().get(0);
-        }catch(RuntimeException e){
-            System.out.println("Subnet with ID[" + subnetId + "] not exist in cloud.");
-        }
-            
-        return subnet;
+        return describeSubnet(subnetId).getSubnets().stream()
+                .findFirst().orElse(null);
     }
     
     public CreateSubnetResult createSubnet(CreateSubnetRequest request){
@@ -296,15 +291,8 @@ public class AWSEC2 implements CloudBlock{
     }
     public Vpc getExistEc2Vpc(String vpcId){
         
-        Vpc vpc = null;
-        
-        try{
-            vpc = describeVpc(vpcId).getVpcs().get(0);
-        }catch(RuntimeException e){
-            System.out.println("VPC with ID[" + vpcId + "] not exist in cloud.");
-        }
-            
-        return vpc;
+        return describeVpc(vpcId).getVpcs().stream()
+                .findFirst().orElse(null);
     }
     
     public CreateVpcResult createVpc(CreateVpcRequest request){
