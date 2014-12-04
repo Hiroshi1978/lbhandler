@@ -28,24 +28,23 @@ public class LaunchConfigurationImpl extends AWSModelBase implements LaunchConfi
     private static LaunchConfiguration create(Builder builder){
         
         AWSAutoScaling as = AWS.access().as();
-        CreateLaunchConfigurationRequest request = new CreateLaunchConfigurationRequest();
         
-        request.setAssociatePublicIpAddress(builder.associatePublicIpAddress);
-        request.setEbsOptimized(builder.ebsOptimized);
-        request.setIamInstanceProfile(builder.iamInstanceProfile);
-        request.setImageId(builder.imageId);
-        request.setInstanceId(builder.instanceId);
-        request.setInstanceType(builder.instanceType);
-        request.setKernelId(builder.kernelId);
-        request.setKeyName(builder.keyName);
-        request.setLaunchConfigurationName(builder.name);
-        request.setPlacementTenancy(builder.placementTenancy);
-        request.setRamdiskId(builder.ramdiskId);
-        request.setSecurityGroups(builder.securityGroups);
-        request.setSpotPrice(builder.spotPrice);
-        request.setUserData(builder.userData);
-        
-        as.createLaunchConfiguration(request);
+        as.createLaunchConfiguration(
+            new CreateLaunchConfigurationRequest()
+                .withAssociatePublicIpAddress(builder.associatePublicIpAddress)
+                .withEbsOptimized(builder.ebsOptimized)
+                .withIamInstanceProfile(builder.iamInstanceProfile)
+                .withImageId(builder.imageId)
+                .withInstanceId(builder.instanceId)
+                .withInstanceType(builder.instanceType)
+                .withKernelId(builder.kernelId)
+                .withKeyName(builder.keyName)
+                .withLaunchConfigurationName(builder.name)
+                .withPlacementTenancy(builder.placementTenancy)
+                .withRamdiskId(builder.ramdiskId)
+                .withSecurityGroups(builder.securityGroups)
+                .withSpotPrice(builder.spotPrice)
+                .withUserData(builder.userData));
         
         return new LaunchConfigurationImpl(as.getExistLaunchConfiguration(builder.name));
     }
@@ -63,27 +62,24 @@ public class LaunchConfigurationImpl extends AWSModelBase implements LaunchConfi
     private com.amazonaws.services.autoscaling.model.LaunchConfiguration copyAwsLaunchConfiguration(
         com.amazonaws.services.autoscaling.model.LaunchConfiguration source){
         
-        com.amazonaws.services.autoscaling.model.LaunchConfiguration copy = new com.amazonaws.services.autoscaling.model.LaunchConfiguration();
-        
-        copy.setAssociatePublicIpAddress(source.getAssociatePublicIpAddress());
-        copy.setBlockDeviceMappings(source.getBlockDeviceMappings());
-        copy.setCreatedTime(source.getCreatedTime());
-        copy.setEbsOptimized(source.getEbsOptimized());
-        copy.setIamInstanceProfile(source.getIamInstanceProfile());
-        copy.setImageId(source.getImageId());
-        copy.setInstanceMonitoring(source.getInstanceMonitoring());
-        copy.setInstanceType(source.getInstanceType());
-        copy.setKernelId(source.getKernelId());
-        copy.setKeyName(source.getKeyName());
-        copy.setLaunchConfigurationARN(source.getLaunchConfigurationARN());
-        copy.setLaunchConfigurationName(source.getLaunchConfigurationName());
-        copy.setPlacementTenancy(source.getPlacementTenancy());
-        copy.setRamdiskId(source.getRamdiskId());
-        copy.setSecurityGroups(source.getSecurityGroups());
-        copy.setSpotPrice(source.getSpotPrice());
-        copy.setUserData(source.getUserData());
-        
-        return copy;
+        return new com.amazonaws.services.autoscaling.model.LaunchConfiguration()
+                .withAssociatePublicIpAddress(source.getAssociatePublicIpAddress())
+                .withBlockDeviceMappings(source.getBlockDeviceMappings())
+                .withCreatedTime(source.getCreatedTime())
+                .withEbsOptimized(source.getEbsOptimized())
+                .withIamInstanceProfile(source.getIamInstanceProfile())
+                .withImageId(source.getImageId())
+                .withInstanceMonitoring(source.getInstanceMonitoring())
+                .withInstanceType(source.getInstanceType())
+                .withKernelId(source.getKernelId())
+                .withKeyName(source.getKeyName())
+                .withLaunchConfigurationARN(source.getLaunchConfigurationARN())
+                .withLaunchConfigurationName(source.getLaunchConfigurationName())
+                .withPlacementTenancy(source.getPlacementTenancy())
+                .withRamdiskId(source.getRamdiskId())
+                .withSecurityGroups(source.getSecurityGroups())
+                .withSpotPrice(source.getSpotPrice())
+                .withUserData(source.getUserData());
     }
     
     com.amazonaws.services.autoscaling.model.LaunchConfiguration asAwsLaunchConfiguration(){
@@ -203,11 +199,7 @@ public class LaunchConfigurationImpl extends AWSModelBase implements LaunchConfi
     
     @Override
     public boolean exists(){
-        
-        com.amazonaws.services.autoscaling.model.LaunchConfiguration awsLc =
-                as().getExistLaunchConfiguration(getName());
-        
-        return awsLc != null;
+        return as().getExistLaunchConfiguration(getName()) != null;
     }
     
     static class Builder{
