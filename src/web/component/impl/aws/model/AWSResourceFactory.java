@@ -7,28 +7,27 @@
 package web.component.impl.aws.model;
 
 import java.util.List;
+import java.util.function.UnaryOperator;
+import static java.util.stream.Collectors.toList;
 import web.component.api.model.AutoScalingGroup;
 import web.component.api.model.Instance;
 import web.component.api.model.LaunchConfiguration;
 import web.component.api.model.LoadBalancer;
-import web.component.api.model.ResourceFactory;
 import web.component.api.model.Subnet;
 import web.component.api.model.VPC;
 import web.component.api.model.Zone;
 import web.component.impl.aws.AWS;
-import static java.util.stream.Collectors.toList;
 
 /**
  *
  * @author Hiroshi
  */
-public class AWSResourceFactory extends ResourceFactory{
+public class AWSResourceFactory{
  
    /*
     * instance
     */
-    @Override
-    public List<Instance> getInstances(){
+    public static List<Instance> getInstances(){
         
         return AWS.access().ec2().getExistEc2Instances().stream()
                 .map(ec2Instance -> new InstanceImpl.Builder().id(ec2Instance.getInstanceId()).get())
@@ -36,22 +35,18 @@ public class AWSResourceFactory extends ResourceFactory{
                 .collect(toList());
     }
     
-    @Override
-    public Instance getInstance(String id){
+    public static Instance getInstance(String id){
         return new InstanceImpl.Builder().id(id).get();
     }
     
-    public Instance createDefaultInstance(){
-        
-        String instanceId = AWS.access().ec2().createDefaultInstance().getInstanceId();
-        return new InstanceImpl.Builder().id(instanceId).get();
+    public static Instance getNewInstance(UnaryOperator<InstanceImpl.Builder> block){
+        return block.apply(new InstanceImpl.Builder()).create();
     }
 
    /*
     * zone
     */
-    @Override
-    public List<Zone> getZones(){
+    public static List<Zone> getZones(){
         
         return AWS.access().ec2()
                 .getExistEc2AvailabilityZones().stream()
@@ -59,32 +54,31 @@ public class AWSResourceFactory extends ResourceFactory{
                 .collect(toList());
     }
     
-    @Override
-    public Zone getZone(String name){
+    public static Zone getZone(String name){
         return new ZoneImpl.Builder().name(name).build();
     }
     
    /*
     * vpc
     */
-    @Override
-    public List<VPC> getVPCs(){
+    public static List<VPC> getVPCs(){
         return AWS.access().ec2()
                 .getExistEc2Vpcs().stream()
                 .map(ec2Vpc -> new VPCImpl.Builder().id(ec2Vpc.getVpcId()).get())
                 .collect(toList());
     }
     
-    @Override
-    public VPC getVPC(String id){
+    public static VPC getVPC(String id){
         return new VPCImpl.Builder().id(id).get();
     }
     
+    public static VPC getNewVPC(UnaryOperator<VPCImpl.Builder> block){
+        return block.apply(new VPCImpl.Builder()).create();
+    }
    /*
     * subnet
     */
-    @Override
-    public List<Subnet> getSubnets(){
+    public static List<Subnet> getSubnets(){
 
         return AWS.access().ec2()
                 .getExistEc2Subnets().stream()
@@ -92,47 +86,52 @@ public class AWSResourceFactory extends ResourceFactory{
                 .collect(toList());
     }
     
-    @Override
-    public Subnet getSubnet(String id){
+    public static Subnet getSubnet(String id){
         return new SubnetImpl.Builder().id(id).get();
+    }
+    
+    public static Subnet getNewSubnet(UnaryOperator<SubnetImpl.Builder> block){
+        return block.apply(new SubnetImpl.Builder()).create();
     }
     
    /*
     * load balancer
     */
-    @Override
-    public List<LoadBalancer> getLoadBalancers(){
+    public static List<LoadBalancer> getLoadBalancers(){
         return LoadBalancerImpl.getExistLoadBalancers();
     }
     
-    @Override
-    public LoadBalancer getLoadBalancer(String name){
+    public static LoadBalancer getLoadBalancer(String name){
         return LoadBalancerImpl.getExistLoadBalancerByName(name);
+    }
+    
+    public static LoadBalancer getNewLoadBalancer(String loadBalancerName, UnaryOperator<LoadBalancerImpl.Builder> block){
+        return block.apply(new LoadBalancerImpl.Builder(loadBalancerName)).build();
     }
     
    /*
     * auto scaling group
     */
-    @Override
-    public List<AutoScalingGroup> getAutoScalingGroups(){     
+    public static List<AutoScalingGroup> getAutoScalingGroups(){     
         return AWS.access().as()
                 .getExistAutoScalingGroups().stream()
                 .map(awsASGroup -> new AutoScalingGroupImpl.Builder().name(awsASGroup.getAutoScalingGroupName()).get())
                 .collect(toList());
     }
     
-    @Override
-    public AutoScalingGroup getAutoScalingGroup(String name){
+    public static AutoScalingGroup getAutoScalingGroup(String name){
         return new AutoScalingGroupImpl.Builder().name(name).get();
     }
 
-    @Override
-    public List<LaunchConfiguration> getLaunchConfigurations() {
+    public static AutoScalingGroup getNewAutoScalingGroup(UnaryOperator<AutoScalingGroupImpl.Builder> block){
+        return block.apply(new AutoScalingGroupImpl.Builder()).create();
+    }
+    
+    public static List<LaunchConfiguration> getLaunchConfigurations() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public LaunchConfiguration getLaunchConfiguration(String name) {
+    public static LaunchConfiguration getLaunchConfiguration(String name) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
