@@ -23,19 +23,17 @@ We aim to offer libraries that makes it possible to handle resources of some web
 ### Configure VPC and subnets.
 
 ```java
-    VPC v = new VPCImpl.Builder().cidr("1.1.0.0/16").tenancy("default").create();
+    VPC v = getNewVPC( builder -> builder.cidr("1.1.0.0/16").tenancy("default") );
     
-    List<Subnet> subnets = new ArrayList<>();
-    Subnet s1 = new SubnetImpl.Builder().cidr("1.1.1.0/24").vpc(v.getId()).zone("z1").create();
-    Subnet s2 = new SubnetImpl.Builder().cidr("1.1.2.0/24").vpc(v.getId()).zone("z2").create();
-    subnets.add(s1);
-    subnets.add(s2);
+    Subnet s1 = getNewSubnet( builder -> builder.cidr("1.1.1.0/24").vpc(v.getId()).zone("z1"));
+    Subnet s2 = getNewSubnet( builder -> builder.cidr("1.1.2.0/24").vpc(v.getId()).zone("z2"));
+    Stream<Subnet> subnets = Stream.of(s1,s2);
 ```
 
 To check The result of the sample code,
 ```java
     System.out.println("------------------------------");
-    for(Subnet subnet : subnets){
+    subnets.forEach(subnet -> {
         System.out.println("available ip : " + subnet.getAvailableIpAddressCount());
         System.out.println("cidr block   : " + subnet.getCidrBlock());
         System.out.println("id           : " + subnet.getId());
@@ -43,7 +41,7 @@ To check The result of the sample code,
         System.out.println("vpc id       : " + subnet.getVpcId());
         System.out.println("zone         : " + subnet.getZone());
         System.out.println("------------------------------");
-    }
+    });
 ```
 
 The output is :
@@ -70,20 +68,7 @@ The output is :
 Make sure you have your own AMI that contains your web server application. Next code will launch the new instance.
 
 ```java
-    Instance server = new InstanceImpl.Builder()
-                        .imageId("id-of-your-ami").type("instance.type").create();
-```
-
-You can also launch new web server instance from AWSResourceFactory assuming that you specified required keys,that are 'ec2.default.imageid', 'ec2.default.instancetype' and 'ec2.default.zonename'(Please refer to [Set up HTTP Client](#setting-up-http-client) sction).
-
-```
-    ec2.default.imageid=your-default-ami
-    ec2.default.instancetype=your-default-instance-type
-    ec2.default.zonename=availability-zone-name-in-which-the-instance-is-launched
-```
-In this case, you can launch web server by writing only 1 line.
-```java
-    Instance server = AWSResourceFactory.createDefaultInstance();
+    Instance server = getNewInstance( builder -> builder.imageId("id-of-your-ami").type("instance.type") );
 ```
 
 When stop it,
@@ -101,22 +86,22 @@ And then for restarting,
 You can write like this.
 
 ```java
-    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB")
-                        .defaultHttpListener().zones("zone-name").build();
+    LoadBalancer lb = getNewLoadBalancer("MyLB", builder -> 
+                        builder.defaultHttpListener().zones("zone-name") );
 ```
 
 If you use VPC,
 
 ```java
-    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB")
-                        .defaultHttpListener().subnet("subnet-id").build();
+    LoadBalancer lb = getNewLoadBalancer("MyLB", builder -> 
+                        builder.defaultHttpListener().subnet("subnet-id") );
 ```
 
 If you need secure system with port 443, then this will go.
 
 ```java
-    LoadBalancer lb = new LoadBalancerImpl.Builder("MyLB")
-                        .defaultHttpsListener("ssl-certificate-id").build();
+    LoadBalancer lb = getNewLoadBalancer("MyLB", builder -> 
+                        builder.defaultHttpsListener("ssl-certificate-id").build();
 ```
 
 ### How to get information about the created load balancer ?
@@ -157,22 +142,16 @@ And the result may be like this.
 It's very simple.
 
 ```java
-    List<Instance> servers = new ArrayList<>();
+    Stream<Instance> servers = 
+        Stream.of(serverNo1,serverNo2, ... ,serverNo20);
 
-    servers.add(serverNo1);
-    servers.add(serverNo2);
-    . . . . . .
-    servers.add(serverNo20);
-
-    for(Instance server : servers)
-        lb.registerInstances(server);
+    servers.forEach(lb::registerInstance)
 ```
 
 Or, you can do the same thing in this way also.
 
 ```java
-    for(Instance server : servers)
-        server.registerWith(lb);
+    servers.forEach( server -> server.registerWith(lb));
 ```
 
 ### Inspect the state of the server.
@@ -208,8 +187,7 @@ Then, if you want to deregister them,
 And again, this is as good.
 
 ```java
-    for(Instance server : servers)
-        server.deregisterFrom(lb);
+    servers.forEach(server -> server.deregisterFrom(lb));
 ```
 
 ### Dependency
