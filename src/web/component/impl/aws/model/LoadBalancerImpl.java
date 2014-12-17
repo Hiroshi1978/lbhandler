@@ -357,7 +357,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
             return null;
         
         return elb().getLoadBalancerDescription(name).getAvailabilityZones().stream()
-                .map(zoneName -> new ZoneImpl.Builder().name(zoneName).build())
+                .map(AWSResourceFactory::getZone)
                 .collect(toList());
     }
 
@@ -368,7 +368,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
             return null;
         
         return elb().getLoadBalancerDescription(name).getSubnets().stream()
-                .map(subnetId -> new SubnetImpl.Builder().id(subnetId).get())
+                .map(AWSResourceFactory::getSubnet)
                 .collect(toList());
     }
 
@@ -379,7 +379,8 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
             return null;
         
         return elb().getLoadBalancerDescription(name).getInstances().stream()
-                .map(elbInstance -> new InstanceImpl.Builder().id(elbInstance.getInstanceId()).get())
+                .map(com.amazonaws.services.elasticloadbalancing.model.Instance::getInstanceId)
+                .map(AWSResourceFactory::getInstance)
                 .collect(toList());
     }
 
@@ -395,7 +396,7 @@ public class LoadBalancerImpl extends AWSModelBase implements LoadBalancer{
         return this.getName().compareTo(o.getName());
     }
 
-    public static class Builder{
+    static class Builder{
         
         private final String name;
         private final List<LoadBalancerListener> listeners = new ArrayList<>();

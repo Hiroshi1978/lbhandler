@@ -15,8 +15,6 @@ import web.component.api.model.InstanceState;
 import web.component.api.model.LoadBalancer;
 import web.component.impl.aws.AWS;
 import web.component.impl.aws.AWSEC2;
-import web.component.impl.aws.AWSEC2Impl;
-import web.component.impl.aws.AWSImpl;
 
 /**
  *
@@ -414,7 +412,7 @@ public class InstanceImpl extends AWSModelBase implements Instance{
         }
     }
     
-    public static class Builder {
+    static class Builder {
         
         private String id;
         private String imageId;

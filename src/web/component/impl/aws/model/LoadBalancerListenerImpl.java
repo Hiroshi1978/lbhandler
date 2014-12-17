@@ -138,7 +138,7 @@ public class LoadBalancerListenerImpl extends AWSModelBase implements LoadBalanc
                    ( getServerCertificate() == null ? 0 : getServerCertificate().hashCode() ) ) );
     }
     
-    public static class Builder{
+    static class Builder{
         
         private int instancePort = 80;
         private String instanceProtocol = "HTTP";

@@ -137,7 +137,7 @@ public class SubnetImpl extends AWSModelBase implements Subnet{
         return this.getId().compareTo(o.getId());
     }
     
-    public static class Builder {
+    static class Builder {
     
         private String id;
         private String zone;

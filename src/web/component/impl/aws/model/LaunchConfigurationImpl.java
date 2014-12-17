@@ -11,8 +11,6 @@ import java.util.List;
 import web.component.api.model.LaunchConfiguration;
 import web.component.impl.aws.AWS;
 import web.component.impl.aws.AWSAutoScaling;
-import web.component.impl.aws.AWSAutoScalingImpl;
-import web.component.impl.aws.AWSImpl;
 
 /**
  *

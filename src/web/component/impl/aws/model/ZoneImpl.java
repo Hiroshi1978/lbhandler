@@ -101,7 +101,7 @@ public class ZoneImpl extends AWSModelBase implements Zone{
         return this.getName().compareTo(o.getName());
     }
     
-    public static class Builder {
+    static class Builder {
         
         private String name;
         
