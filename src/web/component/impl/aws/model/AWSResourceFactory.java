@@ -30,7 +30,8 @@ public class AWSResourceFactory{
     public static List<Instance> getInstances(){
         
         return AWS.access().ec2().getExistEc2Instances().stream()
-                .map(ec2Instance -> new InstanceImpl.Builder().id(ec2Instance.getInstanceId()).get())
+                .map(com.amazonaws.services.ec2.model.Instance::getInstanceId)
+                .map(id -> new InstanceImpl.Builder().id(id).get())
                 .sorted()
                 .collect(toList());
     }
@@ -50,7 +51,8 @@ public class AWSResourceFactory{
         
         return AWS.access().ec2()
                 .getExistEc2AvailabilityZones().stream()
-                .map(ec2Zone -> new ZoneImpl.Builder().name(ec2Zone.getZoneName()).build())
+                .map(com.amazonaws.services.ec2.model.AvailabilityZone::getZoneName)
+                .map(name -> new ZoneImpl.Builder().name(name).build())
                 .sorted()
                 .collect(toList());
     }
@@ -65,7 +67,8 @@ public class AWSResourceFactory{
     public static List<VPC> getVPCs(){
         return AWS.access().ec2()
                 .getExistEc2Vpcs().stream()
-                .map(ec2Vpc -> new VPCImpl.Builder().id(ec2Vpc.getVpcId()).get())
+                .map(com.amazonaws.services.ec2.model.Vpc::getVpcId)
+                .map(id -> new VPCImpl.Builder().id(id).get())
                 .sorted()
                 .collect(toList());
     }
@@ -84,7 +87,8 @@ public class AWSResourceFactory{
 
         return AWS.access().ec2()
                 .getExistEc2Subnets().stream()
-                .map(ec2Subnet -> new SubnetImpl.Builder().id(ec2Subnet.getSubnetId()).get())
+                .map(com.amazonaws.services.ec2.model.Subnet::getSubnetId)
+                .map(id -> new SubnetImpl.Builder().id(id).get())
                 .sorted()
                 .collect(toList());
     }
@@ -118,7 +122,8 @@ public class AWSResourceFactory{
     public static List<AutoScalingGroup> getAutoScalingGroups(){     
         return AWS.access().as()
                 .getExistAutoScalingGroups().stream()
-                .map(awsASGroup -> new AutoScalingGroupImpl.Builder().name(awsASGroup.getAutoScalingGroupName()).get())
+                .map(com.amazonaws.services.autoscaling.model.AutoScalingGroup::getAutoScalingGroupName)
+                .map(name -> new AutoScalingGroupImpl.Builder().name(name).get())
                 .sorted()
                 .collect(toList());
     }
