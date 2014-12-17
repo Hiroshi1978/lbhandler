@@ -51,6 +51,7 @@ public class AWSResourceFactory{
         return AWS.access().ec2()
                 .getExistEc2AvailabilityZones().stream()
                 .map(ec2Zone -> new ZoneImpl.Builder().name(ec2Zone.getZoneName()).build())
+                .sorted()
                 .collect(toList());
     }
     
@@ -65,6 +66,7 @@ public class AWSResourceFactory{
         return AWS.access().ec2()
                 .getExistEc2Vpcs().stream()
                 .map(ec2Vpc -> new VPCImpl.Builder().id(ec2Vpc.getVpcId()).get())
+                .sorted()
                 .collect(toList());
     }
     
@@ -83,6 +85,7 @@ public class AWSResourceFactory{
         return AWS.access().ec2()
                 .getExistEc2Subnets().stream()
                 .map(ec2Subnet -> new SubnetImpl.Builder().id(ec2Subnet.getSubnetId()).get())
+                .sorted()
                 .collect(toList());
     }
     
@@ -116,6 +119,7 @@ public class AWSResourceFactory{
         return AWS.access().as()
                 .getExistAutoScalingGroups().stream()
                 .map(awsASGroup -> new AutoScalingGroupImpl.Builder().name(awsASGroup.getAutoScalingGroupName()).get())
+                .sorted()
                 .collect(toList());
     }
     
@@ -135,4 +139,3 @@ public class AWSResourceFactory{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
-
