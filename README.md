@@ -143,8 +143,9 @@ It's very simple.
 
 ```java
     Stream<Instance> servers = 
-        Stream.of(serverNo1,serverNo2, ... ,serverNo20)
-            .forEach(lb::registerInstance);
+        Stream.of(serverNo1,serverNo2, ... ,serverNo20);
+        
+    servers.forEach(lb::registerInstance);
 ```
 
 Or, you can do the same thing in this way also.
