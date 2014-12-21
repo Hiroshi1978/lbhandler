@@ -68,7 +68,8 @@ The output is :
 Make sure you have your own AMI that contains your web server application. Next code will launch the new instance.
 
 ```java
-    Instance server = getNewInstance( builder -> builder.imageId("id-of-your-ami").type("instance.type") );
+    Instance server = 
+        getNewInstance( builder -> builder.imageId("id-of-your-ami").type("instance.type") );
 ```
 
 When stop it,
