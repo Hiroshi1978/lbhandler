@@ -1,7 +1,7 @@
 lbhandler
 =========
 
-We aim to offer libraries that makes it possible to handle resources of some web services including Amazon EC2 and Amazon Elastic Load Balancing (ELB) seemlessly as the ordinary instances of Java classes on running JVM. And so help build your application that utilizes those web services.
+We aim to offer library that makes it possible to handle resources of some web services including Amazon EC2 and Amazon Elastic Load Balancing (ELB) seemlessly as the ordinary instances of Java classes on running JVM. And so help build your application that utilizes those web services.
 
 
 ## Usage
